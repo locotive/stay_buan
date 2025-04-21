@@ -1,6 +1,6 @@
 import argparse
 import logging
-from crawlers.naver_blog import NaverBlogCrawler
+from crawlers.naver_api_crawler import NaverSearchAPICrawler
 # 나중에 다른 크롤러 임포트
 
 def setup_logger():
@@ -35,8 +35,8 @@ def main():
     
     try:
         # 플랫폼에 따른 크롤러 선택
-        if args.platform == "naver_blog":
-            crawler = NaverBlogCrawler(args.keywords, args.pages)
+        if args.platform == "naver":
+            crawler = NaverSearchAPICrawler(args.keywords, args.pages)
             results = crawler.crawl()
             logger.info(f"Collected {len(results)} items from Naver Blog")
         else:

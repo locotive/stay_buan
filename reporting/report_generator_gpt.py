@@ -9,14 +9,33 @@ class GPTReportGenerator:
     
     def generate_report(self, data):
         """데이터 요약을 바탕으로 리포트 생성"""
-        # 플랫폼별, 감정별 요약
-        platform_summary = data.groupby(['platform', 'sentiment']).size().unstack().fillna(0)
+        df = pd.DataFrame(data)
+        
+        # 1. 컬럼 존재 여부 확인
+        required_columns = ['platform', 'sentiment', 'keyword']
+        for col in required_columns:
+            if col not in df.columns:
+                print(f"⚠️ '{col}' 컬럼이 누락되어 기본값으로 채웁니다.")
+                if col == 'sentiment':
+                    df[col] = 'unknown'
+                else:
+                    df[col] = 'unknown'
+        
+        if df.empty:
+            return "⚠️ 리포트를 생성할 수 없습니다: 데이터가 비어 있습니다."
+
+        # 2. 플랫폼-감정별 집계
+        platform_summary = df.groupby(['platform', 'sentiment']).size().unstack().fillna(0)
         summary_text = platform_summary.to_string()
         
-        prompt = f"다음 데이터 요약을 바탕으로 부안군의 정책 제안을 작성해 주세요:\n{summary_text}\n주요 키워드: {', '.join(data['keyword'].unique())}"
+        # 3. 프롬프트 생성
+        keywords = ', '.join(df['keyword'].dropna().unique())
+        prompt = f"다음 데이터 요약을 바탕으로 부안군의 정책 제안을 작성해 주세요:\n{summary_text}\n주요 키워드: {keywords}"
+        
+        # 4. GPT 호출
         response = openai.Completion.create(
             engine="text-davinci-003",
             prompt=prompt,
             max_tokens=500
         )
-        return response.choices[0].text.strip() 
+        return response.choices[0].text.strip()

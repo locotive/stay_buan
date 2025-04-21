@@ -1,4 +1,6 @@
 import tweepy
+import time
+from urllib.parse import quote
 from core.base_crawler import BaseCrawler
 from utils.savers import DataSaver
 
@@ -25,24 +27,27 @@ class TwitterCrawler(BaseCrawler):
         
         for keyword in self.keywords:
             self.logger.info(f"Crawling Twitter for keyword: {keyword}")
-            tweets = tweepy.Cursor(self.api.search_tweets, q=keyword, lang="ko").items(self.max_pages)
+            encoded_keyword = quote(keyword)
+            keyword_results = []
+            
+            tweets = tweepy.Cursor(self.api.search_tweets, q=encoded_keyword, lang="ko").items(self.max_results)
             
             for tweet in tweets:
                 tweet_data = {
-                    'text': tweet.text,
-                    'user': tweet.user.screen_name,
-                    'created_at': tweet.created_at.strftime("%Y-%m-%d %H:%M:%S"),
-                    'retweet_count': tweet.retweet_count,
-                    'favorite_count': tweet.favorite_count,
+                    'content': tweet.text,
                     'url': f"https://twitter.com/{tweet.user.screen_name}/status/{tweet.id}",
+                    'user': tweet.user.screen_name,
+                    'published_date': tweet.created_at.strftime("%Y-%m-%d %H:%M:%S"),
                     'platform': 'twitter',
                     'keyword': keyword,
                     'crawled_at': time.strftime("%Y-%m-%d %H:%M:%S")
                 }
-                all_results.append(tweet_data)
+                keyword_results.append(tweet_data)
             
-            filename = self.generate_filename(keyword)
-            DataSaver.save_json(all_results, filename, self.save_dir)
-            self.logger.info(f"Saved {len(all_results)} results for keyword '{keyword}'")
+            # keyword별로 저장
+            if keyword_results:
+                filename = self.generate_filename(keyword)
+                DataSaver.save_json(keyword_results, filename, self.save_dir)
+                self.logger.info(f"Saved {len(keyword_results)} results for keyword '{keyword}'")
         
         return all_results 

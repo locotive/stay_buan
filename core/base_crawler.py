@@ -4,6 +4,7 @@ from datetime import datetime
 import os
 import re
 import emoji
+import requests
 
 class BaseCrawler(ABC):
     """모든 크롤러의 기본 클래스"""
@@ -50,4 +51,9 @@ class BaseCrawler(ABC):
         """저장 파일명 생성"""
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         safe_keyword = re.sub(r'[^\w\s]', '', keyword).replace(' ', '_')
-        return f"{self.platform}_{safe_keyword}_{timestamp}" 
+        return f"{self.platform}_{safe_keyword}_{timestamp}"
+
+    def is_crawling_allowed(self, url):
+        """robots.txt 무시 (우회 허용)"""
+        self.logger.warning(f"Bypassing robots.txt check for {url}")
+        return True  # 항상 허용으로 처리

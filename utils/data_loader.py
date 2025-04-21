@@ -7,6 +7,9 @@ class DataLoader:
     
     def __init__(self, data_dir="data/raw"):
         self.data_dir = data_dir
+
+        if not os.path.exists(self.data_dir):
+            os.makedirs(self.data_dir)
     
     def load_data(self, platform=None, keyword=None, start_date=None, end_date=None):
         """JSON 데이터 로드 및 필터링"""
@@ -50,9 +53,12 @@ class DataLoader:
                 'content': item.get('content', ''),
                 'date': item.get('crawled_at', ''),
                 'sentiment': item.get('sentiment', None),
+                'platform': item.get('platform', ''),
+                'keyword': item.get('keyword', ''),
                 'lat': item.get('lat', None),
                 'lon': item.get('lon', None)
             }
+
             filtered_data.append(unified_item)
         
-        return filtered_data 
+        return filtered_data
