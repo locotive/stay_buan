@@ -12,6 +12,19 @@
 ### 2. 환경 변수 설정
 
 - `.env` 파일을 프로젝트 루트 디렉토리에 생성하고, 네이버 API 클라이언트 ID와 시크릿을 설정합니다.
+
+이 프로젝트는 네이버 검색 API를 사용하여 뉴스, 블로그, 카페 등의 데이터를 수집하고, 수집된 데이터를 JSON 형식으로 저장하는 크롤러입니다. 또한, 수집된 데이터를 시각화하는 대시보드를 제공합니다.
+
+## 프로젝트 설정
+
+### 1. 환경 설정
+
+- Python 3.9 이상이 필요합니다.
+- 필요한 Python 패키지는 `requirements.txt`에 명시되어 있습니다.
+
+### 2. 환경 변수 설정
+
+- `.env` 파일을 프로젝트 루트 디렉토리에 생성하고, 네이버 API 클라이언트 ID와 시크릿을 설정합니다.
 plaintext
 NAVER_CLIENT_ID=your_client_id
 NAVER_CLIENT_SECRET=your_client_secret
@@ -51,13 +64,13 @@ NAVER_CLIENT_SECRET=your_client_secret
 1. Docker 이미지 빌드:
 
    ```bash
-   docker build -t naver-crawler .
+   docker build -t buan-sentiment-dashboard .
    ```
 
 2. Docker 컨테이너 실행:
 
    ```bash
-   docker run -p 8501:8501 --env-file .env naver-crawler
+   docker run -p 8501:8501 --env-file .env buan-sentiment-dashboard
    ```
 
    - `--env-file .env` 옵션을 사용하여 환경 변수를 Docker 컨테이너에 전달합니다.
