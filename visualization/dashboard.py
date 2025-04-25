@@ -79,9 +79,14 @@ def main():
     # 사이드바 필터 UI
     st.sidebar.header("필터 옵션")
     selected_platform = st.sidebar.selectbox("플랫폼 선택", ["naver_search", "youtube", "twitter"])
-    selected_keyword = st.sidebar.text_input("검색 키워드", "부안")
-    start_date = st.sidebar.date_input("시작 날짜", datetime(2023, 1, 1))
-    end_date = st.sidebar.date_input("종료 날짜", datetime.now())
+    
+    # 키워드 입력 UI
+    st.sidebar.subheader("키워드 설정")
+    region_keyword = st.sidebar.text_input("지역 키워드", "부안")
+    additional_keywords = st.sidebar.text_input("추가 키워드 (쉼표로 구분)", "맛집,관광,숙소")
+    
+    # 페이지 수 설정
+    num_pages = st.sidebar.number_input("크롤링할 페이지 수", min_value=1, max_value=10000, value=3)
     
     # JSON 파일 개수 확인
     json_files = glob.glob("data/raw/**/*.json", recursive=True)
@@ -95,15 +100,19 @@ def main():
     # ✅ 데이터 수집 버튼 추가
     if st.sidebar.button("🔄 데이터 수집 실행"):
         if selected_platform == "naver_search":
+            # 키워드 리스트 생성
+            keywords = [region_keyword]
+            if additional_keywords:
+                keywords.extend([k.strip() for k in additional_keywords.split(',')])
+            
             crawler = NaverSearchAPICrawler(
-            keywords=[selected_keyword],
-            start_date=start_date.strftime('%Y%m%d'),
-            end_date=end_date.strftime('%Y%m%d')
+                keywords=keywords,
+                max_pages=num_pages
             )
             crawler.crawl()
-            st.success("✅ 네이버 크롤링 완료!")
+            st.success(f"✅ 네이버 크롤링 완료! ({num_pages}페이지)")
         elif selected_platform == "youtube":
-            crawler = YouTubeCrawler(keywords=[selected_keyword], max_results=30)
+            crawler = YouTubeCrawler(keywords=[region_keyword], max_results=30)
             crawler.crawl()
             st.success("✅ 유튜브 크롤링 완료!")
         # 트위터 등 추가 가능
@@ -112,19 +121,11 @@ def main():
     data_loader = DataLoader()
     data = data_loader.load_data(
         platform=selected_platform, 
-        keyword=selected_keyword, 
-        start_date=start_date, 
-        end_date=end_date
+        keyword=region_keyword
     )
     
-    # 기간 필터링
-    filtered_data = [
-        d for d in data 
-        if 'published_date' in d and start_date.strftime('%Y%m%d') <= d['published_date'] <= end_date.strftime('%Y%m%d')
-    ]
-    
     # 중복 필터링
-    unique_data = {item['url']: item for item in filtered_data}.values()
+    unique_data = {item['url']: item for item in data}.values()
     
     # 감성 분석기 초기화
     if analyzer_option == "Naive Bayes":
