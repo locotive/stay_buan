@@ -4,6 +4,7 @@ import json
 import random
 from urllib.parse import quote
 import requests
+from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 from datetime import datetime
 from utils.cache import JsonCache
@@ -11,6 +12,41 @@ from core.base_crawler import BaseCrawler
 from itertools import combinations
 
 load_dotenv()
+
+class NaverBlogCrawler:
+    def __init__(self):
+        self.headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        
+    def get_blog_content(self, url):
+        try:
+            response = requests.get(url, headers=self.headers)
+            if response.status_code == 200:
+                soup = BeautifulSoup(response.text, 'html.parser')
+                
+                # 네이버 블로그 본문 추출
+                if 'blog.naver.com' in url:
+                    iframe = soup.find('iframe', id='mainFrame')
+                    if iframe:
+                        iframe_url = 'https://blog.naver.com' + iframe.get('src')
+                        response = requests.get(iframe_url, headers=self.headers)
+                        soup = BeautifulSoup(response.text, 'html.parser')
+                    
+                    content = soup.find('div', class_='se-main-container')
+                    if content:
+                        return content.get_text(strip=True)
+                
+                # 네이버 뉴스 본문 추출
+                elif 'news.naver.com' in url:
+                    content = soup.find('div', id='dic_area')
+                    if content:
+                        return content.get_text(strip=True)
+                
+            return None
+        except Exception as e:
+            print(f"Error crawling content from {url}: {str(e)}")
+            return None
 
 class NaverSearchAPICrawler(BaseCrawler):
     def __init__(self, keywords, max_pages=3, save_dir="data/raw"):
@@ -23,6 +59,7 @@ class NaverSearchAPICrawler(BaseCrawler):
             "X-Naver-Client-Secret": self.client_secret
         }
         self.cache = JsonCache()
+        self.blog_crawler = NaverBlogCrawler()
         
     def generate_keyword_variations(self, keyword):
         """키워드 변형 생성"""
@@ -93,7 +130,6 @@ class NaverSearchAPICrawler(BaseCrawler):
                         for item in items:
                             title = self.clean_text(item.get("title", ""))
                             desc = self.clean_text(item.get("description", ""))
-                            content = f"{title} {desc}"
                             url = item.get("link", "")
                             blog_name = item.get("bloggername", item.get("author", ""))
                             date = item.get("postdate", item.get("pubDate", "")).replace("-", "")[:8]
@@ -101,6 +137,13 @@ class NaverSearchAPICrawler(BaseCrawler):
                             # 중복 필터
                             if self.cache.exists(url):
                                 continue
+
+                            # 본문 내용 크롤링
+                            full_content = self.blog_crawler.get_blog_content(url)
+                            if full_content:
+                                content = full_content
+                            else:
+                                content = f"{title} {desc}"
 
                             post_data = {
                                 "title": title,
