@@ -9,6 +9,8 @@ RUN apt-get update && apt-get install -y \
     wget \
     unzip \
     gnupg \
+    chromium \
+    chromium-driver \
     && apt-get clean
 
 # JAVA_HOME 설정 (default-jdk가 설치한 경로로 자동 설정됨)
@@ -30,10 +32,14 @@ ENV PYTHONPATH=/app
 EXPOSE 8501
 
 # Chrome 설치
-RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list' \
-    && apt-get update \
-    && apt-get install -y google-chrome-stable
+RUN apt-get update && apt-get install -y \
+    chromium \
+    chromium-driver
+
+# 환경 변수 설정
+ENV CHROME_BIN=/usr/bin/chromium
+ENV CHROME_PATH=/usr/lib/chromium/
+ENV CHROMIUM_FLAGS="--no-sandbox --headless --disable-gpu --disable-dev-shm-usage"
 
 # ChromeDriver 설치
 RUN CHROMEDRIVER_VERSION=`curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE` \
