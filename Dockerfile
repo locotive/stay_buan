@@ -31,22 +31,17 @@ ENV PYTHONPATH=/app
 # 포트 노출
 EXPOSE 8501
 
-# Chrome 설치
-RUN apt-get update && apt-get install -y \
-    chromium \
-    chromium-driver
-
-# 환경 변수 설정
+# 환경 변수 설정 - Chromium 사용
 ENV CHROME_BIN=/usr/bin/chromium
 ENV CHROME_PATH=/usr/lib/chromium/
 ENV CHROMIUM_FLAGS="--no-sandbox --headless --disable-gpu --disable-dev-shm-usage"
 
-# ChromeDriver 설치
-RUN CHROMEDRIVER_VERSION=`curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE` \
-    && wget -O /tmp/chromedriver.zip http://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip \
-    && unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/ \
-    && rm /tmp/chromedriver.zip
+# WebDriver 오류 방지
+ENV WDM_LOG_LEVEL=0
+ENV WDM_PRINT_FIRST_LINE=false
+ENV PYTHONWARNINGS="ignore"
 
+# Selenium stealth 설치
 RUN pip install selenium-stealth
 
 # 앱 실행 명령
