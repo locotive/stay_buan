@@ -23,8 +23,8 @@ def main():
     parser = argparse.ArgumentParser(description="부안군 감성 분석을 위한 데이터 수집기")
     parser.add_argument("--keywords", nargs="+", default=["부안", "변산반도", "부안여행"], 
                         help="검색할 키워드 목록 (공백으로 구분)")
-    parser.add_argument("--platform", default="naver_blog", 
-                        choices=["naver_blog"], 
+    parser.add_argument("--platform", default="naver", 
+                        choices=["naver"], 
                         help="데이터를 수집할 플랫폼")
     parser.add_argument("--pages", type=int, default=3, 
                         help="크롤링할 페이지 수")
@@ -38,7 +38,7 @@ def main():
         if args.platform == "naver":
             crawler = NaverSearchAPICrawler(args.keywords, args.pages)
             results = crawler.crawl()
-            logger.info(f"Collected {len(results)} items from Naver Blog")
+            logger.info(f"Collected {len(results)} items from Naver Search")
         else:
             logger.error(f"Unsupported platform: {args.platform}")
             return

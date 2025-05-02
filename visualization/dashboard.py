@@ -60,7 +60,7 @@ def create_map(data):
 def get_available_datasets():
     """사용 가능한 데이터셋 목록을 반환"""
     datasets = []
-    for file in glob.glob("data/raw/naver_blog_*.json"):
+    for file in glob.glob("data/raw/naver_*.json"):
         filename = os.path.basename(file)
         parts = filename.split('_')
         if len(parts) >= 4:
@@ -102,8 +102,8 @@ def main():
         st.header("데이터 수집")
         selected_platform = st.selectbox(
             "플랫폼 선택",
-            ["naver_blog", "youtube", "twitter"],
-            help="현재는 네이버 블로그만 지원됩니다. 다른 플랫폼은 개발 중입니다."
+            ["naver", "youtube", "twitter"],
+            help="현재는 네이버 검색만 지원됩니다. 다른 플랫폼은 개발 중입니다."
         )
         
         num_pages = st.number_input("크롤링할 페이지 수", min_value=1, max_value=10000, value=3)
@@ -155,7 +155,7 @@ def main():
                 keywords = [{"text": st.session_state.region_keyword, "condition": "AND"}]
                 keywords.extend([k for k in st.session_state.additional_keywords if k["text"].strip()])
                 
-                if selected_platform == "naver_blog":
+                if selected_platform == "naver":
                     crawler = NaverSearchAPICrawler(
                         keywords=keywords,
                         max_pages=num_pages
@@ -164,7 +164,7 @@ def main():
                     if data:
                         st.session_state.analysis_data = data
                         st.session_state.show_results = True
-                        st.success(f"✅ 네이버 블로그 데이터 수집 완료! ({len(data)}개)")
+                        st.success(f"✅ 네이버 검색 데이터 수집 완료! ({len(data)}개)")
                     else:
                         st.error("❌ 데이터 수집에 실패했습니다.")
                 elif selected_platform == "youtube":
@@ -199,7 +199,35 @@ def main():
             
             # 날짜 범위 선택
             st.subheader("날짜 범위 선택")
-            dates = sorted(list(set(item['published_date'] for item in data)))
+            # 날짜 형식 정규화
+            normalized_dates = []
+            for item in data:
+                try:
+                    date_str = item['published_date']
+                    if date_str.isdigit() and len(date_str) == 8:
+                        # 이미 YYYYMMDD 형식
+                        normalized_dates.append(date_str)
+                    elif ',' in date_str:
+                        # 'Mon, 18 May 2023' 형식
+                        try:
+                            date_obj = datetime.strptime(date_str, "%a, %d %b %Y")
+                            normalized_dates.append(date_obj.strftime("%Y%m%d"))
+                        except:
+                            try:
+                                date_obj = datetime.strptime(date_str, "%a, %d %B %Y")
+                                normalized_dates.append(date_obj.strftime("%Y%m%d"))
+                            except:
+                                pass
+                    else:
+                        # 기타 형식은 원본 유지
+                        normalized_dates.append(date_str)
+                except:
+                    pass
+            
+            # 유효한 날짜만 필터링
+            valid_dates = [d for d in normalized_dates if d.isdigit() and len(d) == 8]
+            dates = sorted(list(set(valid_dates)))
+            
             if dates:
                 min_date = datetime.strptime(dates[0], "%Y%m%d")
                 max_date = datetime.strptime(dates[-1], "%Y%m%d")
@@ -213,10 +241,20 @@ def main():
                 # 날짜 필터링
                 start_date = datetime.combine(date_range[0], datetime.min.time())
                 end_date = datetime.combine(date_range[1], datetime.max.time())
-                data = [
-                    item for item in data 
-                    if start_date <= datetime.strptime(item['published_date'], "%Y%m%d") <= end_date
-                ]
+                
+                # 필터링된 데이터 생성
+                filtered_data = []
+                for item in data:
+                    try:
+                        date_str = item['published_date']
+                        if date_str.isdigit() and len(date_str) == 8:
+                            item_date = datetime.strptime(date_str, "%Y%m%d")
+                            if start_date <= item_date <= end_date:
+                                filtered_data.append(item)
+                    except:
+                        pass
+                
+                data = filtered_data
         else:
             st.warning("저장된 데이터셋이 없습니다. 데이터를 수집해주세요.")
             data = []
@@ -302,12 +340,29 @@ def main():
     st.subheader("시계열 감성 트렌드")
     if st.session_state.analysis_data:
         df = pd.DataFrame(st.session_state.analysis_data)
-        df['date'] = pd.to_datetime(df['published_date'])
-        daily_sentiment = df.groupby(['date', 'sentiment']).size().unstack(fill_value=0)
-        fig, ax = plt.subplots(figsize=(12, 6))
-        daily_sentiment.plot(kind='line', ax=ax)
-        plt.title("일별 감성 트렌드")
-        st.pyplot(fig)
+        
+        # 날짜 형식 정규화 및 변환
+        valid_dates = []
+        for idx, row in df.iterrows():
+            try:
+                date_str = row['published_date']
+                if date_str.isdigit() and len(date_str) == 8:
+                    df.at[idx, 'date'] = pd.to_datetime(date_str, format='%Y%m%d')
+                    valid_dates.append(idx)
+            except:
+                pass
+        
+        # 유효한 날짜만 포함된 데이터프레임 생성
+        df_valid = df.loc[valid_dates]
+        
+        if not df_valid.empty:
+            daily_sentiment = df_valid.groupby(['date', 'sentiment']).size().unstack(fill_value=0)
+            fig, ax = plt.subplots(figsize=(12, 6))
+            daily_sentiment.plot(kind='line', ax=ax)
+            plt.title("일별 감성 트렌드")
+            st.pyplot(fig)
+        else:
+            st.warning("시계열 트렌드를 표시할 수 있는 유효한 날짜 데이터가 없습니다.")
     else:
         st.info("분석할 데이터가 없습니다.")
     

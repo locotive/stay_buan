@@ -2,40 +2,51 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 
 class EnsembleSentimentAnalyzer:
-    """3개 감성 분석 모델 앙상블"""
+    """3개 감성 분석 모델 앙상블 - 싱글톤 패턴"""
+    
+    _instance = None
+    _initialized = False
+    
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(EnsembleSentimentAnalyzer, cls).__new__(cls)
+        return cls._instance
     
     def __init__(self):
-        self.models = []
+        if not EnsembleSentimentAnalyzer._initialized:
+            self.models = []
 
-        model_configs = [
-            # ✅ 현재는 이 모델이 삭제 상태 — 대체 필요
-            # {
-            #     'name': 'brainchicken/kobert-sentiment',
-            #     'tokenizer': AutoTokenizer.from_pretrained('brainchicken/kobert-sentiment'),
-            #     'model': AutoModelForSequenceClassification.from_pretrained('brainchicken/kobert-sentiment')
-            # },
-            {
-                'name': 'nlp04/kobert-news-sentiment',
-                'tokenizer': AutoTokenizer.from_pretrained('nlp04/kobert-news-sentiment'),
-                'model': AutoModelForSequenceClassification.from_pretrained('nlp04/kobert-news-sentiment')
-            },
-            {
-                'name': 'taeminlee/korean-sentiment-kobert',  # 대체 모델
-                'tokenizer': AutoTokenizer.from_pretrained('taeminlee/korean-sentiment-kobert'),
-                'model': AutoModelForSequenceClassification.from_pretrained('taeminlee/korean-sentiment-kobert')
-            },
-            {
-                'name': 'beomi/kcbert-base',  # 분류기는 없어서 아래 처리 주의
-                'tokenizer': AutoTokenizer.from_pretrained('beomi/kcbert-base'),
-                'model': AutoModelForSequenceClassification.from_pretrained('taeminlee/korean-sentiment-kobert')  # ✅ 대신 감성 분류 모델을 붙임
-            }
-        ]
+            model_configs = [
+                # ✅ 현재는 이 모델이 삭제 상태 — 대체 필요
+                # {
+                #     'name': 'brainchicken/kobert-sentiment',
+                #     'tokenizer': AutoTokenizer.from_pretrained('brainchicken/kobert-sentiment'),
+                #     'model': AutoModelForSequenceClassification.from_pretrained('brainchicken/kobert-sentiment')
+                # },
+                {
+                    'name': 'nlp04/kobert-news-sentiment',
+                    'tokenizer': AutoTokenizer.from_pretrained('nlp04/kobert-news-sentiment'),
+                    'model': AutoModelForSequenceClassification.from_pretrained('nlp04/kobert-news-sentiment')
+                },
+                {
+                    'name': 'taeminlee/korean-sentiment-kobert',  # 대체 모델
+                    'tokenizer': AutoTokenizer.from_pretrained('taeminlee/korean-sentiment-kobert'),
+                    'model': AutoModelForSequenceClassification.from_pretrained('taeminlee/korean-sentiment-kobert')
+                },
+                {
+                    'name': 'beomi/kcbert-base',  # 분류기는 없어서 아래 처리 주의
+                    'tokenizer': AutoTokenizer.from_pretrained('beomi/kcbert-base'),
+                    'model': AutoModelForSequenceClassification.from_pretrained('taeminlee/korean-sentiment-kobert')  # ✅ 대신 감성 분류 모델을 붙임
+                }
+            ]
 
-        for m in model_configs:
-            self.models.append({
-                'tokenizer': m['tokenizer'],
-                'model': m['model']
-            })
+            for m in model_configs:
+                self.models.append({
+                    'tokenizer': m['tokenizer'],
+                    'model': m['model']
+                })
+                
+            EnsembleSentimentAnalyzer._initialized = True
     
     def predict(self, text):
         avg_probs = torch.zeros(3)
