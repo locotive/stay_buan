@@ -1,8 +1,10 @@
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
-import torch
+from core.sentiment_analysis_kobert import KoBERTSentimentAnalyzer
+from core.sentiment_analysis_koalpaca import KoAlpacaSentimentAnalyzer
+from core.sentiment_analysis_kcbert import KCBERTSentimentAnalyzer
+from collections import Counter
 
 class EnsembleSentimentAnalyzer:
-    """3개 감성 분석 모델 앙상블 - 싱글톤 패턴"""
+    """다양한 감성 분석 모델 앙상블 - 싱글톤 패턴"""
     
     _instance = None
     _initialized = False
@@ -14,58 +16,69 @@ class EnsembleSentimentAnalyzer:
     
     def __init__(self):
         if not EnsembleSentimentAnalyzer._initialized:
-            self.models = []
-
-            model_configs = [
-                # ✅ 현재는 이 모델이 삭제 상태 — 대체 필요
-                # {
-                #     'name': 'brainchicken/kobert-sentiment',
-                #     'tokenizer': AutoTokenizer.from_pretrained('brainchicken/kobert-sentiment'),
-                #     'model': AutoModelForSequenceClassification.from_pretrained('brainchicken/kobert-sentiment')
-                # },
-                {
-                    'name': 'nlp04/kobert-news-sentiment',
-                    'tokenizer': AutoTokenizer.from_pretrained('nlp04/kobert-news-sentiment'),
-                    'model': AutoModelForSequenceClassification.from_pretrained('nlp04/kobert-news-sentiment')
-                },
-                {
-                    'name': 'taeminlee/korean-sentiment-kobert',  # 대체 모델
-                    'tokenizer': AutoTokenizer.from_pretrained('taeminlee/korean-sentiment-kobert'),
-                    'model': AutoModelForSequenceClassification.from_pretrained('taeminlee/korean-sentiment-kobert')
-                },
-                {
-                    'name': 'beomi/kcbert-base',  # 분류기는 없어서 아래 처리 주의
-                    'tokenizer': AutoTokenizer.from_pretrained('beomi/kcbert-base'),
-                    'model': AutoModelForSequenceClassification.from_pretrained('taeminlee/korean-sentiment-kobert')  # ✅ 대신 감성 분류 모델을 붙임
-                }
-            ]
-
-            for m in model_configs:
-                self.models.append({
-                    'tokenizer': m['tokenizer'],
-                    'model': m['model']
-                })
-                
+            # 개별 모델 초기화 (지연 로딩으로 실제 모델은 필요시에만 로드)
+            self.kobert_analyzer = KoBERTSentimentAnalyzer()
+            self.kcbert_analyzer = KCBERTSentimentAnalyzer()
+            self.koalpaca_analyzer = KoAlpacaSentimentAnalyzer()
+            
+            # 레이블 매핑 정의
+            self.label_map = {
+                0: "negative",
+                1: "neutral",
+                2: "positive"
+            }
+            
             EnsembleSentimentAnalyzer._initialized = True
     
     def predict(self, text):
-        avg_probs = torch.zeros(3)
-
-        for m in self.models:
-            inputs = m['tokenizer'](text, return_tensors='pt', truncation=True, padding=True, max_length=512)
-            outputs = m['model'](**inputs)
-            logits = outputs.logits
-
-            if logits.size(-1) == 2:
-                probs = torch.nn.functional.softmax(logits, dim=-1)
-                probs = torch.cat([probs[0][:1], torch.tensor([0.0]), probs[0][1:]])  # 부정, 중립(0), 긍정
-            else:
-                probs = torch.nn.functional.softmax(logits, dim=-1)[0]
-
-            avg_probs += probs
-
-        avg_probs /= len(self.models)
-        sentiment = torch.argmax(avg_probs).item()
-        confidence = avg_probs.max().item()
-
-        return sentiment, confidence
+        """
+        앙상블 다수결 투표 기반 감성 분석 예측 수행
+        
+        Args:
+            text (str): 분석할 텍스트
+            
+        Returns:
+            tuple: (감성 레이블 문자열, 신뢰도 점수, 모델별 투표 결과 딕셔너리)
+        """
+        # 각 모델의 예측 결과 수집
+        kobert_result = self.kobert_analyzer.predict(text)
+        kcbert_result = self.kcbert_analyzer.predict(text)
+        koalpaca_result = self.koalpaca_analyzer.predict(text)
+        
+        # 각 모델의 예측 결과와 신뢰도 추출
+        kobert_label, kobert_conf = kobert_result
+        kcbert_label, kcbert_conf = kcbert_result
+        koalpaca_label, koalpaca_conf = koalpaca_result
+        
+        # 모델별 투표 결과 저장
+        model_votes = {
+            "kobert": self.label_map[kobert_label],
+            "kcbert": self.label_map[kcbert_label],
+            "koalpaca": self.label_map[koalpaca_label]
+        }
+        
+        # 모든 모델이 실패한 경우 중립 반환
+        if kobert_conf == 0 and kcbert_conf == 0 and koalpaca_conf == 0:
+            return "neutral", 0.0, model_votes
+        
+        # 다수결 투표로 최종 레이블 결정
+        votes = [kobert_label, kcbert_label, koalpaca_label]
+        vote_counter = Counter(votes)
+        majority_label = vote_counter.most_common(1)[0][0]
+        
+        # 동점일 경우 신뢰도가 가장 높은 모델의 예측을 선택
+        if len(vote_counter) == 3 and vote_counter.most_common(1)[0][1] == 1:
+            confidences = {
+                kobert_label: kobert_conf,
+                kcbert_label: kcbert_conf,
+                koalpaca_label: koalpaca_conf
+            }
+            majority_label = max(confidences, key=confidences.get)
+        
+        # 최종 신뢰도 계산 (동일한 예측을 한 모델 수 / 전체 모델 수)
+        confidence = vote_counter[majority_label] / len(votes)
+        
+        # 문자열 레이블 반환
+        sentiment_label = self.label_map[majority_label]
+        
+        return sentiment_label, confidence, model_votes

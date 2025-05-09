@@ -11,6 +11,7 @@ from datetime import datetime
 from utils.cache import JsonCache
 from core.base_crawler import BaseCrawler
 from utils.content_extractor import extract_content
+from utils.content_extractor import ContentExtractor
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
@@ -71,12 +72,12 @@ def check_keyword_conditions(text, keywords):
     if not and_keywords and not or_keywords:
         return True
     
-    # AND 키워드가 있고 OR 키워드가 없는 경우: 지역키워드 + AND 키워드 중 하나라도 포함되면 통과 (완화된 조건)
+    # AND 키워드가 있고 OR 키워드가 없는 경우: 지역키워드 + 모든 AND 키워드 포함 시 통과 (엄격한 조건)
     if and_keywords and not or_keywords:
         for kw in and_keywords:
-            if kw.lower() in text.lower():
-                return True
-        return False  # 어떤 AND 키워드도 포함되지 않음
+            if kw.lower() not in text.lower():
+                return False
+        return True
     
     # AND 키워드가 없고 OR 키워드만 있는 경우: 지역키워드 + OR 키워드 중 하나라도 포함되면 통과
     if not and_keywords and or_keywords:
@@ -86,20 +87,16 @@ def check_keyword_conditions(text, keywords):
         return False  # 어떤 OR 키워드도 포함되지 않음
     
     # AND 키워드와 OR 키워드가 모두 있는 경우
-    # AND 키워드 중 하나라도 포함되고 OR 키워드 중 하나라도 포함되면 통과 (완화된 조건)
-    and_found = False
+    # 모든 AND 키워드 포함 + OR 키워드 중 하나 포함 시 통과
     for kw in and_keywords:
-        if kw.lower() in text.lower():
-            and_found = True
-            break
-    
-    or_found = False
+        if kw.lower() not in text.lower():
+            return False
+
     for kw in or_keywords:
         if kw.lower() in text.lower():
-            or_found = True
-            break
-    
-    return and_found and or_found
+            return True
+
+    return False
 
 class NaverBlogCrawler:
     def __init__(self):
@@ -205,61 +202,105 @@ class NaverBlogCrawler:
         return content.strip()
 
 class NaverSearchAPICrawler(BaseCrawler):
-    def __init__(self, keywords, max_pages=1000, save_dir="data/raw"):
-        super().__init__(keywords, max_pages=max_pages, save_dir=save_dir)
+    def __init__(self, keywords, max_pages=5, save_dir="data/raw", analyze_sentiment=True, browser_type="chrome"):
+        """
+        NaverSearchAPICrawler 초기화
+        
+        Args:
+            keywords: 검색할 키워드 리스트
+            max_pages: 수집할 최대 페이지 수
+            save_dir: 저장 디렉터리
+            analyze_sentiment: 감성 분석 수행 여부
+            browser_type: 사용할 브라우저 타입 ("chrome" 또는 "firefox")
+        """
+        super().__init__(keywords, max_pages, save_dir)
+        self.base_url = "https://openapi.naver.com/v1/search"
+        self.doc_ids = set()
+        self.analyze_sentiment = analyze_sentiment
+        
+        # 필터링 조건 완화
+        self.filter_conditions = {
+            'min_acceptable_results': 0,      # 최소 결과 수 제한 제거
+            'min_content_length': 50,         # 최소 컨텐츠 길이 더 완화
+            'max_pages': max_pages,           # 사용자가 지정한 페이지 수 사용
+            'min_confidence': 0.0,            # 감성 분석 신뢰도 제한 제거
+            'exclude_keywords': ['광고', '홍보', 'sponsored', '출처', '저작권'],  # 기본적인 스팸만 제외
+            'required_keywords': ['부안'],     # 부안 키워드는 유지
+            'date_range': None                # 날짜 제한 제거
+        }
+        
+        # ContentExtractor 초기화
+        self.content_extractor = ContentExtractor(browser_type=browser_type)
+        
+        # 감성 분석기 초기화 (지연 로딩)
+        self.sentiment_analyzer = None
+        
+        # 로깅 레벨 설정
+        self.logger.setLevel(logging.INFO)
+        
+        # 원본 키워드 객체 저장
+        if isinstance(keywords, list) and all(isinstance(k, dict) for k in keywords):
+            self.original_keywords = keywords
+            self.keywords = [k['text'] for k in keywords]
+        else:
+            self.keywords = keywords if isinstance(keywords, list) else [keywords]
+            self.original_keywords = [{'text': k, 'condition': 'AND'} for k in self.keywords]
+        
         self.targets = ["blog", "news", "cafearticle"]
-
+        
+        # API 키 설정
         self.client_id = os.getenv("NAVER_CLIENT_ID")
         self.client_secret = os.getenv("NAVER_CLIENT_SECRET")
-
+        
         if not self.client_id or not self.client_secret:
             self.logger.error("네이버 API 키가 없습니다.")
             raise ValueError("네이버 API 키가 없습니다.")
-
-        # 로깅 레벨 설정
-        self.logger.setLevel(logging.INFO)
-
+            
         self.headers = {
             "X-Naver-Client-Id": self.client_id,
             "X-Naver-Client-Secret": self.client_secret
         }
+        
         self.cache = JsonCache()
         self.blog_crawler = NaverBlogCrawler()
-        self.doc_ids = set()  # 문서 ID 중복 체크를 위한 세트
 
-        # 원본 키워드 객체 저장
-        self.original_keywords = keywords
-        # 필터링용 키워드 문자열 추출
-        self.keywords = [k['text'] for k in keywords]
-        
     def __del__(self):
         if hasattr(self, 'blog_crawler') and self.blog_crawler:
             self.blog_crawler.close_driver()
 
     def _postprocess(self, items, original_keywords):
-        """
-        수집된 아이템을 후처리하는 메서드
-        
-        1. AND/OR 조건에 따라 키워드 필터링
-        2. URL+제목 기반 해시로 중복 제거
-        """
+        """수집된 아이템을 후처리하는 메서드"""
         processed_items = []
         filtered_count = 0
         
         for item in items:
-            # 1. 키워드 조건 확인
+            # 1. 키워드 조건 확인 (완화된 조건)
             combined_text = f"{item['title']} {item['content']}"
-            if not check_keyword_conditions(combined_text, original_keywords):
-                self.logger.debug(f"키워드 필터링: 조건에 맞지 않음 - {item['title'][:30]}...")
+            
+            # 필수 키워드(부안)는 반드시 포함
+            if not any(kw.lower() in combined_text.lower() for kw in self.filter_conditions['required_keywords']):
+                filtered_count += 1
+                continue
+                
+            # 제외 키워드가 있으면 제외
+            if any(kw.lower() in combined_text.lower() for kw in self.filter_conditions['exclude_keywords']):
                 filtered_count += 1
                 continue
                 
             # 2. 중복 문서 확인
             doc_id = hashlib.sha256((item['url'] + item['title']).encode()).hexdigest()
             if doc_id in self.doc_ids:
-                self.logger.debug(f"중복 문서: {item['title'][:30]}...")
                 filtered_count += 1
-                continue  # 예외 대신 스킵
+                continue
+            
+            # 3. 날짜 범위 확인
+            try:
+                pub_date = datetime.strptime(item['published_date'], '%Y%m%d')
+                if (datetime.now() - pub_date).days > self.filter_conditions['date_range']:
+                    filtered_count += 1
+                    continue
+            except:
+                pass
             
             # 문서 ID 추가
             self.doc_ids.add(doc_id)
@@ -454,95 +495,88 @@ class NaverSearchAPICrawler(BaseCrawler):
             # 크롤링 시작 시간 기록
             start_time = time.time()
             self.logger.info(f"====== 크롤링 시작: {time.strftime('%Y-%m-%d %H:%M:%S')} ======")
-            keyword_info = [f"{k['text']}({'필수' if k.get('condition') == 'AND' else '선택적'})" for k in self.original_keywords]
-            self.logger.info(f"검색 키워드: {keyword_info}")
             
             # 1. API 기반 크롤링
             for target in self.targets:
                 self.logger.info(f"\n===== 네이버 {target} API 수집 시작 =====")
                 api_url = f"https://openapi.naver.com/v1/search/{target}.json"
-
+                
                 keyword_variations = self.generate_keyword_variations(self.original_keywords)
                 self.logger.info(f"생성된 검색 쿼리 ({len(keyword_variations)}개): {keyword_variations}")
-
-                for i, keyword in enumerate(keyword_variations, 1):
-                    self.logger.info(f"\n>>> 검색 쿼리 {i}/{len(keyword_variations)}: '{keyword}' 처리 중...")
-                    encoded_keyword = quote(keyword)
+                
+                for keyword in keyword_variations:
                     keyword_results = []
+                    page = 1
                     seen_urls = set()
-
-                    page = 0
-                    while True:
-                        if self.max_pages and page >= self.max_pages:
-                            break
-
-                        start = page * 10 + 1
-                        if start >= 1000:
-                            self.logger.warning(f"Reached API's max limit (1000 items) for keyword: {keyword}")
-                            break
-
-                        params = {
-                            "query": encoded_keyword,
-                            "display": 10,
-                            "start": start,
-                            "sort": "date"
-                        }
-
-                        res = requests.get(api_url, headers=self.headers, params=params)
-                        if res.status_code != 200:
-                            self.logger.error(f"API Error [{res.status_code}]: {res.text}")
-                            break
-
-                        items = res.json().get("items", [])
-                        self.logger.info(f"Found {len(items)} items on page {page + 1} for keyword: {keyword}")
-                        if not items:
-                            break
-
-                        for item in items:
-                            title = self.clean_text(item.get("title", ""))
-                            desc = self.clean_text(item.get("description", ""))
-                            url = item.get("link", "")
-                            blog_name = item.get("bloggername", item.get("author", ""))
-                            date = item.get("postdate", item.get("pubDate", "")).replace("-", "")[:8]
-
-                            if url in seen_urls:
-                                continue
-                            seen_urls.add(url)
-
-                            full_content = self.blog_crawler.get_blog_content(url)
-                            content = full_content if full_content else f"{title} {desc}"
-
-                            try:
-                                date_obj = datetime.strptime(date, "%Y%m%d")
-                            except:
-                                date_obj = datetime.now()
-
-                            post_data = {
-                                "title": title,
-                                "content": content,
-                                "url": url,
-                                "blog_name": blog_name,
-                                "published_date": date,
-                                "date_obj": date_obj.isoformat(),
-                                "platform": f"naver_{target}_api",
-                                "keyword": keyword,
-                                "original_keywords": ",".join(self.keywords),
-                                "sentiment": None,
-                                "crawled_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+                    
+                    while page <= self.filter_conditions['max_pages']:
+                        try:
+                            params = {
+                                "query": keyword,
+                                "display": 100,  # 한 번에 100개씩 가져오기
+                                "start": (page - 1) * 100 + 1
                             }
-                            keyword_results.append(post_data)
-                            self.cache.save(url)
-
-                        page += 1
-                        time.sleep(random.uniform(0.2, 0.7))
-
+                            
+                            response = requests.get(api_url, headers=self.headers, params=params)
+                            if response.status_code != 200:
+                                self.logger.error(f"API 요청 실패: {response.status_code}")
+                                break
+                                
+                            data = response.json()
+                            items = data.get("items", [])
+                            
+                            if not items:
+                                break
+                                
+                            for item in items:
+                                title = self.clean_text(item.get("title", ""))
+                                desc = self.clean_text(item.get("description", ""))
+                                url = item.get("link", "")
+                                blog_name = item.get("bloggername", item.get("author", ""))
+                                date = item.get("postdate", item.get("pubDate", "")).replace("-", "")[:8]
+                                
+                                if url in seen_urls:
+                                    continue
+                                seen_urls.add(url)
+                                
+                                full_content = self.blog_crawler.get_blog_content(url)
+                                content = full_content if full_content else f"{title} {desc}"
+                                
+                                try:
+                                    date_obj = datetime.strptime(date, "%Y%m%d")
+                                except:
+                                    date_obj = datetime.now()
+                                    
+                                post_data = {
+                                    "title": title,
+                                    "content": content,
+                                    "url": url,
+                                    "blog_name": blog_name,
+                                    "published_date": date,
+                                    "date_obj": date_obj.isoformat(),
+                                    "platform": f"naver_{target}_api",
+                                    "keyword": keyword,
+                                    "original_keywords": ",".join(self.keywords),
+                                    "sentiment": None,
+                                    "crawled_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+                                }
+                                keyword_results.append(post_data)
+                                self.cache.save(url)
+                                
+                            page += 1
+                            time.sleep(random.uniform(0.2, 0.7))
+                            
+                        except Exception as e:
+                            self.logger.error(f"API 요청 중 오류: {str(e)}")
+                            break
+                            
                     # 키워드 조건에 따른 필터링
                     filtered_results = self._postprocess(keyword_results, self.original_keywords)
- 
+                    
                     self.logger.info(f"[SUMMARY] Found {len(keyword_results)} items, filtered to {len(filtered_results)} for '{keyword}'")
                     keyword_results = filtered_results
                     keyword_results.sort(key=lambda x: x['date_obj'], reverse=True)
-
+                    
                     if keyword_results:
                         keywords_str = '_'.join(self.keywords)
                         filename = f"naver_{target}_{len(keyword_results)}_{keywords_str}_{time.strftime('%Y%m%d_%H%M%S')}.json"
@@ -554,39 +588,19 @@ class NaverSearchAPICrawler(BaseCrawler):
                         combined_results.extend(keyword_results)
                     else:
                         self.logger.warning(f"No data saved for keyword '{keyword}'")
-                    
+                        
             # 2. 직접 크롤링 (API 결과가 부족하거나 질이 낮을 경우)
-            min_acceptable_results = 10  # 최소 허용 결과 수
-            min_content_length = 200  # 최소 컨텐츠 길이
-            
-            # API 결과의 수량과 품질 평가
-            need_direct_crawl = False
-            
-            # 결과 수가 최소 허용치보다 적으면 직접 크롤링 필요
-            if len(combined_results) < min_acceptable_results:
-                need_direct_crawl = True
-                self.logger.info(f"API 결과가 부족하여 직접 크롤링 필요: {len(combined_results)}개 < {min_acceptable_results}개")
-            
-            # 결과의 품질이 낮으면 직접 크롤링 필요
-            else:
-                content_lengths = [len(item.get('content', '')) for item in combined_results]
-                avg_content_length = sum(content_lengths) / len(content_lengths) if content_lengths else 0
-                
-                if avg_content_length < min_content_length:
-                    need_direct_crawl = True
-                    self.logger.info(f"API 결과 품질이 낮아 직접 크롤링 필요: 평균 길이 {avg_content_length:.1f} < {min_content_length}")
-            
-            if need_direct_crawl:
-                self.logger.info("직접 크롤링 시작")
+            if len(combined_results) < self.filter_conditions['min_acceptable_results']:
+                self.logger.info(f"API 결과가 부족하여 직접 크롤링 필요: {len(combined_results)}개 < {self.filter_conditions['min_acceptable_results']}개")
                 
                 # 주요 키워드 조합으로 직접 크롤링
                 main_variations = self.generate_keyword_variations(self.original_keywords)
                 if len(main_variations) > 3:
                     main_variations = main_variations[:3]  # 상위 3개 조합만 사용
-                
+                    
                 for keyword in main_variations:
                     self.logger.info(f"직접 크롤링 키워드: {keyword}")
-                    direct_results = self.direct_crawl_naver_search(keyword, num_pages=3)
+                    direct_results = self.direct_crawl_naver_search(keyword, num_pages=5)  # 페이지 수 증가
                     
                     # 후처리 적용
                     filtered_direct_results = self._postprocess(direct_results, self.original_keywords)
@@ -594,7 +608,7 @@ class NaverSearchAPICrawler(BaseCrawler):
                     
                     if filtered_direct_results:
                         direct_crawl_results.extend(filtered_direct_results)
-                    
+                        
                 if direct_crawl_results:
                     self.logger.info(f"직접 크롤링으로 {len(direct_crawl_results)}개 문서 추가 수집")
                     keywords_str = '_'.join(self.keywords)
@@ -604,31 +618,12 @@ class NaverSearchAPICrawler(BaseCrawler):
                         json.dump(direct_crawl_results, f, ensure_ascii=False, indent=2)
                     self.logger.info(f"Saved direct crawl results to {filepath}")
                     combined_results.extend(direct_crawl_results)
-
+                    
             # 최종 결과 저장
             self.logger.info(f"[FINAL SUMMARY] Total {len(combined_results)} items collected for all keywords")
-            if combined_results:
-                unique_results = {item['url']: item for item in combined_results}.values()
-                combined_results = list(unique_results)
-                combined_results.sort(key=lambda x: x['date_obj'], reverse=True)
-
-                keywords_str = '_'.join(self.keywords)
-                filename = f"naver_combined_{len(combined_results)}_{keywords_str}_{time.strftime('%Y%m%d_%H%M%S')}.json"
-                filepath = os.path.join(self.save_dir, filename)
-                with open(filepath, "w", encoding="utf-8") as f:
-                    json.dump(combined_results, f, ensure_ascii=False, indent=2)
-                self.logger.info(f"Saved combined results to {filepath}")
-                
-                # 크롤링 종료 시간 기록 및 요약
-                end_time = time.time()
-                elapsed_time = end_time - start_time
-                self.logger.info(f"크롤링 종료: {time.strftime('%Y-%m-%d %H:%M:%S')}")
-                self.logger.info(f"소요 시간: {elapsed_time:.2f}초 ({elapsed_time/60:.2f}분)")
-                self.logger.info(f"수집된 총 문서: {len(combined_results)}개")
-            else:
-                self.logger.warning("No data saved (empty result set)")
-
+            
+            return combined_results
+            
         except Exception as e:
-            self.logger.error(f"Crawler error: {str(e)}")
-
-        return combined_results
+            self.logger.error(f"크롤링 중 오류 발생: {str(e)}")
+            return combined_results

@@ -5,6 +5,56 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 import requests
+from selenium import webdriver
+
+class ContentExtractor:
+    """웹 페이지에서 본문 내용을 추출하는 클래스"""
+    
+    def __init__(self, browser_type="chrome"):
+        """
+        ContentExtractor 초기화
+        
+        Args:
+            browser_type: 사용할 브라우저 타입 ("chrome" 또는 "firefox")
+        """
+        self.browser_type = browser_type
+        
+        # Selenium 옵션 설정
+        if browser_type == "chrome":
+            from selenium.webdriver.chrome.options import Options
+            options = Options()
+        elif browser_type == "firefox":
+            from selenium.webdriver.firefox.options import Options
+            options = Options()
+        else:
+            raise ValueError(f"지원되지 않는 브라우저 타입: {browser_type}")
+            
+        options.add_argument("--headless")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--disable-gpu")
+        options.add_argument("--window-size=1920,1080")
+        options.add_argument("--disable-extensions")
+        options.add_argument("--disable-notifications")
+        
+        self.options = options
+        self.driver = None
+        
+    def init_driver(self):
+        """웹드라이버 초기화"""
+        try:
+            if self.browser_type == "chrome":
+                self.driver = webdriver.Chrome(options=self.options)
+            elif self.browser_type == "firefox":
+                self.driver = webdriver.Firefox(options=self.options)
+            else:
+                raise ValueError(f"지원되지 않는 브라우저 타입: {self.browser_type}")
+            
+            self.driver.set_page_load_timeout(30)
+            return True
+        except Exception as e:
+            print(f"드라이버 초기화 실패: {str(e)}")
+            return False
 
 def extract_content(url, driver=None):
     """

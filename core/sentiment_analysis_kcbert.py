@@ -5,24 +5,24 @@ import torch
 # Transformers 오프라인 모드 설정
 os.environ["TRANSFORMERS_OFFLINE"] = "1"
 
-class KoBERTSentimentAnalyzer:
-    """단일 KoBERT 기반 감성 분석기 (3클래스) - 싱글톤 패턴"""
+class KCBERTSentimentAnalyzer:
+    """단일 KCBERT 기반 감성 분석기 (3클래스) - 싱글톤 패턴"""
     
     _instance = None
     _initialized = False
     
     def __new__(cls):
         if cls._instance is None:
-            cls._instance = super(KoBERTSentimentAnalyzer, cls).__new__(cls)
+            cls._instance = super(KCBERTSentimentAnalyzer, cls).__new__(cls)
         return cls._instance
     
     def __init__(self):
-        if not KoBERTSentimentAnalyzer._initialized:
-            self.model_name = "taeminlee/korean-sentiment-kobert"
+        if not KCBERTSentimentAnalyzer._initialized:
+            self.model_name = "beomi/kcbert-base"
             try:
                 self.tokenizer = AutoTokenizer.from_pretrained(self.model_name, local_files_only=True)
                 self.model = AutoModelForSequenceClassification.from_pretrained(self.model_name, local_files_only=True)
-                KoBERTSentimentAnalyzer._initialized = True
+                KCBERTSentimentAnalyzer._initialized = True
             except Exception as e:
                 print("🔴 감성 분석 모델 로딩 실패:", e)
                 print("⚠️ Hugging Face 모델 캐시가 없거나 인터넷이 필요합니다.")
@@ -39,4 +39,4 @@ class KoBERTSentimentAnalyzer:
         probs = torch.nn.functional.softmax(outputs.logits, dim=-1)
         sentiment = torch.argmax(probs, dim=1).item()
         confidence = probs.max().item()
-        return sentiment, confidence  # 0: 부정, 1: 중립, 2: 긍정
+        return sentiment, confidence  # 0: 부정, 1: 중립, 2: 긍정 
