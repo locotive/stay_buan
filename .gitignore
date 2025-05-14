@@ -27,6 +27,7 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+dwonloaded
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -121,6 +122,7 @@ ENV/
 # Data files
 data/raw/
 data/processed/
+data/models/
 
 # API keys and config
 config/config.py
