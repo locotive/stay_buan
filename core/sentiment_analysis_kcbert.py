@@ -1,42 +1,76 @@
-import os
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import logging
+from typing import Optional, Tuple
+import os
 
-# Transformers 오프라인 모드 설정
-os.environ["TRANSFORMERS_OFFLINE"] = "1"
+logger = logging.getLogger(__name__)
 
 class KCBERTSentimentAnalyzer:
-    """단일 KCBERT 기반 감성 분석기 (3클래스) - 싱글톤 패턴"""
+    """KCBERT 기반 감성 분석기"""
     
     _instance = None
-    _initialized = False
     
-    def __new__(cls):
+    def __new__(cls, *args, **kwargs):
         if cls._instance is None:
             cls._instance = super(KCBERTSentimentAnalyzer, cls).__new__(cls)
         return cls._instance
     
-    def __init__(self):
-        if not KCBERTSentimentAnalyzer._initialized:
-            self.model_name = "beomi/kcbert-base"
-            try:
-                self.tokenizer = AutoTokenizer.from_pretrained(self.model_name, local_files_only=True)
-                self.model = AutoModelForSequenceClassification.from_pretrained(self.model_name, local_files_only=True)
-                KCBERTSentimentAnalyzer._initialized = True
-            except Exception as e:
-                print("🔴 감성 분석 모델 로딩 실패:", e)
-                print("⚠️ Hugging Face 모델 캐시가 없거나 인터넷이 필요합니다.")
-                self.model = None
-                self.tokenizer = None
-    
-    def predict(self, text):
-        if self.model is None or self.tokenizer is None:
-            print("⚠️ 감성 분석 모델이 로드되지 않아 분석을 건너뜁니다.")
-            return 1, 0.0  # 중립(1) 반환, 신뢰도 0
+    def __init__(self, model_path="data/models/kcbert"):
+        if hasattr(self, 'initialized'):
+            return
             
-        inputs = self.tokenizer(text, return_tensors='pt', truncation=True, padding=True, max_length=512)
-        outputs = self.model(**inputs)
-        probs = torch.nn.functional.softmax(outputs.logits, dim=-1)
-        sentiment = torch.argmax(probs, dim=1).item()
-        confidence = probs.max().item()
-        return sentiment, confidence  # 0: 부정, 1: 중립, 2: 긍정 
+        try:
+            if not (os.path.exists(model_path) and os.path.exists(os.path.join(model_path, "pytorch_model.bin"))):
+                from huggingface_hub import snapshot_download
+                logger.info("모델 파일이 없어 자동 다운로드를 시도합니다.")
+                snapshot_download(repo_id="beomi/kcbert-base", local_dir=model_path, local_dir_use_symlinks=False)
+            
+            # 모델 경로 설정
+            self.model_path = model_path
+            
+            # 디바이스 설정
+            self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+            logger.info(f"KCBERT 모델 디바이스: {self.device}")
+            
+            # 토크나이저와 모델 로드
+            logger.info(f"KCBERT 모델 로드 중... (경로: {self.model_path})")
+            self.tokenizer = AutoTokenizer.from_pretrained(model_path)
+            self.model = AutoModelForSequenceClassification.from_pretrained(model_path, num_labels=3).to(self.device)
+            
+            self.model.eval()  # 평가 모드로 설정
+            logger.info("KCBERT 모델 로드 완료")
+            
+            self.initialized = True
+            
+        except Exception as e:
+            logger.error(f"KCBERT 모델 초기화 중 오류 발생: {str(e)}")
+            raise
+    
+    def predict(self, text: str) -> Tuple[int, float]:
+        """텍스트의 감성 분석 수행"""
+        try:
+            # 토크나이징
+            inputs = self.tokenizer(
+                text,
+                return_tensors="pt",
+                truncation=True,
+                padding=True,
+                max_length=512
+            ).to(self.device)
+            
+            # 추론
+            with torch.no_grad():
+                outputs = self.model(**inputs)
+                logits = outputs.logits
+                probs = torch.softmax(logits, dim=1)
+                
+            # 결과 처리
+            sentiment = torch.argmax(probs, dim=1).item()
+            confidence = probs[0][sentiment].item()
+            
+            return sentiment, confidence
+            
+        except Exception as e:
+            logger.error(f"KCBERT 감성 분석 중 오류 발생: {str(e)}")
+            return 1, 0.0  # 오류 시 중립으로 처리 

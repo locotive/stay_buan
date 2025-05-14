@@ -33,9 +33,10 @@ class GPTReportGenerator:
         prompt = f"다음 데이터 요약을 바탕으로 부안군의 정책 제안을 작성해 주세요:\n{summary_text}\n주요 키워드: {keywords}"
         
         # 4. GPT 호출
-        response = openai.Completion.create(
-            engine="text-davinci-003",
-            prompt=prompt,
+        response = openai.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "system", "content": "당신은 정책 제안 전문가입니다."},
+                      {"role": "user", "content": prompt}],
             max_tokens=500
         )
-        return response.choices[0].text.strip()
+        return response.choices[0].message.content.strip()

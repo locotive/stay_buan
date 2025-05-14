@@ -316,29 +316,7 @@ class FMKoreaCrawler(BaseCrawler):
             date_el = soup.select_one('span.date')
             pub_date = self._clean_text(date_el.get_text()) if date_el else None
             
-            if pub_date:
-                try:
-                    # 다양한 날짜 형식 처리
-                    if '.' in pub_date:
-                        date_parts = pub_date.split('.')
-                        if len(date_parts) >= 3:
-                            year = int(date_parts[0])
-                            month = int(date_parts[1])
-                            day = int(date_parts[2])
-                            pub_date = f"{year:04d}{month:02d}{day:02d}"
-                    elif '-' in pub_date:
-                        date_parts = pub_date.split('-')
-                        if len(date_parts) >= 3:
-                            year = int(date_parts[0])
-                            month = int(date_parts[1])
-                            day = int(date_parts[2])
-                            pub_date = f"{year:04d}{month:02d}{day:02d}"
-                    else:
-                        pub_date = time.strftime("%Y%m%d")
-                except:
-                    pub_date = time.strftime("%Y%m%d")
-            else:
-                pub_date = time.strftime("%Y%m%d")
+            pub_date = self._normalize_date(pub_date)
             
             # 댓글 추출
             comments = []
@@ -481,4 +459,67 @@ class FMKoreaCrawler(BaseCrawler):
             
         except Exception as e:
             self.logger.error(f"크롤링 중 오류 발생: {str(e)}")
-            return [] 
+            return []
+
+    def validate_platform_data(self, df, platform):
+        """플랫폼별 데이터 유효성 검사"""
+        validation_results = {
+            'missing_fields': [],
+            'invalid_dates': [],
+            'invalid_urls': [],
+            'empty_content': []
+        }
+        
+        # 1. 필수 필드 확인
+        required_fields = self.get_required_fields(platform)
+        for field in required_fields:
+            if field not in df.columns:
+                validation_results['missing_fields'].append(field)
+        
+        # 2. 날짜 형식 검사 (문자열로 변환 후 검사)
+        if 'published_date' in df.columns:
+            # 숫자형인 경우 문자열로 변환
+            df['published_date'] = df['published_date'].astype(str)
+            # 8자리 숫자 형식이 아닌 날짜 찾기
+            invalid_dates = df[~df['published_date'].str.match(r'^\d{8}$')]
+            if not invalid_dates.empty:
+                validation_results['invalid_dates'] = invalid_dates['published_date'].tolist()
+        
+        # 3. URL 형식 검사
+        if 'url' in df.columns:
+            invalid_urls = df[~df['url'].str.startswith(('http://', 'https://'))]
+            if not invalid_urls.empty:
+                validation_results['invalid_urls'] = invalid_urls['url'].tolist()
+        
+        # 4. 빈 컨텐츠 확인
+        if 'content' in df.columns:
+            empty_content = df[df['content'].isna() | (df['content'].str.strip() == '')]
+            if not empty_content.empty:
+                validation_results['empty_content'] = empty_content.index.tolist()
+        
+        return validation_results 
+
+    def _normalize_date(self, date_str):
+        """날짜 정규화"""
+        if not date_str:
+            return time.strftime("%Y%m%d")
+        
+        try:
+            if '.' in date_str:
+                date_parts = date_str.split('.')
+                if len(date_parts) >= 3:
+                    year = int(date_parts[0])
+                    month = int(date_parts[1])
+                    day = int(date_parts[2])
+                    return f"{year:04d}{month:02d}{day:02d}"
+            elif '-' in date_str:
+                date_parts = date_str.split('-')
+                if len(date_parts) >= 3:
+                    year = int(date_parts[0])
+                    month = int(date_parts[1])
+                    day = int(date_parts[2])
+                    return f"{year:04d}{month:02d}{day:02d}"
+        except:
+            pass
+        
+        return time.strftime("%Y%m%d") 

@@ -1,0 +1,108 @@
+2025-05-13 20:38:44,474 - main - INFO -
+==================================================
+2025-05-13 20:38:44,474 - main - INFO - 크롤링 시작
+2025-05-13 20:38:44,474 - main - INFO - 시작 시간: 2025-05-13 20:38:44
+2025-05-13 20:38:44,474 - main - INFO - 검색 키워드: ['부안']
+2025-05-13 20:38:44,474 - main - INFO - 브라우저: chrome
+2025-05-13 20:38:44,474 - main - INFO - 필터링 모드: 엄격 (AND 조건)
+2025-05-13 20:38:44,474 - main - INFO - robots.txt 정책: 준수
+2025-05-13 20:38:44,474 - main - INFO - 병렬 처리: 활성화
+2025-05-13 20:38:44,474 - main - INFO - 최대 워커 수: 4
+2025-05-13 20:38:44,474 - main - INFO - ==================================================
+2025-05-13 20:38:44,474 - main - INFO - 크롤링 대상 플랫폼: naver, youtube
+2025-05-13 20:38:44,475 - main - INFO -
+==================== NAVER 크롤링 시작 ====================
+2025-05-13 20:38:44,475 - main - INFO - 키워드: [{'text': '부안', 'condition': 'AND'}]
+2025-05-13 20:38:44,475 - main - INFO - 최대 페이지: 3
+2025-05-13 20:38:44,475 - main - INFO - 최대 댓글: 10
+2025-05-13 20:38:44,475 - main - INFO - 감성 분석: 비활성화
+2025-05-13 20:38:44,475 - main - INFO - 브라우저: chrome
+2025-05-13 20:38:44,475 - main - INFO -
+==================== YOUTUBE 크롤링 시작 ====================
+2025-05-13 20:38:44,475 - main - INFO - 키워드: [{'text': '부안', 'condition': 'AND'}]
+2025-05-13 20:38:44,475 - main - INFO - 최대 페이지: 3
+2025-05-13 20:38:44,475 - main - INFO - 최대 댓글: 10
+2025-05-13 20:38:44,476 - main - INFO - 감성 분석: 비활성화
+2025-05-13 20:38:44,476 - main - INFO - 브라우저: chrome
+2025-05-13 20:38:44,476 - youtube - INFO - ====== 유튜브 크롤링 시작: 2025-05-13 20:38:44 ======
+2025-05-13 20:38:44,476 - youtube - INFO - 검색 키워드: ['부안(필수)']
+2025-05-13 20:38:44,476 - youtube - INFO - 키워드 '부안' 처리 중...
+2025-05-13 20:38:44,476 - naversearchapi - INFO - ====== 크롤링 시작: 2025-05-13 20:38:44 ======
+2025-05-13 20:38:44,476 - naversearchapi - INFO -
+===== 네이버 blog API 수집 시작 =====
+2025-05-13 20:38:44,476 - naversearchapi - INFO - 생성된 검색 쿼리 (1개): ['부안']
+
+크롤링 진행률:   0%|          | 0/2 [00:00<?, ?it/s]2025-05-13 20:39:19,037 - youtube - INFO - 키워드 '부안'에 대해 30개 비디오 저장 완료: data/raw/youtube_30_부안_20250513_203919.json
+2025-05-13 20:39:19,037 - youtube - INFO - 크롤링 종료: 2025-05-13 20:39:19
+2025-05-13 20:39:19,037 - youtube - INFO - 소요 시간: 34.56초 (0.58분)
+2025-05-13 20:39:19,037 - youtube - INFO - 수집된 총 비디오: 30개
+2025-05-13 20:39:19,039 - youtube - INFO - 통합 결과 저장 완료: data/raw/youtube_combined_30_부안_20250513_203919.json
+2025-05-13 20:39:19,040 - main - INFO - 유튜브에서 30개 비디오 수집 완료
+2025-05-13 20:39:19,040 - main - INFO -
+==================== YOUTUBE 크롤링 완료 ====================
+2025-05-13 20:39:19,040 - main - INFO - 소요 시간: 34.56초
+2025-05-13 20:39:19,040 - main - INFO - 수집된 항목 수: 30개
+
+크롤링 진행률:  50%|█████     | 1/2 [00:34<00:34, 34.56s/it]2025-05-13 20:39:44,900 - naversearchapi - INFO - 필터링 비율: 9.3% (14/150)
+2025-05-13 20:39:44,900 - naversearchapi - INFO - [SUMMARY] Found 150 items, filtered to 136 for '부안'
+2025-05-13 20:39:44,909 - naversearchapi - INFO - Saved results to data/raw/naver_blog_136_부안_20250513_203944.json
+2025-05-13 20:39:44,909 - naversearchapi - INFO -
+===== 네이버 news API 수집 시작 =====
+2025-05-13 20:39:44,909 - naversearchapi - INFO - 생성된 검색 쿼리 (1개): ['부안']
+2025-05-13 20:39:45,263 - WDM - INFO - ====== WebDriver manager ======
+2025-05-13 20:39:45,312 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-05-13 20:39:45,314 - WDM - INFO - ====== WebDriver manager ======
+2025-05-13 20:39:45,398 - WDM - INFO - Get LATEST geckodriver version for 128.10 firefox
+2025-05-13 20:39:45,715 - WDM - INFO - Get LATEST geckodriver version for 128.10 firefox
+2025-05-13 20:39:45,787 - WDM - INFO - There is no [linux64] geckodriver "v0.36.0" for browser firefox "128.10" in cache
+2025-05-13 20:39:45,788 - WDM - INFO - Get LATEST geckodriver version for 128.10 firefox
+2025-05-13 20:39:45,851 - WDM - INFO - Getting latest mozilla release info for v0.36.0
+2025-05-13 20:39:46,158 - WDM - INFO - About to download new driver from https://github.com/mozilla/geckodriver/releases/download/v0.36.0/geckodriver-v0.36.0-linux64.tar.gz
+2025-05-13 20:39:47,409 - WDM - INFO - Driver downloading response is 200
+2025-05-13 20:39:47,651 - WDM - INFO - Get LATEST geckodriver version for 128.10 firefox
+2025-05-13 20:39:47,796 - WDM - INFO - Driver has been saved in cache [/root/.wdm/drivers/geckodriver/linux64/v0.36.0]
+2025-05-13 20:41:33,311 - naversearchapi - INFO - 필터링 비율: 41.6% (62/149)
+2025-05-13 20:41:33,312 - naversearchapi - INFO - [SUMMARY] Found 149 items, filtered to 87 for '부안'
+2025-05-13 20:41:33,316 - naversearchapi - INFO - Saved results to data/raw/naver_news_87_부안_20250513_204133.json
+2025-05-13 20:41:33,316 - naversearchapi - INFO -
+===== 네이버 cafearticle API 수집 시작 =====
+2025-05-13 20:41:33,316 - naversearchapi - INFO - 생성된 검색 쿼리 (1개): ['부안']
+2025-05-13 20:48:40,108 - naversearchapi - INFO - 필터링 비율: 28.0% (42/150)
+2025-05-13 20:48:40,108 - naversearchapi - INFO - [SUMMARY] Found 150 items, filtered to 108 for '부안'
+2025-05-13 20:48:40,113 - naversearchapi - INFO - Saved results to data/raw/naver_cafearticle_108_부안_20250513_204840.json
+2025-05-13 20:48:40,113 - naversearchapi - INFO - [FINAL SUMMARY] Total 331 items collected for all keywords
+2025-05-13 20:48:40,114 - main - INFO - 네이버에서 331개 항목 수집 완료
+2025-05-13 20:48:40,114 - main - INFO -
+==================== NAVER 크롤링 완료 ====================
+2025-05-13 20:48:40,114 - main - INFO - 소요 시간: 595.64초
+2025-05-13 20:48:40,114 - main - INFO - 수집된 항목 수: 331개
+
+크롤링 진행률: 100%|██████████| 2/2 [09:56<00:00, 344.52s/it]
+크롤링 진행률: 100%|██████████| 2/2 [09:56<00:00, 298.03s/it]
+2025-05-13 20:48:40,537 - main - INFO -
+==================================================
+2025-05-13 20:48:40,537 - main - INFO - 결과 통합 및 저장 시작
+2025-05-13 20:48:40,537 - main - INFO - YOUTUBE: 30개 항목
+2025-05-13 20:48:40,537 - main - INFO - NAVER: 331개 항목
+2025-05-13 20:48:40,552 - main - INFO - 통합 결과 저장 완료: data/raw/combined_361_부안_20250513_204840.json
+2025-05-13 20:48:40,552 - main - INFO - ==================================================
+2025-05-13 20:48:40,552 - main - INFO -
+==================================================
+2025-05-13 20:48:40,552 - main - INFO - 크롤링 최종 결과 요약
+2025-05-13 20:48:40,552 - main - INFO - 시작 시간: 2025-05-13 20:38:44
+2025-05-13 20:48:40,552 - main - INFO - 종료 시간: 2025-05-13 20:48:40
+2025-05-13 20:48:40,552 - main - INFO - 총 소요 시간: 596.08초 (9.93분)
+2025-05-13 20:48:40,552 - main - INFO - 총 수집 항목: 361개
+2025-05-13 20:48:40,552 - main - INFO -
+플랫폼별 수집 결과:
+2025-05-13 20:48:40,552 - main - INFO - - YOUTUBE: 30개
+2025-05-13 20:48:40,552 - main - INFO - - NAVER: 331개
+2025-05-13 20:48:40,552 - main - INFO -
+통합 결과 파일: data/raw/combined_361_부안_20250513_204840.json
+2025-05-13 20:48:40,552 - main - INFO - ==================================================
+2025-05-13 20:48:40,552 - main - INFO -
+==================================================
+2025-05-13 20:48:40,552 - main - INFO - 크롤링 종료
+2025-05-13 20:48:40,552 - main - INFO - 종료 시간: 2025-05-13 20:48:40
+2025-05-13 20:48:40,552 - main - INFO - ==================================================
+Static extraction failed for general URL: HTTPSConnectionPool(host='www.sentv.co.kr', port=443): Max retries exceeded with url: /article/view/sentv202505120217 (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1147)')))

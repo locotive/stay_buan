@@ -16,7 +16,7 @@ class EnsembleSentimentAnalyzer:
     
     def __init__(self):
         if not EnsembleSentimentAnalyzer._initialized:
-            # 개별 모델 초기화 (지연 로딩으로 실제 모델은 필요시에만 로드)
+            # 개별 모델 초기화 (오프라인/온라인 자동 다운로드 지원)
             self.kobert_analyzer = KoBERTSentimentAnalyzer()
             self.kcbert_analyzer = KCBERTSentimentAnalyzer()
             self.koalpaca_analyzer = KoAlpacaSentimentAnalyzer()

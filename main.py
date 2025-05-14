@@ -249,37 +249,35 @@ def main():
 
     all_platform_results = {}
 
-    # 병렬 처리 설정
-    if args.parallel:
-        max_workers = min(args.max_workers, 8)  # 최대 8개로 제한
-        logger.info(f"병렬 처리 시작 (워커 수: {max_workers})")
+    # 플랫폼별 독립적인 워커 풀 구성
+    platform_workers = {
+        'api_based': 2,      # 네이버 API, 유튜브 API (API 기반)
+        'selenium': 2,       # DC인사이드, FM코리아 (웹드라이버 기반)
+        'google': 1          # 구글 검색 (API 제한이 엄격)
+    }
+
+    # 플랫폼 분류
+    api_platforms = ['naver', 'youtube']
+    selenium_platforms = ['dcinside', 'fmkorea', 'buan']
+    google_platforms = ['google']
+
+    # 각 그룹별 독립적인 스레드 풀 생성
+    with concurrent.futures.ThreadPoolExecutor(max_workers=platform_workers['api_based']) as api_executor, \
+         concurrent.futures.ThreadPoolExecutor(max_workers=platform_workers['selenium']) as selenium_executor, \
+         concurrent.futures.ThreadPoolExecutor(max_workers=platform_workers['google']) as google_executor:
         
-        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-            futures = []
-            for platform in platforms:
-                future = executor.submit(
-                    crawl_platform,
-                    platform,
-                    keywords,
-                    args.max_pages,
-                    args.max_comments,
-                    args.no_sentiment,
-                    args.browser,
-                    args.max_daily_queries
-                )
-                futures.append(future)
+        # API 기반 플랫폼
+        api_futures = [api_executor.submit(crawl_platform, p, keywords, args.max_pages, args.max_comments, args.no_sentiment, args.browser, args.max_daily_queries) for p in api_platforms if p in platforms]
+        
+        # Selenium 기반 플랫폼
+        selenium_futures = [selenium_executor.submit(crawl_platform, p, keywords, args.max_pages, args.max_comments, args.no_sentiment, args.browser, args.max_daily_queries) for p in selenium_platforms if p in platforms]
+        
+        # 구글 검색
+        google_futures = [google_executor.submit(crawl_platform, p, keywords, args.max_pages, args.max_comments, args.no_sentiment, args.browser, args.max_daily_queries) for p in google_platforms if p in platforms]
 
-            # 결과 수집
-            for future in tqdm(concurrent.futures.as_completed(futures), total=len(futures), desc="크롤링 진행률"):
-                platform, results = future.result()
-                if results:
-                    all_platform_results[platform] = results
-
-    else:
-        # 순차 처리
-        logger.info("순차 처리 시작")
-        for platform in platforms:
-            platform, results = crawl_platform(platform, keywords, args.max_pages, args.max_comments, args.no_sentiment, args.browser, args.max_daily_queries)
+        # 결과 수집
+        for future in tqdm(concurrent.futures.as_completed(api_futures + selenium_futures + google_futures), total=len(api_futures + selenium_futures + google_futures), desc="크롤링 진행률"):
+            platform, results = future.result()
             if results:
                 all_platform_results[platform] = results
 

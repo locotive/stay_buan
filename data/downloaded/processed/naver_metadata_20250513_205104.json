@@ -1,0 +1,24 @@
+{
+  "platform": "naver",
+  "timestamp": "20250513_205104",
+  "row_count": 87,
+  "columns": [
+    "platform",
+    "title",
+    "content",
+    "published_date",
+    "url"
+  ],
+  "sentiment_distribution": null,
+  "filtering_stats": {
+    "min_text_length": 30,
+    "max_text_length": 20000,
+    "min_confidence": 0.5,
+    "excluded_keywords": [
+      "광고",
+      "홍보",
+      "sponsored"
+    ],
+    "required_keywords": []
+  }
+}

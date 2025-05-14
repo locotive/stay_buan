@@ -12,13 +12,16 @@ RUN apt-get update && apt-get install -y \
     chromium \
     chromium-driver \
     firefox-esr \
+    xvfb \
+    libxi6 \
+    libgconf-2-4 \
     && apt-get clean
 
-# geckodriver 설치
+# Firefox 및 GeckoDriver 설치
 RUN wget https://github.com/mozilla/geckodriver/releases/download/v0.33.0/geckodriver-v0.33.0-linux64.tar.gz \
     && tar -xvzf geckodriver-v0.33.0-linux64.tar.gz \
-    && chmod +x geckodriver \
     && mv geckodriver /usr/local/bin/ \
+    && chmod +x /usr/local/bin/geckodriver \
     && rm geckodriver-v0.33.0-linux64.tar.gz
 
 # JAVA_HOME 설정 (default-jdk가 설치한 경로로 자동 설정됨)

@@ -300,18 +300,7 @@ class DCInsideCrawler(BaseCrawler):
             date_el = soup.select_one('span.gall_date')
             pub_date = self._clean_text(date_el.get('title') or date_el.get_text()) if date_el else None
             
-            formatted_date = time.strftime("%Y%m%d")
-            if pub_date:
-                try:
-                    if ':' in pub_date and '-' in pub_date:  # 2023-01-01 12:34:56 형식
-                        date_obj = datetime.strptime(pub_date, "%Y-%m-%d %H:%M:%S")
-                        formatted_date = date_obj.strftime("%Y%m%d")
-                    elif '.' in pub_date:  # 2023.01.01 12:34:56 형식
-                        pub_date = pub_date.replace('.', '-')
-                        date_obj = datetime.strptime(pub_date, "%Y-%m-%d %H:%M:%S")
-                        formatted_date = date_obj.strftime("%Y%m%d")
-                except Exception as e:
-                    self.logger.error(f"날짜 파싱 오류: {str(e)}")
+            formatted_date = self._normalize_date(pub_date)
             
             # 댓글 가져오기 (AJAX 요청)
             comments = self._get_comments(gallery_id, post_id)

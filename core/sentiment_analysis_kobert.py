@@ -1,42 +1,61 @@
-import os
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import logging
+from typing import Tuple, Optional
+import os
 
-# Transformers 오프라인 모드 설정
-os.environ["TRANSFORMERS_OFFLINE"] = "1"
+logger = logging.getLogger(__name__)
 
 class KoBERTSentimentAnalyzer:
-    """단일 KoBERT 기반 감성 분석기 (3클래스) - 싱글톤 패턴"""
+    """KoBERT 기반 감성 분석 클래스"""
     
-    _instance = None
-    _initialized = False
-    
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super(KoBERTSentimentAnalyzer, cls).__new__(cls)
-        return cls._instance
-    
-    def __init__(self):
-        if not KoBERTSentimentAnalyzer._initialized:
-            self.model_name = "taeminlee/korean-sentiment-kobert"
-            try:
-                self.tokenizer = AutoTokenizer.from_pretrained(self.model_name, local_files_only=True)
-                self.model = AutoModelForSequenceClassification.from_pretrained(self.model_name, local_files_only=True)
-                KoBERTSentimentAnalyzer._initialized = True
-            except Exception as e:
-                print("🔴 감성 분석 모델 로딩 실패:", e)
-                print("⚠️ Hugging Face 모델 캐시가 없거나 인터넷이 필요합니다.")
-                self.model = None
-                self.tokenizer = None
-    
-    def predict(self, text):
-        if self.model is None or self.tokenizer is None:
-            print("⚠️ 감성 분석 모델이 로드되지 않아 분석을 건너뜁니다.")
-            return 1, 0.0  # 중립(1) 반환, 신뢰도 0
+    def __init__(self, model_path="data/models/kobert"):
+        """KoBERT 모델 초기화"""
+        try:
+            # 모델 파일이 없으면 자동 다운로드 시도
+            if not (os.path.exists(model_path) and os.path.exists(os.path.join(model_path, "pytorch_model.bin"))):
+                from huggingface_hub import snapshot_download
+                logger.info("모델 파일이 없어 자동 다운로드를 시도합니다.")
+                snapshot_download(repo_id="skt/kobert-base-v1", local_dir=model_path, local_dir_use_symlinks=False)
             
-        inputs = self.tokenizer(text, return_tensors='pt', truncation=True, padding=True, max_length=512)
-        outputs = self.model(**inputs)
-        probs = torch.nn.functional.softmax(outputs.logits, dim=-1)
-        sentiment = torch.argmax(probs, dim=1).item()
-        confidence = probs.max().item()
-        return sentiment, confidence  # 0: 부정, 1: 중립, 2: 긍정
+            # 토크나이저와 모델 초기화
+            self.tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+            
+            self.model = AutoModelForSequenceClassification.from_pretrained(model_path, num_labels=3, trust_remote_code=True)
+            
+            # GPU 설정 및 모델 준비
+            self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+            self.model = self.model.to(self.device)
+            self.model.eval()
+                            
+            logger.info(f"KoBERT 모델 초기화 완료 (device: {self.device})")
+            
+        except Exception as e:
+            logger.error(f"KoBERT 모델 초기화 실패: {str(e)}", exc_info=True)
+            raise
+    
+    def predict(self, text: str) -> Tuple[int, float]:
+        """텍스트의 감성 분석 수행"""
+        try:
+            # 입력 텍스트 토크나이징
+            inputs = self.tokenizer(
+                text,
+                return_tensors="pt",
+                truncation=True,
+                padding=True,
+                max_length=512
+            ).to(self.device)
+            
+            # 추론
+            with torch.no_grad():
+                outputs = self.model(**inputs)
+                logits = outputs.logits
+                probs = torch.softmax(logits, dim=1)
+                pred = torch.argmax(probs, dim=1).item()
+                conf = probs[0][pred].item()
+                
+                return pred, conf
+                
+        except Exception as e:
+            logger.error(f"감성 분석 중 오류 발생: {str(e)}", exc_info=True)
+            return 1, 0.0  # 오류 발생시 중립(1) 반환

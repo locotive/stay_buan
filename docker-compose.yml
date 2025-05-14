@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  dashboard:
+    build: .
+    container_name: buan-dashboard
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data/models:/app/data/models  # 모델 파일 볼륨 마운트
+      - ./data/raw:/app/data/raw        # 크롤링 데이터 볼륨 마운트
+      - ./data/processed:/app/data/processed  # 처리된 데이터 볼륨 마운트
+      - ./data/logs:/app/data/logs      # 로그 파일 볼륨 마운트
+    env_file:
+      - .env
+    environment:
+      - HF_HUB_OFFLINE=0  # Hugging Face Hub 온라인 모드 활성화
+      - TRANSFORMERS_OFFLINE=0  # Transformers 온라인 모드 활성화
+      - TOKENIZERS_PARALLELISM=false
+    restart: unless-stopped
+    networks:
+      - buan-network
+
+networks:
+  buan-network:
+    driver: bridge 

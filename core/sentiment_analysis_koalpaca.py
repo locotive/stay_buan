@@ -1,71 +1,76 @@
-from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import logging
+from typing import Optional, Tuple
+import os
+
+logger = logging.getLogger(__name__)
 
 class KoAlpacaSentimentAnalyzer:
-    """KoAlpaca 모델을 사용한 감성 분석기 - 싱글톤 패턴"""
+    """KoAlpaca 기반 감성 분석기 (8비트 양자화 적용)"""
     
     _instance = None
-    _initialized = False
     
-    def __new__(cls):
+    def __new__(cls, *args, **kwargs):
         if cls._instance is None:
             cls._instance = super(KoAlpacaSentimentAnalyzer, cls).__new__(cls)
         return cls._instance
     
-    def __init__(self):
-        if not KoAlpacaSentimentAnalyzer._initialized:
-            self.model_name = "beomi/KoAlpaca-Polyglot-12.8B"
+    def __init__(self, model_path="data/models/koalpaca"):
+        if hasattr(self, 'initialized'):
+            return
+            
+        try:
+            if not (os.path.exists(model_path) and os.path.exists(os.path.join(model_path, "pytorch_model.bin"))):
+                from huggingface_hub import snapshot_download
+                logger.info("모델 파일이 없어 자동 다운로드를 시도합니다.")
+                snapshot_download(repo_id="beomi/KoAlpaca-Polyglot-12.8B", local_dir=model_path, local_dir_use_symlinks=False)
+            
+            # 디바이스 설정
             self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-            self.tokenizer = None
-            self.model = None
-            KoAlpacaSentimentAnalyzer._initialized = True
+            logger.info(f"KoAlpaca 모델 디바이스: {self.device}")
+            
+            # 토크나이저와 모델 로드
+            logger.info(f"KoAlpaca 모델 로드 중... (경로: {model_path})")
+            self.tokenizer = AutoTokenizer.from_pretrained(model_path)
+            self.model = AutoModelForSequenceClassification.from_pretrained(
+                model_path,
+                num_labels=3
+            ).to(self.device)
+            
+            self.model.eval()  # 평가 모드로 설정
+            logger.info("KoAlpaca 모델 로드 완료")
+            
+            self.initialized = True
+            
+        except Exception as e:
+            logger.error(f"KoAlpaca 모델 초기화 중 오류 발생: {str(e)}")
+            raise
     
-    def _load_model(self):
-        """지연 로딩 방식으로 모델 초기화"""
-        if self.tokenizer is None or self.model is None:
-            self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-            # 8비트 양자화를 사용하여 메모리 효율성 향상
-            self.model = AutoModelForCausalLM.from_pretrained(
-                self.model_name, 
-                torch_dtype=torch.float16,
-                low_cpu_mem_usage=True,
-                load_in_8bit=True,
-                device_map="auto"
-            )
-    
-    def predict(self, text):
-        """감성 분석 예측 수행"""
-        self._load_model()
-        
-        # 프롬프트 구성
-        prompt = f"""다음 문장의 감성을 분석해 주세요. 긍정적(positive), 중립적(neutral), 부정적(negative) 중 하나로 답변해주세요.
-
-텍스트: {text}
-
-감성:"""
-
-        # 토큰화 및 추론
-        inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
-        with torch.no_grad():
-            outputs = self.model.generate(
-                inputs.input_ids,
-                max_new_tokens=5,
-                do_sample=False,
-                pad_token_id=self.tokenizer.eos_token_id
-            )
-        
-        # 결과 디코딩 및 파싱
-        result = self.tokenizer.decode(outputs[0][inputs.input_ids.shape[1]:], skip_special_tokens=True).strip().lower()
-        
-        # 감성 레이블 매핑
-        if "positive" in result:
-            sentiment = 2  # 긍정
-            confidence = 0.9  # 신뢰도는 고정값 사용
-        elif "negative" in result:
-            sentiment = 0  # 부정
-            confidence = 0.9
-        else:
-            sentiment = 1  # 중립
-            confidence = 0.7
-        
-        return sentiment, confidence 
+    def predict(self, text: str) -> Tuple[int, float]:
+        """텍스트의 감성 분석 수행"""
+        try:
+            # 토크나이징
+            inputs = self.tokenizer(
+                text,
+                return_tensors="pt",
+                truncation=True,
+                padding=True,
+                max_length=512
+            ).to(self.device)
+            
+            # 추론
+            with torch.no_grad():
+                outputs = self.model(**inputs)
+                logits = outputs.logits
+                probs = torch.softmax(logits, dim=1)
+                
+            # 결과 처리
+            pred = torch.argmax(probs, dim=1).item()
+            conf = probs[0][pred].item()
+            
+            return pred, conf
+            
+        except Exception as e:
+            logger.error(f"KoAlpaca 감성 분석 중 오류 발생: {str(e)}")
+            return 1, 0.0  # 오류 시 중립으로 처리 

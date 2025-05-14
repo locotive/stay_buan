@@ -323,29 +323,40 @@ def analyze_sentiment(text, analyzer):
 
 def create_map(data):
     """지도 시각화 생성"""
-    if not data:
+
+    # None 이거나 비어있는 경우 종료
+    if data is None:
         return None
-        
-    # 데이터가 리스트인 경우 데이터프레임으로 변환
+
+    # 리스트인 경우 DataFrame으로 변환
     if isinstance(data, list):
         data = pd.DataFrame(data)
-    
+
+    # DataFrame이 아닌 경우 종료
+    if not isinstance(data, pd.DataFrame):
+        return None
+
+    # DataFrame이 비어있는 경우 종료
+    if data.empty:
+        return None
+
+    # 위치 정보가 있는 경우
     if 'location' in data.columns:
-        # 위치 정보가 있는 경우
         locations = data['location'].dropna().unique()
         if len(locations) > 0:
-            # 첫 번째 위치 정보 사용
-            location = locations[0]
-            lat, lon = location.split(',')
-            return folium.Map(
-                location=[float(lat), float(lon)],
-                zoom_start=13,
-                tiles='CartoDB positron'
-            )
-    
-    # 위치 정보가 없는 경우 부안군 중심으로 지도 생성
+            try:
+                lat, lon = map(float, locations[0].split(','))
+                return folium.Map(
+                    location=[lat, lon],
+                    zoom_start=13,
+                    tiles='CartoDB positron'
+                )
+            except ValueError:
+                pass  # location 형식이 이상할 경우 무시하고 기본 지도 생성
+
+    # 위치 정보가 없는 경우: 부안군 중심
     return folium.Map(
-        location=[35.7284, 126.7320],  # 부안군 중심 좌표
+        location=[35.7284, 126.7320],
         zoom_start=11,
         tiles='CartoDB positron'
     )
@@ -563,10 +574,15 @@ def main():
                         ]
                         
                         # 플랫폼 옵션 처리
-                        if len(platforms) == 0:
-                            cmd_parts.append("--platform all")
+                        if platforms:
+                            platform_option = ",".join(platforms)
+                            if platform_option.strip().lower() == "all":
+                                st.error("플랫폼을 하나 이상 선택해주세요.")
+                                return
+                            cmd_parts.append(f"--platform {platform_option}")
                         else:
-                            cmd_parts.append(f"--platform {','.join(platforms)}")
+                            st.error("플랫폼을 하나 이상 선택해주세요.")
+                            return
                         
                         # 나머지 옵션 추가
                         cmd_parts.append(f"--max-pages {pages}")
@@ -631,57 +647,44 @@ def main():
                 st.warning("사용 가능한 데이터셋이 없습니다.")
                 return
             
+            # 데이터셋 선택
             selected_dataset = st.selectbox(
                 "분석할 데이터셋 선택",
                 options=[d['filename'] for d in datasets],
                 format_func=lambda x: f"{x} ({datasets[[d['filename'] for d in datasets].index(x)]['count']}개)"
             )
             
-            if st.button("데이터셋 분석"):
-                # 선택된 데이터셋의 파일 경로 찾기
-                filepath = next(d['path'] for d in datasets if d['filename'] == selected_dataset)
-                
-                # 데이터 로드 및 처리
-                df = load_selected_dataset(filepath)
-                
-                if df is not None:
-                    # 데이터 미리보기
-                    st.subheader("데이터 미리보기")
-                    st.dataframe(df.head())
-                    
-                    # 데이터 검증 결과 표시
-                    data_processor = DataProcessor()
-                    validation_results = data_processor.validate_platform_data(df, os.path.basename(filepath).split('_')[0])
-                    
-                    if validation_results['warnings']:
-                        st.warning("데이터 검증 경고:")
-                        for warning in validation_results['warnings']:
-                            st.write(f"- {warning}")
-                    
-                    # 감성 분석 옵션
-                    if st.checkbox("감성 분석 재실행"):
-                        analyzer_option = st.selectbox(
-                            "감성 분석기 선택",
-                            ["Naive Bayes", "KoBERT", "Ensemble"]
-                        )
+            # 감성분석 모델 선택
+            data_processor = DataProcessor()
+            available_models = data_processor.get_available_models()
+            selected_model = st.selectbox(
+                "감성분석 모델 선택",
+                options=list(available_models.keys()),
+                format_func=lambda x: available_models[x],
+                help="각 모델의 특징:\n- Ensemble: 가장 정확하지만 느림\n- KoBERT: 가벼운 모델\n- KCBERT: 중간 크기 모델\n- KoAlpaca: 큰 모델"
+            )
+            
+            # 분석 버튼 클릭 시 결과를 세션에 저장
+            if st.button("데이터셋 분석 시작"):
+                try:
+                    with st.spinner("데이터셋 분석 중..."):
+                        # 선택된 데이터셋의 파일 경로 찾기
+                        filepath = next(d['path'] for d in datasets if d['filename'] == selected_dataset)
                         
-                        if analyzer_option == "Naive Bayes":
-                            analyzer = SentimentAnalyzer()
-                        elif analyzer_option == "KoBERT":
-                            analyzer = KoBERTSentimentAnalyzer()
+                        # 데이터셋 분석 실행
+                        df = data_processor.analyze_dataset(selected_dataset, selected_model)
+                        
+                        if df is not None and not df.empty:
+                            st.session_state.analysis_data = df
+                            st.session_state.show_results = True
+                            st.session_state.last_dataset = selected_dataset
+                            st.session_state.last_model = selected_model
+                            st.rerun()
                         else:
-                            analyzer = EnsembleSentimentAnalyzer()
-                        
-                        # 감성 분석 실행
-                        df = data_processor.process_data(df, os.path.basename(filepath).split('_')[0], analyzer)
-                        
-                        # 결과 저장
-                        processed_filepath = data_processor.save_processed_data(df, os.path.basename(filepath).split('_')[0])
-                        st.success(f"감성 분석 완료: {processed_filepath}")
-                    
-                    # 분석 결과 저장
-                    st.session_state.analysis_data = df
-                    st.session_state.show_results = True
+                            st.error("분석 결과가 없습니다.")
+                except Exception as e:
+                    st.error(f"데이터셋 분석 중 오류 발생: {str(e)}")
+                    logger.error(f"데이터셋 분석 중 오류 발생: {str(e)}", exc_info=True)
     
     # 메인 영역 - 크롤링 모드일 때 상태 표시
     if dashboard_mode == "크롤링":
@@ -785,8 +788,12 @@ def main():
     
         # 기본 시각화 표시 (데이터 유무와 관계없이)
         st.subheader("감성 분포 지도")
-        if st.session_state.analysis_data:
+        if st.session_state.analysis_data is not None and isinstance(st.session_state.analysis_data, (pd.DataFrame, list)) and len(st.session_state.analysis_data) > 0:
             map_ = create_map(st.session_state.analysis_data)
+            if map_ is not None:
+                st_folium(map_, width=700, height=500)
+            else:
+                st.info("지도 데이터가 없습니다.")
         else:
             # 기본 지도 생성 (부안군 중심)
             map_ = folium.Map(location=[35.728, 126.733], zoom_start=10)
@@ -796,48 +803,57 @@ def main():
                 popup="부안군",
                 icon=folium.Icon(color='blue')
             ).add_to(marker_cluster)
-        st_folium(map_, width=700, height=500)
+            st_folium(map_, width=700, height=500)
         
         # 감성 분석 샘플 출력
         st.subheader("📋 감성 분석 샘플")
-        if st.session_state.analysis_data:
-            df = pd.DataFrame(st.session_state.analysis_data)
-            st.write(df[['title', 'content', 'sentiment', 'confidence']].head())
+        if st.session_state.get("show_results", False) and st.session_state.get("analysis_data") is not None:
+            df = st.session_state.analysis_data
+            if not df.empty and all(col in df.columns for col in ['title', 'content', 'sentiment', 'confidence']):
+                st.write(df[['title', 'content', 'sentiment', 'confidence']].head())
+            else:
+                st.warning("필요한 컬럼이 없거나 데이터가 비어있습니다.")
         else:
             st.info("분석할 데이터가 없습니다.")
         
         # CSV 다운로드
-        if st.session_state.analysis_data:
-            df = pd.DataFrame(st.session_state.analysis_data)
-            st.download_button(
-                "📥 CSV 다운로드",
-                df.to_csv(index=False).encode('utf-8'),
-                file_name=f"sentiment_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
-                mime='text/csv'
-            )
+        if st.session_state.analysis_data is not None and isinstance(st.session_state.analysis_data, (pd.DataFrame, list)) and len(st.session_state.analysis_data) > 0:
+            df = pd.DataFrame(st.session_state.analysis_data) if isinstance(st.session_state.analysis_data, list) else st.session_state.analysis_data
+            if not df.empty:
+                st.download_button(
+                    "📥 CSV 다운로드",
+                    df.to_csv(index=False).encode('utf-8'),
+                    file_name=f"sentiment_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
+                    mime='text/csv'
+                )
+            else:
+                st.warning("다운로드할 데이터가 없습니다.")
         
         # 감성 분포 시각화
         st.subheader("감성 분포")
-        if st.session_state.analysis_data:
-            df = pd.DataFrame(st.session_state.analysis_data)
-            col1, col2 = st.columns(2)
-            with col1:
-                sentiment_counts = df['sentiment'].value_counts()
-                fig, ax = plt.subplots(figsize=(10, 6))
-                sentiment_counts.plot(kind='bar', ax=ax)
-                plt.title("감성 분포")
-                st.pyplot(fig)
-            with col2:
-                fig, ax = plt.subplots(figsize=(10, 6))
-                sentiment_counts.plot(kind='pie', autopct='%1.1f%%', ax=ax)
-                plt.title("감성 분포 (비율)")
-                st.pyplot(fig)
+        if st.session_state.analysis_data is not None and isinstance(st.session_state.analysis_data, (pd.DataFrame, list)) and len(st.session_state.analysis_data) > 0:
+            df = pd.DataFrame(st.session_state.analysis_data) if isinstance(st.session_state.analysis_data, list) else st.session_state.analysis_data
+            if not df.empty and 'sentiment' in df.columns:
+                col1, col2 = st.columns(2)
+                with col1:
+                    sentiment_counts = df['sentiment'].value_counts()
+                    fig, ax = plt.subplots(figsize=(10, 6))
+                    sentiment_counts.plot(kind='bar', ax=ax)
+                    plt.title("감성 분포")
+                    st.pyplot(fig)
+                with col2:
+                    fig, ax = plt.subplots(figsize=(10, 6))
+                    sentiment_counts.plot(kind='pie', autopct='%1.1f%%', ax=ax)
+                    plt.title("감성 분포 (비율)")
+                    st.pyplot(fig)
+            else:
+                st.warning("감성 분석 데이터가 없습니다.")
         else:
             st.info("분석할 데이터가 없습니다.")
         
         # 시계열 트렌드
         st.subheader("시계열 감성 트렌드")
-        if st.session_state.analysis_data:
+        if st.session_state.analysis_data is not None and len(st.session_state.analysis_data) > 0:
             df = pd.DataFrame(st.session_state.analysis_data)
             
             # 날짜 형식 정규화 및 변환
@@ -867,7 +883,7 @@ def main():
         
         # 워드클라우드
         st.subheader("키워드 워드클라우드")
-        if st.session_state.analysis_data:
+        if st.session_state.analysis_data is not None and len(st.session_state.analysis_data) > 0:
             df = pd.DataFrame(st.session_state.analysis_data)
             col1, col2 = st.columns(2)
             with col1:
@@ -893,10 +909,10 @@ def main():
                     st.write("긍정 감성의 텍스트가 없습니다.")
         else:
             st.info("분석할 데이터가 없습니다.")
-    
-    # GPT 리포트 생성
+        
+        # GPT 리포트 생성
         st.subheader("정책 제안 리포트")
-        if st.session_state.analysis_data:
+        if st.session_state.analysis_data is not None and len(st.session_state.analysis_data) > 0:
             try:
                 df = pd.DataFrame(st.session_state.analysis_data)
                 report_generator = GPTReportGenerator(api_key=os.getenv("OPENAI_API_KEY"))

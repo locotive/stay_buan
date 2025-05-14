@@ -218,15 +218,19 @@ class NaverSearchAPICrawler(BaseCrawler):
         self.doc_ids = set()
         self.analyze_sentiment = analyze_sentiment
         
-        # 필터링 조건 완화
+        # 필터링 조건 완화 및 최적화
         self.filter_conditions = {
             'min_acceptable_results': 0,      # 최소 결과 수 제한 제거
-            'min_content_length': 50,         # 최소 컨텐츠 길이 더 완화
+            'min_content_length': 30,         # 최소 컨텐츠 길이 더 완화
             'max_pages': max_pages,           # 사용자가 지정한 페이지 수 사용
             'min_confidence': 0.0,            # 감성 분석 신뢰도 제한 제거
-            'exclude_keywords': ['광고', '홍보', 'sponsored', '출처', '저작권'],  # 기본적인 스팸만 제외
+            'exclude_keywords': ['광고', '홍보', 'sponsored'],  # 기본적인 스팸만 제외
             'required_keywords': ['부안'],     # 부안 키워드는 유지
-            'date_range': None                # 날짜 제한 제거
+            'date_range': None,               # 날짜 제한 제거
+            'api_display': 50,                # API 한 번 요청당 결과 수 (100 -> 50으로 감소)
+            'api_wait_time': (0.1, 0.3),      # API 요청 간 대기 시간 감소
+            'direct_wait_time': (0.2, 0.5),   # 직접 크롤링 대기 시간 감소
+            'content_wait_time': 0.5          # 콘텐츠 추출 대기 시간 감소
         }
         
         # ContentExtractor 초기화
@@ -389,7 +393,8 @@ class NaverSearchAPICrawler(BaseCrawler):
                     search_url = f"https://search.naver.com/search.naver?where=view&query={encoded_keyword}&start={start_idx}"
                     
                     driver.get(search_url)
-                    time.sleep(random.uniform(0.3, 1.0))  # 차단 방지를 위한 대기
+                    # 최적화된 대기 시간 적용
+                    time.sleep(random.uniform(*self.filter_conditions['direct_wait_time']))
                     
                     # 최신 Selenium API 사용
                     from selenium.webdriver.common.by import By
@@ -476,7 +481,8 @@ class NaverSearchAPICrawler(BaseCrawler):
                     if not next_buttons or "disabled" in next_buttons[0].get_attribute("class"):
                         break
                         
-                    time.sleep(random.uniform(0.3, 0.8))  # 차단 방지를 위한 대기
+                    # 최적화된 대기 시간 적용
+                    time.sleep(random.uniform(*self.filter_conditions['direct_wait_time']))
                     
                 except Exception as e:
                     self.logger.error(f"직접 크롤링 중 페이지 처리 오류: {str(e)}")
@@ -513,8 +519,8 @@ class NaverSearchAPICrawler(BaseCrawler):
                         try:
                             params = {
                                 "query": keyword,
-                                "display": 100,  # 한 번에 100개씩 가져오기
-                                "start": (page - 1) * 100 + 1
+                                "display": self.filter_conditions['api_display'],  # 최적화된 display 값 사용
+                                "start": (page - 1) * self.filter_conditions['api_display'] + 1
                             }
                             
                             response = requests.get(api_url, headers=self.headers, params=params)
@@ -533,7 +539,7 @@ class NaverSearchAPICrawler(BaseCrawler):
                                 desc = self.clean_text(item.get("description", ""))
                                 url = item.get("link", "")
                                 blog_name = item.get("bloggername", item.get("author", ""))
-                                date = item.get("postdate", item.get("pubDate", "")).replace("-", "")[:8]
+                                date = self._normalize_date(item.get("postdate", item.get("pubDate", "")))
                                 
                                 if url in seen_urls:
                                     continue
@@ -564,7 +570,8 @@ class NaverSearchAPICrawler(BaseCrawler):
                                 self.cache.save(url)
                                 
                             page += 1
-                            time.sleep(random.uniform(0.2, 0.7))
+                            # 최적화된 대기 시간 적용
+                            time.sleep(random.uniform(*self.filter_conditions['api_wait_time']))
                             
                         except Exception as e:
                             self.logger.error(f"API 요청 중 오류: {str(e)}")

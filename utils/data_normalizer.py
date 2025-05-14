@@ -3,6 +3,9 @@ import json
 import pandas as pd
 from dateutil import parser
 import logging
+from typing import Dict
+import time
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -25,15 +28,15 @@ class PlatformDataNormalizer:
         self.platform_mappings = {
             'naver': {
                 'title': 'title',
-                'content': 'description',
+                'content': 'content',
                 'published_date': 'pubDate',
-                'url': 'link'
+                'url': 'url'
             },
             'youtube': {
-                'title': 'snippet.title',
-                'content': 'snippet.description',
-                'published_date': 'snippet.publishedAt',
-                'url': 'id.videoId'
+                'title': 'title',
+                'content': 'content',
+                'published_date': 'published_date',
+                'url': 'url'
             },
             'dcinside': {
                 'title': 'subject',
@@ -54,7 +57,7 @@ class PlatformDataNormalizer:
                 'url': 'url'
             }
         }
-    
+
     def normalize_data(self, data, platform):
         """플랫폼별 데이터 정규화"""
         normalized_items = []
@@ -88,36 +91,71 @@ class PlatformDataNormalizer:
             normalized_items.append(normalized_item)
         
         return normalized_items
-    
+
     def _get_nested_value(self, item, field_path):
         """중첩된 필드 값 추출"""
+        if not isinstance(item, dict):
+            return ''
+            
         if '.' not in field_path:
-            return item.get(field_path, '')
+            value = item.get(field_path, '')
+            return str(value) if value is not None else ''
             
         parts = field_path.split('.')
         value = item
+        
         for part in parts:
-            if isinstance(value, dict):
-                value = value.get(part, '')
-            else:
+            if not isinstance(value, dict):
                 return ''
-        return value
-    
+            value = value.get(part)
+            if value is None:
+                return ''
+                
+        return str(value) if value is not None else ''
+
     def _normalize_date(self, date_str, platform):
         """날짜 형식 통일"""
+        if not date_str:
+            return time.strftime("%Y%m%d")
+        
         try:
-            if platform == 'youtube':
-                # YouTube: "2024-03-15T10:30:00Z" -> "20240315"
-                return date_str.split('T')[0].replace('-', '')
-            elif platform == 'naver':
-                # Naver: "Wed, 15 Mar 2024 10:30:00 +0900" -> "20240315"
-                return parser.parse(date_str).strftime('%Y%m%d')
-            else:
-                # 기타 플랫폼: "2024-03-15" -> "20240315"
-                return date_str.replace('-', '')
-        except:
-            return ''
-    
+            # 문자열로 변환
+            date_str = str(date_str).strip()
+            
+            # 이미 YYYYMMDD 형식인 경우
+            if date_str.isdigit() and len(date_str) == 8:
+                return date_str
+            
+            # 날짜 형식 변환
+            date_formats = [
+                "%Y-%m-%d %H:%M:%S",
+                "%Y.%m.%d %H:%M:%S",
+                "%Y-%m-%d",
+                "%Y.%m.%d",
+                "%Y%m%d",
+                "%Y년%m월%d일",
+                "%Y년 %m월 %d일",
+                "%a, %d %b %Y %H:%M:%S %z",
+                "%Y-%m-%dT%H:%M:%SZ"
+            ]
+            
+            for fmt in date_formats:
+                try:
+                    date_obj = datetime.strptime(date_str, fmt)
+                    return date_obj.strftime("%Y%m%d")
+                except:
+                    continue
+            
+            digits = ''.join(filter(str.isdigit, date_str))
+            if len(digits) >= 8:
+                return digits[:8]
+            
+            return time.strftime("%Y%m%d")
+        
+        except Exception as e:
+            logger.warning(f"날짜 변환 실패: {date_str} - {str(e)}")
+            return time.strftime("%Y%m%d")
+
     def _normalize_url(self, url, platform):
         """URL 형식 통일"""
         if platform == 'youtube':
@@ -135,19 +173,20 @@ class DataValidator:
             'empty_content': []
         }
         
-        # 필수 필드 확인
         required_fields = ['platform', 'title', 'content', 'published_date']
         for field in required_fields:
             if field not in df.columns:
                 validation_results['missing_fields'].append(field)
         
-        # 날짜 형식 검증
         if 'published_date' in df.columns:
-            invalid_dates = df[~df['published_date'].str.match(r'^\d{8}$')]
+            invalid_dates = df[~df['published_date'].astype(str).str.match(r'^\d{8}$')]
             if not invalid_dates.empty:
+                normalizer = PlatformDataNormalizer()
+                df.loc[invalid_dates.index, 'published_date'] = df.loc[invalid_dates.index, 'published_date'].apply(
+                    lambda x: normalizer._normalize_date(x, df['platform'].iloc[0])
+                )
                 validation_results['invalid_dates'].extend(invalid_dates.index.tolist())
         
-        # 빈 컨텐츠 확인
         if 'content' in df.columns:
             empty_content = df[df['content'].str.strip() == '']
             if not empty_content.empty:
@@ -158,30 +197,17 @@ class DataValidator:
 def load_and_normalize_data(filepath):
     """데이터 로드 및 정규화"""
     try:
-        # 파일명에서 플랫폼 추출
         platform = os.path.basename(filepath).split('_')[0]
-        
-        # 데이터 로드
         with open(filepath, 'r', encoding='utf-8') as f:
             raw_data = json.load(f)
-        
-        # 데이터 정규화
         normalizer = PlatformDataNormalizer()
         normalized_data = normalizer.normalize_data(raw_data, platform)
-        
-        # 데이터프레임으로 변환
         df = pd.DataFrame(normalized_data)
-        
-        # 데이터 검증
         validator = DataValidator()
         validation_results = validator.validate_data(df)
-        
-        # 검증 결과 로깅
         if any(validation_results.values()):
             logger.warning(f"데이터 검증 결과: {validation_results}")
-        
         return df
-        
     except Exception as e:
         logger.error(f"데이터 로드 및 정규화 중 오류 발생: {str(e)}")
-        raise 
+        raise
