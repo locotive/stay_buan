@@ -129,3 +129,6 @@ config/config.py
 
 # PDF reports
 *.pdf 
+
+사용법.txt
+start_dashboard.bat
