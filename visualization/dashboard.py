@@ -34,11 +34,12 @@ import logging
 import concurrent.futures
 
 # 로깅 설정
+os.makedirs("data/logs", exist_ok=True)
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler("streamlit_dashboard.log"),
+        logging.FileHandler("data/logs/streamlit_dashboard.log"),
         logging.StreamHandler()
     ]
 )
@@ -657,28 +658,91 @@ def main():
             # 감성분석 모델 선택
             data_processor = DataProcessor()
             available_models = data_processor.get_available_models()
-            selected_model = st.selectbox(
-                "감성분석 모델 선택",
+            model_combinations = data_processor.model_combinations
+            
+            st.subheader("모델 선택")
+            
+            # 개별 모델 선택 (기본 옵션)
+            selected_models = st.multiselect(
+                "사용할 모델을 선택하세요",
                 options=list(available_models.keys()),
                 format_func=lambda x: available_models[x],
-                help="각 모델의 특징:\n- Ensemble: 가장 정확하지만 느림\n- KoBERT: 가벼운 모델\n- KCBERT: 중간 크기 모델\n- KoAlpaca: 큰 모델"
+                default=['kobert', 'kcbert'],
+                help="여러 모델을 선택하면 앙상블로 분석됩니다."
             )
             
-            # 분석 버튼 클릭 시 결과를 세션에 저장
-            if st.button("데이터셋 분석 시작"):
+            # 미리 정의된 조합 선택 (보조 옵션)
+            st.markdown("---")
+            st.subheader("미리 정의된 모델 조합")
+            
+            # 조합 설명을 더 가독성 있게 표시
+            combinations_info = {
+                'light': {
+                    'title': '가벼운 조합',
+                    'models': ['kobert', 'kcelectra'],
+                    'description': '빠른 처리 속도에 최적화된 조합입니다.'
+                },
+                'balanced': {
+                    'title': '균형잡힌 조합',
+                    'models': ['kcbert', 'kcelectra', 'kosentencebert'],
+                    'description': '속도와 정확도의 균형을 맞춘 조합입니다.'
+                },
+                'heavy': {
+                    'title': '정확도 중심 조합',
+                    'models': ['kcbert-large', 'kosentencebert', 'kcelectra'],
+                    'description': '높은 정확도를 우선시하는 조합입니다.'
+                }
+            }
+            
+            # 조합 선택 UI
+            for combo_key, combo_info in combinations_info.items():
+                with st.expander(f"📊 {combo_info['title']}"):
+                    st.markdown(f"**포함 모델:** {', '.join(combo_info['models'])}")
+                    st.markdown(f"*{combo_info['description']}*")
+                    if st.button(f"이 조합으로 분석하기", key=f"use_{combo_key}"):
+                        try:
+                            with st.spinner("데이터셋 분석 중..."):
+                                # 선택된 데이터셋의 파일 경로 찾기
+                                filepath = next(d['path'] for d in datasets if d['filename'] == selected_dataset)
+                                
+                                # 선택된 조합으로 분석 실행
+                                df = data_processor.analyze_dataset(
+                                    input_file=filepath,
+                                    models=combo_info['models'],
+                                    output_dir="data/processed"
+                                )
+                                
+                                if df is not None and not df.empty:
+                                    st.session_state.analysis_data = df
+                                    st.session_state.show_results = True
+                                    st.session_state.last_dataset = selected_dataset
+                                    st.session_state.last_models = combo_info['models']
+                                    st.rerun()
+                                else:
+                                    st.error("분석 결과가 없습니다.")
+                        except Exception as e:
+                            st.error(f"데이터셋 분석 중 오류 발생: {str(e)}")
+                            logger.error(f"데이터셋 분석 중 오류 발생: {str(e)}", exc_info=True)
+            
+            # 개별 모델 선택 시 분석 버튼
+            if selected_models and st.button("선택한 모델로 분석하기"):
                 try:
                     with st.spinner("데이터셋 분석 중..."):
                         # 선택된 데이터셋의 파일 경로 찾기
                         filepath = next(d['path'] for d in datasets if d['filename'] == selected_dataset)
                         
-                        # 데이터셋 분석 실행
-                        df = data_processor.analyze_dataset(selected_dataset, selected_model)
+                        # 데이터셋 분석 실행 (파일 경로와 모델 목록 전달)
+                        df = data_processor.analyze_dataset(
+                            input_file=filepath,
+                            models=selected_models,
+                            output_dir="data/processed"
+                        )
                         
                         if df is not None and not df.empty:
                             st.session_state.analysis_data = df
                             st.session_state.show_results = True
                             st.session_state.last_dataset = selected_dataset
-                            st.session_state.last_model = selected_model
+                            st.session_state.last_models = selected_models
                             st.rerun()
                         else:
                             st.error("분석 결과가 없습니다.")

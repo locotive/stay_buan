@@ -119,42 +119,13 @@ class PlatformDataNormalizer:
             return time.strftime("%Y%m%d")
         
         try:
-            # 문자열로 변환
-            date_str = str(date_str).strip()
-            
-            # 이미 YYYYMMDD 형식인 경우
+            # 8자리 숫자 형식 확인
             if date_str.isdigit() and len(date_str) == 8:
-                return date_str
-            
-            # 날짜 형식 변환
-            date_formats = [
-                "%Y-%m-%d %H:%M:%S",
-                "%Y.%m.%d %H:%M:%S",
-                "%Y-%m-%d",
-                "%Y.%m.%d",
-                "%Y%m%d",
-                "%Y년%m월%d일",
-                "%Y년 %m월 %d일",
-                "%a, %d %b %Y %H:%M:%S %z",
-                "%Y-%m-%dT%H:%M:%SZ"
-            ]
-            
-            for fmt in date_formats:
-                try:
-                    date_obj = datetime.strptime(date_str, fmt)
-                    return date_obj.strftime("%Y%m%d")
-                except:
-                    continue
-            
-            digits = ''.join(filter(str.isdigit, date_str))
-            if len(digits) >= 8:
-                return digits[:8]
-            
-            return time.strftime("%Y%m%d")
-        
-        except Exception as e:
-            logger.warning(f"날짜 변환 실패: {date_str} - {str(e)}")
-            return time.strftime("%Y%m%d")
+                return pd.to_datetime(date_str, format='%Y%m%d')
+            # 기타 형식 처리
+            return pd.to_datetime(date_str)
+        except:
+            return None
 
     def _normalize_url(self, url, platform):
         """URL 형식 통일"""
