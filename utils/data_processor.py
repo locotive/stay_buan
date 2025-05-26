@@ -30,7 +30,7 @@ class DataProcessor:
         os.makedirs(self.cache_dir, exist_ok=True)
         os.makedirs(self.model_dir, exist_ok=True)
         
-        # 모델 설정
+        # 모델 설정 (KoAlpaca 제외, 새로운 모델 추가)
         self.model_configs = {
             'kobert': {
                 'name': 'monologg/kobert',
@@ -42,9 +42,19 @@ class DataProcessor:
                 'local_path': os.path.join(self.model_dir, 'kcbert'),
                 'offline': True
             },
-            'koalpaca': {
-                'name': 'beomi/KoAlpaca-Polyglot-12.8B',
-                'local_path': os.path.join(self.model_dir, 'koalpaca'),
+            'kcelectra': {
+                'name': 'beomi/kcelectra-base',
+                'local_path': os.path.join(self.model_dir, 'kcelectra'),
+                'offline': True
+            },
+            'kcbert-large': {
+                'name': 'beomi/kcbert-large',
+                'local_path': os.path.join(self.model_dir, 'kcbert-large'),
+                'offline': True
+            },
+            'kosentencebert': {
+                'name': 'snunlp/KR-SBERT-V40K-klueNLI-augSTS',
+                'local_path': os.path.join(self.model_dir, 'kosentencebert'),
                 'offline': True
             }
         }
@@ -61,10 +71,19 @@ class DataProcessor:
         
         # 사용 가능한 감성분석 모델 목록
         self.available_models = {
-            'ensemble': 'EnsembleSentimentAnalyzer (KoBERT + KCBERT + KoAlpaca)',
             'kobert': 'KoBERT (가벼운 모델)',
             'kcbert': 'KCBERT (중간 크기 모델)',
-            'koalpaca': 'KoAlpaca (큰 모델)'
+            'kcelectra': 'KcELECTRA (감성분석 특화)',
+            'kcbert-large': 'KcBERT-large (큰 모델)',
+            'kosentencebert': 'KoSentenceBERT (문장 수준 분석)'
+        }
+        
+        # 미리 정의된 모델 조합
+        self.model_combinations = {
+            'light': ['kobert', 'kcelectra'],  # 가벼운 조합
+            'balanced': ['kcbert', 'kcelectra', 'kosentencebert'],  # 균형잡힌 조합
+            'heavy': ['kcbert-large', 'kosentencebert', 'kcelectra'],  # 정확도 중심
+            'custom': []  # 사용자 정의
         }
         
         # 모델 초기화 상태
@@ -123,11 +142,15 @@ class DataProcessor:
             elif model_name == 'kcbert':
                 from core.sentiment_analysis_kcbert import KCBERTSentimentAnalyzer
                 model = KCBERTSentimentAnalyzer(model_path=config['local_path'])
-            elif model_name == 'koalpaca':
-                from core.sentiment_analysis_koalpaca import KoAlpacaSentimentAnalyzer
-                model = KoAlpacaSentimentAnalyzer(
-                    model_path=config['local_path']
-                )
+            elif model_name == 'kcelectra':
+                from core.sentiment_analysis_kcelectra import KcELECTRASentimentAnalyzer
+                model = KcELECTRASentimentAnalyzer(model_path=config['local_path'])
+            elif model_name == 'kcbert-large':
+                from core.sentiment_analysis_kcbert_large import KcBERTLargeSentimentAnalyzer
+                model = KcBERTLargeSentimentAnalyzer(model_path=config['local_path'])
+            elif model_name == 'kosentencebert':
+                from core.sentiment_analysis_kosentencebert import KoSentenceBERTSentimentAnalyzer
+                model = KoSentenceBERTSentimentAnalyzer(model_path=config['local_path'])
             else:
                 raise ValueError(f"지원하지 않는 모델: {model_name}")
             
@@ -173,20 +196,19 @@ class DataProcessor:
             logger.error(f"processed 데이터 검색 중 오류 발생: {str(e)}")
             return None
     
-    def get_sentiment_analyzer(self, model_name: str):
-        """선택된 모델에 따른 감성분석기 반환"""
+    def get_sentiment_analyzer(self, model_names: List[str] = None):
+        """선택된 모델들로 앙상블 감성분석기 반환"""
         try:
-            if model_name == 'ensemble':
-                from core.sentiment_analysis_ensemble import EnsembleSentimentAnalyzer
-                # 앙상블 모델 초기화
-                models = [
-                    self._initialize_model('kobert'),
-                    self._initialize_model('kcbert'),
-                    self._initialize_model('koalpaca')
-                ]
-                return EnsembleSentimentAnalyzer(models=models)
-            else:
-                return self._initialize_model(model_name)
+            from core.sentiment_analysis_ensemble import EnsembleSentimentAnalyzer
+            
+            # 기본값 설정
+            if model_names is None:
+                model_names = ['kobert', 'kcbert']
+            
+            # 선택된 모델들 초기화
+            models = [self._initialize_model(name) for name in model_names]
+            
+            return EnsembleSentimentAnalyzer(models=models)
                 
         except Exception as e:
             logger.error(f"감성분석기 초기화 중 오류 발생: {str(e)}")
