@@ -1,7 +1,7 @@
 from core.sentiment_analysis_kobert import KoBERTSentimentAnalyzer
-from core.sentiment_analysis_kcbert import KCBERTSentimentAnalyzer, KcBERTLargeSentimentAnalyzer
 from core.sentiment_analysis_kcelectra import KcELECTRASentimentAnalyzer
 from core.sentiment_analysis_kosentencebert import KoSentenceBERTSentimentAnalyzer
+from core.sentiment_analysis_kcbert_large import KcBERTLargeSentimentAnalyzer
 from collections import Counter
 from typing import List, Dict, Tuple, Union
 import logging
@@ -12,33 +12,58 @@ import os
 logger = logging.getLogger(__name__)
 
 class EnsembleSentimentAnalyzer:
-    """다양한 감성 분석 모델 앙상블 - 싱글톤 패턴"""
+    """다양한 감성 분석 모델 앙상블"""
     
     _instance = None
-    _initialized = False
     
     def __new__(cls, models: List = None):
         if cls._instance is None:
             cls._instance = super(EnsembleSentimentAnalyzer, cls).__new__(cls)
+            cls._instance._initialized = False
         return cls._instance
     
     def __init__(self, models: List = None):
-        if not EnsembleSentimentAnalyzer._initialized:
+        # 모델 목록이 변경되었거나 초기화되지 않은 경우에만 재초기화
+        if not hasattr(self, '_initialized') or not self._initialized or (models is not None and set(models) != set(self.model_names)):
             self.model_mapping = {
                 'kobert': lambda: KoBERTSentimentAnalyzer(model_path="data/models/kobert"),
-                'kcbert': lambda: KCBERTSentimentAnalyzer(model_path="data/models/kcbert"),
+                'kcelectra-base-v2022': lambda: KcELECTRASentimentAnalyzer(model_path="data/models/kcelectra-base-v2022"),
                 'kcelectra': lambda: KcELECTRASentimentAnalyzer(model_path="data/models/kcelectra"),
                 'kcbert-large': lambda: KcBERTLargeSentimentAnalyzer(model_path="data/models/kcbert-large"),
                 'kosentencebert': lambda: KoSentenceBERTSentimentAnalyzer(model_path="data/models/kosentencebert")
             }
             
-            # 기본 모델 조합
-            self.model_names = ['kobert', 'kcbert', 'kcelectra']
+            # 사용자가 지정한 모델 목록 사용 (없으면 모든 모델 사용)
+            self.model_names = models if models else list(self.model_mapping.keys())
+            
+            # 지원하지 않는 모델 필터링
+            self.model_names = [name for name in self.model_names if name in self.model_mapping]
+            
+            if not self.model_names:
+                logger.warning("유효한 모델이 선택되지 않았습니다. 기본 모델을 사용합니다.")
+                self.model_names = ['kobert', 'kcelectra-base-v2022', 'kcelectra']
+            
+            logger.info(f"선택된 모델 목록: {self.model_names}")
             self.analyzers = {}
+            
+            # 기존 모델 해제
+            if hasattr(self, 'analyzers'):
+                for analyzer in self.analyzers.values():
+                    if hasattr(analyzer, 'model'):
+                        del analyzer.model
+                    if hasattr(analyzer, 'tokenizer'):
+                        del analyzer.tokenizer
             
             # 모델 초기화
             self._initialize_models()
-            logger.info(f"앙상블 분석기 초기화 완료 (모델 수: {len(self.analyzers)})")
+            
+            # 초기화된 모델 수 확인
+            initialized_models = list(self.analyzers.keys())
+            if len(initialized_models) != len(self.model_names):
+                failed_models = set(self.model_names) - set(initialized_models)
+                logger.warning(f"일부 모델 초기화 실패: {failed_models}")
+            
+            logger.info(f"앙상블 분석기 초기화 완료 (모델 수: {len(self.analyzers)}, 초기화된 모델: {initialized_models})")
             
             # 레이블 매핑 정의
             self.label_map = {
@@ -54,7 +79,7 @@ class EnsembleSentimentAnalyzer:
                 "positive": 2
             }
             
-            EnsembleSentimentAnalyzer._initialized = True
+            self._initialized = True
     
     def _initialize_models(self):
         """모델 초기화 및 메서드 검증"""
@@ -72,33 +97,44 @@ class EnsembleSentimentAnalyzer:
                         from huggingface_hub import snapshot_download
                         repo_id = {
                             'kobert': 'monologg/kobert',
-                            'kcbert': 'beomi/kcbert-base',
+                            'kcelectra-base-v2022': 'beomi/kcelectra-base-v2022',
                             'kcelectra': 'beomi/kcelectra-base',
                             'kcbert-large': 'beomi/kcbert-large',
                             'kosentencebert': 'snunlp/KR-SBERT-V40K-klueNLI-augSTS'
                         }[model_name]
+                        
+                        # 모델 다운로드 시도
+                        logger.info(f"{model_name} 모델 다운로드 시작: {repo_id}")
                         snapshot_download(
                             repo_id=repo_id,
                             local_dir=model_path,
-                            local_dir_use_symlinks=False
+                            local_dir_use_symlinks=False,
+                            ignore_patterns=["*.md", "*.txt", "*.json", "*.h5", "*.ckpt", "*.bin", "*.pt", "*.pth"]
                         )
+                        logger.info(f"{model_name} 모델 다운로드 완료")
+                        
                     except Exception as e:
                         logger.error(f"{model_name} 모델 다운로드 실패: {str(e)}")
                         continue
                 
                 # 모델 초기화
-                analyzer = self.model_mapping[model_name]()
-                
-                # predict 또는 analyze_text 메서드 존재 여부 확인
-                if not (hasattr(analyzer, 'predict') or hasattr(analyzer, 'analyze_text')):
-                    logger.warning(f"{model_name} 모델에 predict 또는 analyze_text 메서드가 없습니다")
+                try:
+                    analyzer = self.model_mapping[model_name]()
+                    
+                    # predict 또는 analyze_text 메서드 존재 여부 확인
+                    if not (hasattr(analyzer, 'predict') or hasattr(analyzer, 'analyze_text')):
+                        logger.warning(f"{model_name} 모델에 predict 또는 analyze_text 메서드가 없습니다")
+                        continue
+                    
+                    self.analyzers[model_name] = analyzer
+                    logger.info(f"{model_name} 모델 초기화 완료")
+                    
+                except Exception as e:
+                    logger.error(f"{model_name} 모델 초기화 중 오류 발생: {str(e)}")
                     continue
                 
-                self.analyzers[model_name] = analyzer
-                logger.info(f"{model_name} 모델 초기화 완료")
-                
             except Exception as e:
-                logger.error(f"{model_name} 모델 초기화 중 오류 발생: {str(e)}")
+                logger.error(f"{model_name} 모델 처리 중 예상치 못한 오류 발생: {str(e)}")
                 continue
     
     def predict(self, text: str) -> Tuple[int, float]:
@@ -127,7 +163,7 @@ class EnsembleSentimentAnalyzer:
                 
                 predictions.append(pred)
                 confidences.append(conf)
-                logger.debug(f"{model_name} 예측 결과: {pred} (신뢰도: {conf:.3f})")
+                logger.info(f"{model_name} 예측 결과: {pred} (신뢰도: {conf:.3f})")
                 
             except Exception as e:
                 logger.error(f"{model_name} 모델 예측 중 오류 발생: {str(e)}")

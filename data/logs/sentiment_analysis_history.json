@@ -1,0 +1,33 @@
+{
+  "analyses": [
+    {
+      "timestamp": "2025-05-27 09:29:06",
+      "file_path": "data/raw/youtube_29_여행_20250527_072305.json",
+      "models": [
+        "kobert",
+        "kcelectra-base-v2022"
+      ],
+      "item_count": 29,
+      "sentiment_distribution": {
+        "negative": "0.0%",
+        "neutral": "0.0%",
+        "positive": "0.0%"
+      },
+      "processing_time": 77.70973992347717
+    },
+    {
+      "timestamp": "2025-05-27 09:45:32",
+      "file_path": "data/raw/naver_news_82_부안_여행_20250527_072457.json",
+      "models": [
+        "kobert"
+      ],
+      "item_count": 82,
+      "sentiment_distribution": {
+        "negative": "0.0%",
+        "neutral": "0.0%",
+        "positive": "0.0%"
+      },
+      "processing_time": 149.56497287750244
+    }
+  ]
+}

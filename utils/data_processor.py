@@ -11,8 +11,63 @@ from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 from pathlib import Path
 from core.sentiment_analysis_ensemble import EnsembleSentimentAnalyzer
+import time
 
 logger = logging.getLogger(__name__)
+
+class SentimentAnalysisHistory:
+    """감성 분석 이력 관리 클래스"""
+    
+    def __init__(self, history_file="data/logs/sentiment_analysis_history.json"):
+        self.history_file = history_file
+        self.history = self._load_history()
+        
+    def _load_history(self):
+        """이력 파일 로드"""
+        if os.path.exists(self.history_file):
+            try:
+                with open(self.history_file, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            except Exception as e:
+                logger.error(f"이력 파일 로드 실패: {str(e)}")
+                return {"analyses": []}
+        return {"analyses": []}
+    
+    def _save_history(self):
+        """이력 파일 저장"""
+        os.makedirs(os.path.dirname(self.history_file), exist_ok=True)
+        try:
+            with open(self.history_file, 'w', encoding='utf-8') as f:
+                json.dump(self.history, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            logger.error(f"이력 파일 저장 실패: {str(e)}")
+    
+    def add_analysis(self, file_path, models, item_count, sentiment_distribution, processing_time):
+        """새로운 분석 이력 추가"""
+        analysis = {
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "file_path": file_path,
+            "models": models,
+            "item_count": item_count,
+            "sentiment_distribution": sentiment_distribution,
+            "processing_time": processing_time
+        }
+        self.history["analyses"].append(analysis)
+        self._save_history()
+    
+    def get_file_analysis_history(self, file_path):
+        """특정 파일의 분석 이력 조회"""
+        return [a for a in self.history["analyses"] if a["file_path"] == file_path]
+    
+    def is_file_analyzed(self, file_path, models=None):
+        """파일이 이미 분석되었는지 확인"""
+        file_history = self.get_file_analysis_history(file_path)
+        if not file_history:
+            return False
+        if models is None:
+            return True
+        # 모델 목록이 지정된 경우, 해당 모델들로 분석된 이력이 있는지 확인
+        return any(set(models) == set(a["models"]) for a in file_history)
 
 class DataProcessor:
     """데이터 전처리 파이프라인 클래스"""
@@ -21,10 +76,7 @@ class DataProcessor:
         self.sentiment_map = {
             0: 'negative',
             1: 'neutral',
-            2: 'positive',
-            'negative': 'negative',
-            'neutral': 'neutral',
-            'positive': 'positive'
+            2: 'positive'
         }
         self.reverse_sentiment_map = {v: k for k, v in self.sentiment_map.items()}
         self.cache_dir = "data/cache"
@@ -39,9 +91,9 @@ class DataProcessor:
                 'local_path': os.path.join(self.model_dir, 'kobert'),
                 'offline': True
             },
-            'kcbert': {
-                'name': 'beomi/kcbert-base',
-                'local_path': os.path.join(self.model_dir, 'kcbert'),
+            'kcelectra-base-v2022': {
+                'name': 'beomi/kcelectra-base-v2022',
+                'local_path': os.path.join(self.model_dir, 'kcelectra-base-v2022'),
                 'offline': True
             },
             'kcelectra': {
@@ -64,17 +116,19 @@ class DataProcessor:
         # 감성 분석 필터링 조건 수정
         self.sentiment_filters = {
             'min_text_length': 30,
-            'max_text_length': 20000,
-            'min_confidence': 0.2,  # 신뢰도 임계값을 0.2로 낮춤
+            'max_text_length': 4096,  # 최대 길이 증가
+            'min_confidence': 0.2,
             'exclude_keywords': ['광고', '홍보', 'sponsored'],
             'required_keywords': [],
-            'min_content_words': 3
+            'min_content_words': 3,
+            'max_tokens': 512,  # BERT 모델의 최대 토큰 수
+            'chunk_size': 1024  # 청크 크기 설정
         }
         
         # 사용 가능한 감성분석 모델 목록
         self.available_models = {
             'kobert': 'KoBERT (가벼운 모델)',
-            'kcbert': 'KCBERT (중간 크기 모델)',
+            'kcelectra-base-v2022': 'KcELECTRA-base-v2022 (감성분석 특화)',
             'kcelectra': 'KcELECTRA (감성분석 특화)',
             'kcbert-large': 'KcBERT-large (큰 모델)',
             'kosentencebert': 'KoSentenceBERT (문장 수준 분석)'
@@ -82,9 +136,9 @@ class DataProcessor:
         
         # 미리 정의된 모델 조합
         self.model_combinations = {
-            'light': ['kobert', 'kcelectra'],  # 가벼운 조합
-            'balanced': ['kcbert', 'kcelectra', 'kosentencebert'],  # 균형잡힌 조합
-            'heavy': ['kcbert-large', 'kosentencebert', 'kcelectra'],  # 정확도 중심
+            'light': ['kobert', 'kcelectra-base-v2022'],  # 가벼운 조합
+            'balanced': ['kcelectra-base-v2022', 'kcelectra', 'kosentencebert'],  # 균형잡힌 조합
+            'heavy': ['kcbert-large', 'kosentencebert', 'kcelectra-base-v2022'],  # 정확도 중심
             'custom': []  # 사용자 정의
         }
         
@@ -92,6 +146,7 @@ class DataProcessor:
         self._initialized_models = {}
         
         self.analyzer = EnsembleSentimentAnalyzer()
+        self.sentiment_history = SentimentAnalysisHistory()
     
     def _download_model(self, model_name: str) -> bool:
         """모델 파일 다운로드"""
@@ -143,9 +198,6 @@ class DataProcessor:
             if model_name == 'kobert':
                 from core.sentiment_analysis_kobert import KoBERTSentimentAnalyzer
                 model = KoBERTSentimentAnalyzer(model_path=config['local_path'])
-            elif model_name == 'kcbert':
-                from core.sentiment_analysis_kcbert import KCBERTSentimentAnalyzer
-                model = KCBERTSentimentAnalyzer(model_path=config['local_path'])
             elif model_name == 'kcelectra':
                 from core.sentiment_analysis_kcelectra import KcELECTRASentimentAnalyzer
                 model = KcELECTRASentimentAnalyzer(model_path=config['local_path'])
@@ -207,7 +259,7 @@ class DataProcessor:
             
             # 기본값 설정
             if model_names is None:
-                model_names = ['kobert', 'kcbert']
+                model_names = ['kobert', 'kcelectra']
             
             # 선택된 모델들 초기화
             models = [self._initialize_model(name) for name in model_names]
@@ -218,113 +270,108 @@ class DataProcessor:
             logger.error(f"감성분석기 초기화 중 오류 발생: {str(e)}")
             raise
     
-    def analyze_dataset(self, 
-                       input_file: Union[str, Path],
-                       output_dir: Optional[Union[str, Path]] = None,
-                       models: Optional[List[str]] = None,
-                       confidence_threshold: float = 0.1) -> pd.DataFrame:
-        """데이터셋 감성 분석 수행"""
+    def analyze_dataset(self, input_file, models=None, output_dir="data/processed", progress_callback=None):
+        """데이터셋 감성 분석"""
         try:
-            # 입력 파일 경로 처리
-            if isinstance(input_file, str):
-                # 상대 경로인 경우 data/raw 디렉토리 기준으로 처리
-                if not os.path.isabs(input_file):
-                    input_path = Path("data/raw") / input_file
-                else:
-                    input_path = Path(input_file)
-            else:
-                input_path = input_file
-
-            if not input_path.exists():
-                # 파일이 없는 경우 data/raw 디렉토리에서 다시 시도
-                raw_path = Path("data/raw") / input_path.name
-                if raw_path.exists():
-                    input_path = raw_path
-                else:
-                    raise FileNotFoundError(f"입력 파일을 찾을 수 없습니다: {input_file} (시도한 경로: {input_path}, {raw_path})")
-                
-            logger.info(f"데이터셋 분석 시작: {input_path.name} (경로: {input_path})")
+            start_time = time.time()
             
-            # 파일 형식에 따른 로드
-            if input_path.suffix == '.json':
-                with open(input_path, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-                df = pd.DataFrame(data)
-            elif input_path.suffix == '.csv':
-                df = pd.read_csv(input_path, encoding='utf-8')
-            else:
-                raise ValueError(f"지원하지 않는 파일 형식: {input_path.suffix}")
+            # 파일이 이미 분석되었는지 확인
+            if self.sentiment_history.is_file_analyzed(input_file, models):
+                logger.info(f"파일이 이미 분석되었습니다: {input_file}")
+                # 이전 분석 결과 로드
+                analysis_history = self.sentiment_history.get_file_analysis_history(input_file)
+                if analysis_history:
+                    latest_analysis = max(analysis_history, key=lambda x: x['timestamp'])
+                    if os.path.exists(latest_analysis['output_files']['csv']):
+                        df = pd.read_csv(latest_analysis['output_files']['csv'])
+                        logger.info(f"이전 분석 결과를 로드했습니다: {latest_analysis['output_files']['csv']}")
+                        return df
             
-            # 데이터셋 검증
-            if not self._validate_dataset(df):
-                raise ValueError("데이터셋 검증 실패")
+            # 데이터 로드 및 검증
+            with open(input_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
             
-            # 감성 분석 수행
-            logger.info(f"감성 분석 시작 (모델: {models or 'all'})")
+            # 빈 내용 확인
+            empty_contents = sum(1 for item in data if not item.get('content', '').strip())
+            if empty_contents > 0:
+                logger.warning(f"빈 내용: {empty_contents}개")
+            
+            # 데이터 검증
+            valid_data = [item for item in data if item.get('content', '').strip()]
+            logger.info(f"데이터셋 검증 완료: {len(valid_data)}개 항목")
+            
+            if not valid_data:
+                logger.error("분석할 데이터가 없습니다.")
+                return None
+            
+            # 감성 분석 시작
+            logger.info(f"감성 분석 시작 (모델: {models})")
+            
+            # 앙상블 분석기 초기화
+            analyzer = EnsembleSentimentAnalyzer(models=models)
+            
+            # 결과 저장을 위한 리스트
             results = []
             
-            for idx, row in df.iterrows():
+            # 각 항목에 대해 감성 분석 수행
+            for i, item in enumerate(valid_data):
                 try:
-                    # content 컬럼 사용
-                    text = str(row['content']).strip()
-                    if not text:
-                        logger.warning(f"빈 텍스트 발견 (index: {idx})")
-                        continue
-                        
                     # 텍스트 전처리
-                    text = self.preprocess_text(text)
+                    text = self.preprocess_text(item['content'])
                     if not text:
-                        logger.warning(f"전처리 후 빈 텍스트 (index: {idx})")
+                        logger.warning(f"전처리 후 빈 텍스트 (index: {i})")
                         continue
-                        
-                    label, confidence = self.analyzer.predict(text)
                     
-                    if confidence >= confidence_threshold:
-                        results.append({
-                            'video_id': row.get('video_id', f'video_{idx}'),
-                            'content': text,
-                            'sentiment': label,
-                            'confidence': confidence,
-                            'url': row.get('url', ''),
-                            'title': row.get('title', ''),
-                            'published_date': row.get('published_date', '')
-                        })
-                    else:
-                        logger.debug(f"신뢰도 미달: {confidence:.3f} (index: {idx})")
-                        
+                    # 감성 분석 수행
+                    sentiment, confidence = analyzer.predict(text)
+                    
+                    # 결과 저장
+                    result = {
+                        'title': item.get('title', ''),
+                        'content': text,
+                        'platform': item.get('platform', 'unknown'),
+                        'published_date': item.get('published_date', ''),
+                        'url': item.get('url', ''),
+                        'sentiment': sentiment,
+                        'confidence': confidence
+                    }
+                    results.append(result)
+                    
+                    # 진행 상황 업데이트
+                    if progress_callback:
+                        progress_callback(i + 1)
+                    
                 except Exception as e:
-                    logger.error(f"항목 분석 중 오류 발생 (index: {idx}): {str(e)}")
+                    logger.error(f"항목 {i} 분석 중 오류: {str(e)}")
                     continue
             
-            if not results:
-                logger.warning("분석 결과가 없습니다")
-                return pd.DataFrame()
+            # 결과를 DataFrame으로 변환
+            df = pd.DataFrame(results)
             
-            # 결과 데이터프레임 생성
-            result_df = pd.DataFrame(results)
+            # 감성 분포 계산
+            if not df.empty:
+                sentiment_counts = df['sentiment'].value_counts(normalize=True) * 100
+                logger.info("감성 분포:")
+                for sentiment, percentage in sentiment_counts.items():
+                    sentiment_label = 'negative' if sentiment == 0 else 'neutral' if sentiment == 1 else 'positive'
+                    logger.info(f"  {sentiment_label}: {percentage:.1f}%")
             
-            # 결과 저장
-            if output_dir:
-                output_path = Path(output_dir)
-                output_path.mkdir(parents=True, exist_ok=True)
-                
-                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                output_file = output_path / f"sentiment_analysis_{timestamp}.csv"
-                
-                result_df.to_csv(output_file, index=False, encoding='utf-8')
-                logger.info(f"분석 결과 저장 완료: {output_file}")
+            # 결과 저장 부분 수정
+            processing_time = time.time() - start_time
+            save_results = self.save_analysis_results(
+                df=df,
+                input_file=input_file,
+                models=models,
+                processing_time=processing_time,
+                output_dir=output_dir
+            )
             
-            # 감성 분포 로깅
-            sentiment_dist = result_df['sentiment'].value_counts(normalize=True) * 100
-            logger.info("감성 분포:")
-            for sentiment, ratio in sentiment_dist.items():
-                logger.info(f"  {sentiment}: {ratio:.1f}%")
-            
-            return result_df
+            logger.info(f"분석 결과 저장 완료: {save_results['csv_path']}")
+            return df
             
         except Exception as e:
             logger.error(f"데이터셋 분석 중 오류 발생: {str(e)}")
-            raise
+            return None
     
     def validate_platform_data(self, df: pd.DataFrame, platform: str) -> Dict:
         """플랫폼별 데이터 검증"""
@@ -336,9 +383,34 @@ class DataProcessor:
         
         # 필수 컬럼 검증
         required_columns = {
+            # 네이버 플랫폼
             'naver': ['title', 'content', 'published_date', 'platform', 'url'],
-            'youtube': ['title', 'content', 'published_date', 'platform', 'url'],
-            'google': ['title', 'content', 'published_date', 'platform', 'url']
+            'naver_blog': ['title', 'content', 'published_date', 'platform', 'url'],
+            'naver_blog_api': ['title', 'content', 'published_date', 'platform', 'url'],
+            'naver_cafe': ['title', 'content', 'published_date', 'platform', 'url'],
+            'naver_cafearticle': ['title', 'content', 'published_date', 'platform', 'url'],
+            'naver_cafearticle_api': ['title', 'content', 'published_date', 'platform', 'url'],
+            'naver_news': ['title', 'content', 'published_date', 'platform', 'url'],
+            'naver_community': ['title', 'content', 'published_date', 'platform', 'url'],
+            
+            # 유튜브 플랫폼
+            'youtube': ['title', 'content', 'published_date', 'platform', 'url', 'video_id'],
+            'youtube_api': ['title', 'content', 'published_date', 'platform', 'url', 'video_id'],
+            
+            # 구글 플랫폼
+            'google': ['title', 'content', 'published_date', 'platform', 'url'],
+            'google_search': ['title', 'content', 'published_date', 'platform', 'url'],
+            'google_news': ['title', 'content', 'published_date', 'platform', 'url'],
+            
+            # 부안군청 플랫폼
+            'buan_gov': ['title', 'content', 'published_date', 'platform', 'url'],
+            'buan_gov_news': ['title', 'content', 'published_date', 'platform', 'url'],
+            'buan_gov_notice': ['title', 'content', 'published_date', 'platform', 'url'],
+            
+            # 커뮤니티 플랫폼
+            'community': ['title', 'content', 'published_date', 'platform', 'url'],
+            'local_community': ['title', 'content', 'published_date', 'platform', 'url'],
+            'tour_community': ['title', 'content', 'published_date', 'platform', 'url']
         }
         
         if platform not in required_columns:
@@ -426,14 +498,11 @@ class DataProcessor:
         return f"video_{hash(url) & 0xFFFFFFFF:08x}"
 
     def preprocess_text(self, text: str) -> str:
-        """텍스트 전처리"""
+        """텍스트 전처리 개선"""
         if not isinstance(text, str):
             return ""
             
-        # 최대 길이 제한 (BERT 모델의 최대 토큰 수 고려)
-        max_chars = 2048  # 한글 기준 대략적인 문자 수 (512 토큰 * 4)
-        text = text[:max_chars]
-        
+        # 1. 기본 전처리
         # HTML 태그 제거
         text = re.sub(r'<[^>]+>', '', text)
         # URL 제거
@@ -447,23 +516,59 @@ class DataProcessor:
         # 앞뒤 공백 제거
         text = text.strip()
         
+        # 2. 길이 제한 및 청크 처리
+        if len(text) > self.sentiment_filters['max_text_length']:
+            # 문장 단위로 분할
+            sentences = re.split(r'[.!?]+', text)
+            chunks = []
+            current_chunk = []
+            current_length = 0
+            
+            for sentence in sentences:
+                sentence = sentence.strip()
+                if not sentence:
+                    continue
+                    
+                # 현재 문장의 예상 토큰 수 계산 (한글 기준)
+                sentence_tokens = len(sentence) // 4
+                
+                if current_length + sentence_tokens > self.sentiment_filters['max_tokens']:
+                    # 현재 청크가 최소 길이를 만족하면 저장
+                    if current_length >= self.sentiment_filters['min_text_length']:
+                        chunks.append(' '.join(current_chunk))
+                    current_chunk = [sentence]
+                    current_length = sentence_tokens
+                else:
+                    current_chunk.append(sentence)
+                    current_length += sentence_tokens
+            
+            # 마지막 청크 처리
+            if current_chunk and current_length >= self.sentiment_filters['min_text_length']:
+                chunks.append(' '.join(current_chunk))
+            
+            # 가장 의미 있는 청크 선택 (첫 번째 청크 사용)
+            if chunks:
+                text = chunks[0]
+            else:
+                # 청크가 없는 경우 앞부분만 사용
+                text = text[:self.sentiment_filters['max_text_length']]
+        
         return text
 
     def is_valid_for_sentiment(self, text: str) -> Tuple[bool, str]:
-        """감성 분석 가능 여부 검증"""
+        """감성 분석 가능 여부 검증 개선"""
         if not isinstance(text, str):
             return False, "텍스트가 문자열이 아님"
             
         # 기본 길이 검증
         if len(text) < self.sentiment_filters['min_text_length']:
             return False, f"텍스트가 너무 짧음 ({len(text)}자)"
-        if len(text) > self.sentiment_filters['max_text_length']:
-            return False, f"텍스트가 너무 김 ({len(text)}자)"
             
         # 토큰 수 예상 검증 (한글 기준 대략적인 계산)
         estimated_tokens = len(text) // 4  # 한글 1글자당 약 4토큰
-        if estimated_tokens > 512:  # BERT 모델의 최대 토큰 수
-            return False, f"예상 토큰 수 초과 ({estimated_tokens}토큰)"
+        if estimated_tokens > self.sentiment_filters['max_tokens']:
+            # 긴 텍스트는 자동으로 전처리되므로 경고만 표시
+            logger.warning(f"긴 텍스트 감지: {estimated_tokens}토큰 (자동 전처리 적용)")
             
         # 제외 키워드 검사
         for keyword in self.sentiment_filters['exclude_keywords']:
@@ -698,8 +803,7 @@ class DataProcessor:
                     'min_text_length': self.sentiment_filters['min_text_length'],
                     'max_text_length': self.sentiment_filters['max_text_length'],
                     'min_confidence': self.sentiment_filters['min_confidence'],
-                    'excluded_keywords': self.sentiment_filters['exclude_keywords'],
-                    'required_keywords': self.sentiment_filters['required_keywords']
+                    'excluded_keywords': self.sentiment_filters['exclude_keywords']
                 }
             }
             
@@ -722,9 +826,34 @@ class DataProcessor:
 
             # 필수 컬럼 검증
             required_columns = {
-                'youtube': ['title', 'content', 'published_date', 'platform', 'url'],
+                # 네이버 플랫폼
                 'naver': ['title', 'content', 'published_date', 'platform', 'url'],
-                'google': ['title', 'content', 'published_date', 'platform', 'url']
+                'naver_blog': ['title', 'content', 'published_date', 'platform', 'url'],
+                'naver_blog_api': ['title', 'content', 'published_date', 'platform', 'url'],
+                'naver_cafe': ['title', 'content', 'published_date', 'platform', 'url'],
+                'naver_cafearticle': ['title', 'content', 'published_date', 'platform', 'url'],
+                'naver_cafearticle_api': ['title', 'content', 'published_date', 'platform', 'url'],
+                'naver_news': ['title', 'content', 'published_date', 'platform', 'url'],
+                'naver_community': ['title', 'content', 'published_date', 'platform', 'url'],
+                
+                # 유튜브 플랫폼
+                'youtube': ['title', 'content', 'published_date', 'platform', 'url'],
+                'youtube_api': ['title', 'content', 'published_date', 'platform', 'url'],
+                
+                # 구글 플랫폼
+                'google': ['title', 'content', 'published_date', 'platform', 'url'],
+                'google_search': ['title', 'content', 'published_date', 'platform', 'url'],
+                'google_news': ['title', 'content', 'published_date', 'platform', 'url'],
+                
+                # 부안군청 플랫폼
+                'buan_gov': ['title', 'content', 'published_date', 'platform', 'url'],
+                'buan_gov_news': ['title', 'content', 'published_date', 'platform', 'url'],
+                'buan_gov_notice': ['title', 'content', 'published_date', 'platform', 'url'],
+                
+                # 커뮤니티 플랫폼
+                'community': ['title', 'content', 'published_date', 'platform', 'url'],
+                'local_community': ['title', 'content', 'published_date', 'platform', 'url'],
+                'tour_community': ['title', 'content', 'published_date', 'platform', 'url']
             }
 
             # 플랫폼 확인
@@ -733,7 +862,43 @@ class DataProcessor:
                 platforms = df['platform'].unique()
                 if len(platforms) == 1:
                     platform = platforms[0].lower()
-                    if platform not in required_columns:
+                    
+                    # 플랫폼 매핑
+                    platform_mapping = {
+                        # 네이버 플랫폼 - naver_로 시작하는 모든 플랫폼을 naver로 매핑
+                        'naver_blog': 'naver',
+                        'naver_blog_api': 'naver',
+                        'naver_cafe': 'naver',
+                        'naver_cafearticle': 'naver',
+                        'naver_cafearticle_api': 'naver',
+                        'naver_news': 'naver',
+                        'naver_community': 'naver',
+                        
+                        # 유튜브 플랫폼
+                        'youtube_api': 'youtube',
+                        
+                        # 구글 플랫폼
+                        'google_search': 'google',
+                        'google_news': 'google',
+                        
+                        # 부안군청 플랫폼
+                        'buan_gov_news': 'buan_gov',
+                        'buan_gov_notice': 'buan_gov',
+                        
+                        # 커뮤니티 플랫폼
+                        'local_community': 'community',
+                        'tour_community': 'community'
+                    }
+                    
+                    # 매핑된 플랫폼으로 변경
+                    if platform in platform_mapping:
+                        platform = platform_mapping[platform]
+                        df['platform'] = platform
+                    elif platform.startswith('naver_'):
+                        # naver_로 시작하는 모든 플랫폼을 naver로 매핑
+                        platform = 'naver'
+                        df['platform'] = platform
+                    elif platform not in ['naver', 'youtube', 'google', 'buan_gov', 'community']:
                         logger.warning(f"지원하지 않는 플랫폼: {platform}")
                         return False
                 else:
@@ -745,24 +910,26 @@ class DataProcessor:
                         return False
 
             # 필수 컬럼 검사
-            missing_columns = [col for col in required_columns[platform] if col not in df.columns]
-            if missing_columns:
-                logger.warning(f"필수 컬럼 누락: {missing_columns}")
-                return False
-
-            # YouTube 데이터의 경우 video_id 처리
-            if platform == 'youtube' and 'video_id' not in df.columns:
-                logger.info("YouTube video_id 컬럼이 없어 URL에서 추출을 시도합니다")
-                try:
-                    df['video_id'] = df['url'].apply(self._extract_video_id)
-                    # 추출 실패한 경우 임의의 ID 생성
-                    missing_ids = df['video_id'].isna()
-                    if missing_ids.any():
-                        logger.warning(f"video_id 추출 실패: {missing_ids.sum()}개")
-                        df.loc[missing_ids, 'video_id'] = [f"yt_{i:08d}" for i in range(missing_ids.sum())]
-                except Exception as e:
-                    logger.error(f"video_id 생성 중 오류 발생: {str(e)}")
-                    return False
+            if platform in required_columns:
+                missing_columns = [col for col in required_columns[platform] if col not in df.columns]
+                if missing_columns:
+                    # video_id가 누락된 경우 자동 생성 시도
+                    if platform == 'youtube' and 'video_id' in missing_columns:
+                        logger.info("YouTube video_id 컬럼이 없어 URL에서 추출을 시도합니다")
+                        try:
+                            df['video_id'] = df['url'].apply(self._extract_video_id)
+                            # 추출 실패한 경우 임의의 ID 생성
+                            missing_ids = df['video_id'].isna()
+                            if missing_ids.any():
+                                logger.warning(f"video_id 추출 실패: {missing_ids.sum()}개")
+                                df.loc[missing_ids, 'video_id'] = [f"yt_{i:08d}" for i in range(missing_ids.sum())]
+                            missing_columns.remove('video_id')
+                        except Exception as e:
+                            logger.error(f"video_id 생성 중 오류 발생: {str(e)}")
+                    
+                    if missing_columns:
+                        logger.warning(f"필수 컬럼 누락: {missing_columns}")
+                        return False
 
             # 날짜 형식 검증
             if 'published_date' in df.columns:
@@ -790,3 +957,72 @@ class DataProcessor:
         except Exception as e:
             logger.error(f"데이터셋 검증 중 오류 발생: {str(e)}")
             return False 
+
+    def get_analysis_history(self, file_path=None):
+        """감성 분석 이력 조회"""
+        if file_path:
+            return self.sentiment_history.get_file_analysis_history(file_path)
+        return self.sentiment_history.history["analyses"] 
+
+    def save_analysis_results(self, df: pd.DataFrame, input_file: str, models: List[str], processing_time: float, output_dir: str = "data/processed") -> Dict[str, str]:
+        """감성 분석 결과 저장 (CSV + JSON)"""
+        try:
+            os.makedirs(output_dir, exist_ok=True)
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            base_filename = f"sentiment_analysis_{timestamp}"
+            
+            # CSV 파일 저장
+            csv_path = os.path.join(output_dir, f"{base_filename}.csv")
+            df.to_csv(csv_path, index=False, encoding='utf-8')
+            
+            # 감성 분포 계산
+            sentiment_distribution = {
+                'negative': f"{len(df[df['sentiment'] == 'negative']) / len(df) * 100:.1f}%",
+                'neutral': f"{len(df[df['sentiment'] == 'neutral']) / len(df) * 100:.1f}%",
+                'positive': f"{len(df[df['sentiment'] == 'positive']) / len(df) * 100:.1f}%"
+            }
+            
+            # JSON 메타데이터 생성
+            metadata = {
+                'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                'input_file': input_file,
+                'models': models,
+                'item_count': len(df),
+                'processing_time': processing_time,
+                'sentiment_distribution': sentiment_distribution,
+                'output_files': {
+                    'csv': csv_path,
+                    'json': os.path.join(output_dir, f"{base_filename}.json")
+                },
+                'analysis_parameters': {
+                    'min_text_length': self.sentiment_filters['min_text_length'],
+                    'max_text_length': self.sentiment_filters['max_text_length'],
+                    'min_confidence': self.sentiment_filters['min_confidence'],
+                    'excluded_keywords': self.sentiment_filters['exclude_keywords']
+                }
+            }
+            
+            # JSON 파일 저장
+            json_path = os.path.join(output_dir, f"{base_filename}.json")
+            with open(json_path, 'w', encoding='utf-8') as f:
+                json.dump(metadata, f, ensure_ascii=False, indent=2)
+            
+            # 분석 이력에 추가
+            self.sentiment_history.add_analysis(
+                file_path=input_file,
+                models=models,
+                item_count=len(df),
+                sentiment_distribution=sentiment_distribution,
+                processing_time=processing_time
+            )
+            
+            logger.info(f"감성 분석 결과 저장 완료: {csv_path}, {json_path}")
+            return {
+                'csv_path': csv_path,
+                'json_path': json_path,
+                'metadata': metadata
+            }
+            
+        except Exception as e:
+            logger.error(f"결과 저장 중 오류 발생: {str(e)}")
+            raise 

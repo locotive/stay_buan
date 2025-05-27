@@ -44,14 +44,14 @@ def parse_keywords(keywords_list):
 
 def crawl_platform(platform, keywords, max_pages, max_comments, no_sentiment, browser_type, max_daily_queries):
     """특정 플랫폼 크롤링 실행"""
-    try:
-        logger.info(f"\n{'='*20} {platform.upper()} 크롤링 시작 {'='*20}")
-        logger.info(f"키워드: {keywords}")
-        logger.info(f"최대 페이지: {max_pages}")
-        logger.info(f"최대 댓글: {max_comments}")
-        logger.info(f"감성 분석: {'비활성화' if no_sentiment else '활성화'}")
-        logger.info(f"브라우저: {browser_type}")
+    logger.info(f"\n==================== {platform.upper()} 크롤링 시작 ====================")
+    logger.info(f"키워드: {keywords}")
+    logger.info(f"최대 페이지: {max_pages}")
+    logger.info(f"최대 댓글: {max_comments}")
+    logger.info(f"감성 분석: {'활성화' if not no_sentiment else '비활성화'}")
+    logger.info(f"브라우저: {browser_type}")
 
+    try:
         # 네이버 API 키 체크
         if platform == "naver":
             if not os.getenv("NAVER_CLIENT_ID") or not os.getenv("NAVER_CLIENT_SECRET"):
@@ -88,7 +88,13 @@ def crawl_platform(platform, keywords, max_pages, max_comments, no_sentiment, br
         results = []
 
         if platform == "naver":
-            crawler = NaverSearchAPICrawler(keywords, max_pages=max_pages, save_dir="data/raw", analyze_sentiment=not no_sentiment, browser_type=browser_type)
+            crawler = NaverSearchAPICrawler(
+                keywords, 
+                max_pages=max_pages, 
+                save_dir="data/raw", 
+                analyze_sentiment=False if no_sentiment else True,  # 기본값을 False로 변경
+                browser_type=browser_type
+            )
             results = crawler.crawl()
             logger.info(f"네이버에서 {len(results)}개 항목 수집 완료")
 
@@ -98,30 +104,58 @@ def crawl_platform(platform, keywords, max_pages, max_comments, no_sentiment, br
                 max_results=max_pages * 10,  # 페이지당 약 10개 결과
                 max_comments=max_comments,
                 save_dir="data/raw",
-                analyze_sentiment=not no_sentiment
+                analyze_sentiment=False if no_sentiment else True  # 기본값을 False로 변경
             )
             results = crawler.crawl()
             logger.info(f"유튜브에서 {len(results)}개 비디오 수집 완료")
 
         elif platform == "google":
-            crawler = GoogleSearchCrawler(keywords, max_pages=max_pages, save_dir="data/raw", analyze_sentiment=not no_sentiment, max_daily_queries=max_daily_queries)
+            crawler = GoogleSearchCrawler(
+                keywords, 
+                max_pages=max_pages, 
+                save_dir="data/raw", 
+                analyze_sentiment=False if no_sentiment else True,  # 기본값을 False로 변경
+                max_daily_queries=max_daily_queries
+            )
             results = crawler.crawl()
             logger.info(f"구글에서 {len(results)}개 항목 수집 완료")
 
         elif platform == "dcinside":
-            crawler = DCInsideCrawler(keywords, max_pages=max_pages, max_comments=max_comments, save_dir="data/raw", analyze_sentiment=not no_sentiment, browser_type=browser_type, respect_robots=False)
+            crawler = DCInsideCrawler(
+                keywords, 
+                max_pages=max_pages, 
+                max_comments=max_comments, 
+                save_dir="data/raw", 
+                analyze_sentiment=False if no_sentiment else True,  # 기본값을 False로 변경
+                browser_type=browser_type, 
+                respect_robots=False
+            )
             results = crawler.crawl()
             logger.info(f"디시인사이드에서 {len(results)}개 게시글 수집 완료")
 
         elif platform == "fmkorea":
-            crawler = FMKoreaCrawler(keywords, max_pages=max_pages, max_comments=max_comments, save_dir="data/raw", analyze_sentiment=not no_sentiment, browser_type=browser_type, respect_robots=False)
+            crawler = FMKoreaCrawler(
+                keywords, 
+                max_pages=max_pages, 
+                max_comments=max_comments, 
+                save_dir="data/raw", 
+                analyze_sentiment=False if no_sentiment else True,  # 기본값을 False로 변경
+                browser_type=browser_type, 
+                respect_robots=False
+            )
             results = crawler.crawl()
             logger.info(f"FM코리아에서 {len(results)}개 게시글 수집 완료")
 
         elif platform == "buan":
-            crawler = BuanGovCrawler(keywords, max_pages=max_pages, save_dir="data/raw", analyze_sentiment=not no_sentiment, browser_type="firefox")
+            crawler = BuanGovCrawler(
+                keywords, 
+                max_pages=max_pages, 
+                save_dir="data/raw", 
+                analyze_sentiment=False if no_sentiment else True,  # 기본값을 False로 변경
+                browser_type=browser_type
+            )
             results = crawler.crawl()
-            logger.info(f"부안군에서 {len(results)}개 게시글 수집 완료")
+            logger.info(f"부안군청에서 {len(results)}개 게시글 수집 완료")
 
         else:
             logger.error(f"지원하지 않는 플랫폼: {platform}")

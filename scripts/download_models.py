@@ -23,7 +23,7 @@ def main():
     # 모델 설정 업데이트 (KoAlpaca 제외, 새로운 모델 추가)
     models = {
         'kobert': 'skt/kobert-base-v1',
-        'kcbert': 'beomi/kcbert-base',
+        'kcelectra-base-v2022': 'beomi/kcelectra-base-v2022',
         'kcelectra': 'beomi/kcelectra-base',
         'kcbert-large': 'beomi/kcbert-large',
         'kosentencebert': 'snunlp/KR-SBERT-V40K-klueNLI-augSTS'
