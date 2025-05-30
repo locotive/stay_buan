@@ -7,6 +7,7 @@ services:
     ports:
       - "8501:8501"
     volumes:
+      - .:/app
       - ./data/models:/app/data/models:delegated
       - ./data/raw:/app/data/raw
       - ./data/processed:/app/data/processed
@@ -18,6 +19,8 @@ services:
       - HF_HUB_OFFLINE=1
       - HF_DATASETS_OFFLINE=1
       - TOKENIZERS_PARALLELISM=false
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
     restart: unless-stopped
     networks:
       - buan-network

@@ -11,6 +11,7 @@ from core.sentiment_analysis_ensemble import EnsembleSentimentAnalyzer
 from reporting.report_generator_gpt import GPTReportGenerator
 from datetime import datetime
 import matplotlib.pyplot as plt
+import matplotlib.font_manager as fm
 from wordcloud import WordCloud
 from folium.plugins import MarkerCluster
 from reporting.pdf_report_generator import PDFReportGenerator
@@ -33,6 +34,57 @@ import queue
 import logging
 import concurrent.futures
 
+# WordCloud 한글 폰트 경로 설정
+def get_korean_font_path():
+    possible_paths = [
+        "/System/Library/Fonts/AppleSDGothicNeo.ttc",  # macOS
+        "/Library/Fonts/AppleGothic.ttf",              # macOS alternative
+        "/usr/share/fonts/truetype/nanum/NanumGothic.ttf",  # Linux
+        "C:/Windows/Fonts/malgun.ttf"                  # Windows
+    ]
+    for path in possible_paths:
+        if os.path.exists(path):
+            return path
+    return None
+
+korean_font_path = get_korean_font_path()
+
+# matplotlib 한글 폰트 설정
+def set_matplotlib_font():
+    # 시스템에 설치된 폰트 중 나눔고딕 또는 맑은 고딕 찾기
+    font_list = [f.name for f in fm.fontManager.ttflist]
+    nanum_fonts = [f for f in font_list if 'NanumGothic' in f]
+    malgun_fonts = [f for f in font_list if 'Malgun Gothic' in f]
+    
+    # 폰트 설정
+    if nanum_fonts:
+        plt.rc('font', family=nanum_fonts[0])
+        plt.rcParams['font.family'] = nanum_fonts[0]
+    elif malgun_fonts:
+        plt.rc('font', family=malgun_fonts[0])
+        plt.rcParams['font.family'] = malgun_fonts[0]
+    else:
+        # 폰트가 없는 경우 경고 메시지 출력
+        print("경고: 한글 폰트를 찾을 수 없습니다. 기본 폰트를 사용합니다.")
+        # 기본 폰트 설정
+        plt.rcParams['font.family'] = 'sans-serif'
+        plt.rcParams['font.sans-serif'] = ['Arial Unicode MS', 'AppleGothic', 'DejaVu Sans']
+    
+    # 마이너스 기호 깨짐 방지
+    plt.rc('axes', unicode_minus=False)
+    plt.rcParams['axes.unicode_minus'] = False
+    
+    # 폰트 크기 설정
+    plt.rcParams['font.size'] = 12
+    plt.rcParams['axes.titlesize'] = 14
+    plt.rcParams['axes.labelsize'] = 12
+    
+    # 폰트 설정 확인
+    print(f"현재 설정된 폰트: {plt.rcParams['font.family']}")
+    print(f"사용 가능한 폰트 목록: {[f.name for f in fm.fontManager.ttflist if 'Gothic' in f.name or 'Nanum' in f.name]}")
+
+# 한글 폰트 설정 적용
+set_matplotlib_font()
 # 로깅 설정
 os.makedirs("data/logs", exist_ok=True)
 logging.basicConfig(
@@ -134,7 +186,7 @@ def run_crawler(cmd):
                 platforms = all_platforms
             else:
                 platforms = platform_param.split(",")
-            
+                
             # 플랫폼별 진행률 초기화
             for platform in platforms:
                 crawler_status['platform_progress'][platform] = 0.0
@@ -297,27 +349,50 @@ def load_latest_results(num_files=5):
 def get_latest_result_stats():
     """최근 크롤링 결과 통계"""
     try:
-        result_files = glob.glob("data/raw/combined_*.json")
-        if not result_files:
-            return None
-            
-        # 가장 최근 파일
-        latest_file = max(result_files, key=os.path.getmtime)
+        # 모든 플랫폼의 최근 결과 파일 검색
+        platforms = {
+            "naver_news": "네이버 뉴스",
+            "naver_blog": "네이버 블로그",
+            "naver_cafearticle": "네이버 카페",
+            "youtube": "유튜브",
+            "google": "구글",
+            "dcinside": "디시인사이드",
+            "fmkorea": "에펨코리아",
+            "buan": "부안군청"
+        }
         
-        with open(latest_file, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        
-        # 플랫폼별 항목 수
+        all_results = []
         platform_counts = {}
-        for item in data:
-            platform = item.get('platform', 'unknown')
-            platform_counts[platform] = platform_counts.get(platform, 0) + 1
+        latest_files = {}
+        
+        # 각 플랫폼별 최근 파일 검색
+        for platform in platforms.keys():
+            files = glob.glob(f"data/raw/{platform}*.json")
+            if files:
+                # 가장 최근 파일 선택
+                latest_file = max(files, key=os.path.getmtime)
+                latest_files[platform] = latest_file
+                try:
+                    with open(latest_file, 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+                        if isinstance(data, list):
+                            all_results.extend(data)
+                            platform_counts[platforms[platform]] = len(data)
+                            logger.info(f"{platforms[platform]}: {len(data)}개 항목 로드됨")
+                except Exception as e:
+                    logger.error(f"{platform} 결과 파일 로드 중 오류: {str(e)}")
+        
+        if not all_results:
+            logger.warning("수집된 데이터가 없습니다.")
+            return None
         
         # 감성별 항목 수
         sentiment_counts = {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 0}
-        for item in data:
-            sentiment = item.get('sentiment', 'unknown')
-            if sentiment == 0 or sentiment == 'negative':
+        for item in all_results:
+            sentiment = item.get('sentiment')
+            if sentiment is None:
+                sentiment_counts['unknown'] += 1
+            elif sentiment == 0 or sentiment == 'negative':
                 sentiment_counts['negative'] += 1
             elif sentiment == 1 or sentiment == 'neutral':
                 sentiment_counts['neutral'] += 1
@@ -328,24 +403,31 @@ def get_latest_result_stats():
         
         # 날짜별 항목 수
         date_counts = {}
-        for item in data:
+        for item in all_results:
             date = item.get('published_date', '')
             if date and len(date) >= 8:  # 'YYYYMMDD' 형식
-                date = f"{date[:4]}-{date[4:6]}-{date[6:8]}"
+                try:
+                    date = f"{date[:4]}-{date[4:6]}-{date[6:8]}"
+                except:
+                    date = 'unknown'
             else:
                 date = 'unknown'
             date_counts[date] = date_counts.get(date, 0) + 1
         
+        # 결과 로깅
+        logger.info(f"총 {len(all_results)}개 항목 처리됨")
+        logger.info(f"플랫폼별 항목 수: {platform_counts}")
+        logger.info(f"감성별 항목 수: {sentiment_counts}")
+        
         return {
-            'total': len(data),
-            'filename': os.path.basename(latest_file),
+            'total': len(all_results),
             'platform_counts': platform_counts,
             'sentiment_counts': sentiment_counts,
             'date_counts': date_counts,
-            'path': latest_file
+            'latest_files': latest_files
         }
     except Exception as e:
-        st.error(f"결과 통계 계산 중 오류 발생: {str(e)}")
+        logger.error(f"결과 통계 계산 중 오류 발생: {str(e)}", exc_info=True)
         return None
 
 @st.cache_data
@@ -355,45 +437,22 @@ def analyze_sentiment(text, analyzer):
     sentiment_label = 'negative' if sentiment == 0 else 'neutral' if sentiment == 1 else 'positive'
     return sentiment_label, confidence
 
-def create_map(data):
-    """지도 시각화 생성"""
-
-    # None 이거나 비어있는 경우 종료
-    if data is None:
-        return None
-
-    # 리스트인 경우 DataFrame으로 변환
-    if isinstance(data, list):
-        data = pd.DataFrame(data)
-
-    # DataFrame이 아닌 경우 종료
-    if not isinstance(data, pd.DataFrame):
-        return None
-
-    # DataFrame이 비어있는 경우 종료
-    if data.empty:
-        return None
-
-    # 위치 정보가 있는 경우
-    if 'location' in data.columns:
-        locations = data['location'].dropna().unique()
-        if len(locations) > 0:
-            try:
-                lat, lon = map(float, locations[0].split(','))
-                return folium.Map(
-                    location=[lat, lon],
-                    zoom_start=13,
-                    tiles='CartoDB positron'
-                )
-            except ValueError:
-                pass  # location 형식이 이상할 경우 무시하고 기본 지도 생성
-
-    # 위치 정보가 없는 경우: 부안군 중심
-    return folium.Map(
-        location=[35.7284, 126.7320],
-        zoom_start=11,
-        tiles='CartoDB positron'
-    )
+def clear_analysis_cache():
+    """분석 관련 캐시와 세션 상태 초기화"""
+    try:
+        # 세션 상태 초기화
+        for key in list(st.session_state.keys()):
+            if key.startswith('analysis_') or key in ['show_results', 'last_dataset', 'last_models']:
+                del st.session_state[key]
+        
+        # Streamlit 캐시 초기화
+        analyze_sentiment.clear()
+        
+        logger.info("모든 분석 캐시가 초기화되었습니다.")
+        return True
+    except Exception as e:
+        logger.error(f"캐시 초기화 중 오류 발생: {str(e)}")
+        return False
 
 def get_available_datasets():
     """사용 가능한 데이터셋 목록을 반환"""
@@ -814,259 +873,272 @@ def main():
                     if selected_dataset['is_analyzed']:
                         st.warning("이 데이터셋은 이미 분석되었습니다. 분석 결과를 확인하세요.")
                     
-                    # 감성분석 모델 선택
-                    data_processor = DataProcessor()
-                    available_models = data_processor.get_available_models()
-                    model_combinations = data_processor.model_combinations
-                    
-                    st.subheader("모델 선택")
-                    
-                    # 개별 모델 선택 (기본 옵션)
-                    selected_models = st.multiselect(
-                        "사용할 모델을 선택하세요",
-                        options=list(available_models.keys()),
-                        format_func=lambda x: available_models[x],
-                        default=['kobert', 'kcelectra-base-v2022'],
-                        help="여러 모델을 선택하면 앙상블로 분석됩니다."
-                    )
-                    
-                    # 미리 정의된 조합 선택 (보조 옵션)
-                    st.markdown("---")
-                    st.subheader("미리 정의된 모델 조합")
-                    
-                    # 조합 설명을 더 가독성 있게 표시
-                    combinations_info = {
-                        'light': {
-                            'title': '가벼운 조합',
-                            'models': ['kobert', 'kcelectra-base-v2022'],
-                            'description': '빠른 처리 속도에 최적화된 조합입니다.'
-                        },
-                        'balanced': {
-                            'title': '균형잡힌 조합',
-                            'models': ['kcelectra-base-v2022', 'kcelectra', 'kosentencebert'],
-                            'description': '속도와 정확도의 균형을 맞춘 조합입니다.'
-                        },
-                        'heavy': {
-                            'title': '정확도 중심 조합',
-                            'models': ['kcbert-large', 'kosentencebert', 'kcelectra-base-v2022'],
-                            'description': '높은 정확도를 우선시하는 조합입니다.'
-                        }
-                    }
-                    
-                    # 조합 선택 UI
-                    for combo_key, combo_info in combinations_info.items():
-                        with st.expander(f"📊 {combo_info['title']}"):
-                            st.markdown(f"**포함 모델:** {', '.join(combo_info['models'])}")
-                            st.markdown(f"*{combo_info['description']}*")
-                            if st.button(f"이 조합으로 분석하기", key=f"use_{combo_key}"):
-                                try:
-                                    with st.spinner("데이터셋 분석 중..."):
-                                        # 선택된 데이터셋의 파일 경로 찾기
-                                        filepath = selected_dataset['path']
-                                        
-                                        # 선택된 조합으로 분석 실행
-                                        df = data_processor.analyze_dataset(
-                                            input_file=filepath,
-                                            models=combo_info['models'],
-                                            output_dir="data/processed"
-                                        )
-                                        
-                                        if df is not None and not df.empty:
-                                            st.session_state.analysis_data = df
-                                            st.session_state.show_results = True
-                                            st.session_state.last_dataset = selected_dataset['filename']
-                                            st.session_state.last_models = combo_info['models']
-                                            st.rerun()
-                                        else:
-                                            st.error("분석 결과가 없습니다.")
-                                except Exception as e:
-                                    st.error(f"데이터셋 분석 중 오류 발생: {str(e)}")
-                                    logger.error(f"데이터셋 분석 중 오류 발생: {str(e)}", exc_info=True)
-                
-                # 개별 모델 선택 시 분석 버튼
-                if selected_models and st.button("선택한 모델로 분석하기"):
-                    try:
-                        # 선택된 데이터셋의 파일 경로 찾기
-                        filepath = selected_dataset['path']
-                        
-                        # 데이터 크기 확인
-                        with open(filepath, 'r', encoding='utf-8') as f:
-                            data = json.load(f)
-                            data_size = len(data)
-                        
-                        # 예상 처리 시간 계산
-                        estimated_time = estimate_processing_time(data_size, selected_models)
-                        
-                        # 진행 상황 표시를 위한 컨테이너 생성
-                        progress_container = st.empty()
-                        status_container = st.empty()
-                        progress_bar = progress_container.progress(0)
-                        status_text = status_container.text("분석 준비 중...")
-                        
-                        # 분석 시작 시간 기록
-                        st.session_state.analysis_start_time = time.time()
-                        st.session_state.analysis_progress = 0
-                        st.session_state.analysis_total = data_size
-                        
-                        # 예상 시간 표시
-                        st.info(f"예상 처리 시간: {format_time(estimated_time)} (데이터 {data_size}개, 모델 {len(selected_models)}개)")
-                        
-                        with st.spinner("데이터셋 분석 중..."):
-                            # 데이터셋 분석 실행
-                            df = data_processor.analyze_dataset(
-                                input_file=filepath,
-                                models=selected_models,
-                                output_dir="data/processed",
-                                progress_callback=lambda current: update_analysis_progress(
-                                    progress_bar,
-                                    status_text,
-                                    current,
-                                    data_size,
-                                    st.session_state.analysis_start_time
+            # 감성분석 모델 선택
+            data_processor = DataProcessor()
+            available_models = data_processor.get_available_models()
+            model_combinations = data_processor.model_combinations
+            
+            st.subheader("모델 선택")
+            
+            # 개별 모델 선택 (기본 옵션)
+            selected_models = st.multiselect(
+                "사용할 모델을 선택하세요",
+                options=list(available_models.keys()),
+                format_func=lambda x: available_models[x],
+                default=['kobert', 'kcelectra-base-v2022'],
+                help="여러 모델을 선택하면 앙상블로 분석됩니다."
+            )
+            
+            # 미리 정의된 조합 선택 (보조 옵션)
+            st.markdown("---")
+            st.subheader("미리 정의된 모델 조합")
+            
+            # 조합 설명을 더 가독성 있게 표시
+            combinations_info = {
+                'light': {
+                    'title': '가벼운 조합',
+                    'models': ['kobert', 'kcelectra-base-v2022'],
+                    'description': '빠른 처리 속도에 최적화된 조합입니다.'
+                },
+                'balanced': {
+                    'title': '균형잡힌 조합',
+                    'models': ['kcelectra-base-v2022', 'kcelectra', 'kosentencebert'],
+                    'description': '속도와 정확도의 균형을 맞춘 조합입니다.'
+                },
+                'heavy': {
+                    'title': '정확도 중심 조합',
+                    'models': ['kcbert-large', 'kosentencebert', 'kcelectra-base-v2022'],
+                    'description': '높은 정확도를 우선시하는 조합입니다.'
+                }
+            }
+            
+            # 조합 선택 UI
+            for combo_key, combo_info in combinations_info.items():
+                with st.expander(f"📊 {combo_info['title']}"):
+                    st.markdown(f"**포함 모델:** {', '.join(combo_info['models'])}")
+                    st.markdown(f"*{combo_info['description']}*")
+                    if st.button(f"이 조합으로 분석하기", key=f"use_{combo_key}"):
+                        try:
+                            with st.spinner("데이터셋 분석 중..."):
+                                # 선택된 데이터셋의 파일 경로 찾기
+                                filepath = selected_dataset['path']
+                                
+                                # 선택된 조합으로 분석 실행
+                                df = data_processor.analyze_dataset(
+                                    input_file=filepath,
+                                    models=combo_info['models'],
+                                    output_dir="data/processed"
                                 )
+                                
+                                if df is not None and not df.empty:
+                                    st.session_state.analysis_data = df
+                                    st.session_state.show_results = True
+                                    st.session_state.last_dataset = selected_dataset['filename']
+                                    st.session_state.last_models = combo_info['models']
+                                    st.rerun()
+                                else:
+                                    st.error("분석 결과가 없습니다.")
+                        except Exception as e:
+                            st.error(f"데이터셋 분석 중 오류 발생: {str(e)}")
+                            logger.error(f"데이터셋 분석 중 오류 발생: {str(e)}", exc_info=True)
+            
+            # 개별 모델 선택 시 분석 버튼
+            if selected_models and st.button("선택한 모델로 분석하기"):
+                try:
+                    # 선택된 데이터셋의 파일 경로 찾기
+                    filepath = selected_dataset['path']
+                    
+                    # 데이터 크기 확인
+                    with open(filepath, 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+                        data_size = len(data)
+                    
+                    # 예상 처리 시간 계산
+                    estimated_time = estimate_processing_time(data_size, selected_models)
+                    
+                    # 진행 상황 표시를 위한 컨테이너 생성
+                    progress_container = st.empty()
+                    status_container = st.empty()
+                    progress_bar = progress_container.progress(0)
+                    status_text = status_container.text("분석 준비 중...")
+                    
+                    # 분석 시작 시간 기록
+                    st.session_state.analysis_start_time = time.time()
+                    st.session_state.analysis_progress = 0
+                    st.session_state.analysis_total = data_size
+                    
+                    # 예상 시간 표시
+                    st.info(f"예상 처리 시간: {format_time(estimated_time)} (데이터 {data_size}개, 모델 {len(selected_models)}개)")
+                    
+                    with st.spinner("데이터셋 분석 중..."):
+                        # 데이터셋 분석 실행
+                        df = data_processor.analyze_dataset(
+                            input_file=filepath,
+                            models=selected_models,
+                            output_dir="data/processed",
+                            progress_callback=lambda current: update_analysis_progress(
+                                progress_bar,
+                                status_text,
+                                current,
+                                data_size,
+                                st.session_state.analysis_start_time
                             )
-                            
-                            if df is not None and not df.empty:
-                                st.session_state.analysis_data = df
-                                st.session_state.show_results = True
-                                st.session_state.last_dataset = selected_dataset['filename']
-                                st.session_state.last_models = selected_models
-                                
-                                # 진행 상황 컨테이너 제거
-                                progress_container.empty()
-                                status_container.empty()
-                                
-                                st.success("분석이 완료되었습니다!")
-                                st.rerun()
-                            else:
-                                st.error("분석 결과가 없습니다.")
-                    except Exception as e:
-                        st.error(f"데이터셋 분석 중 오류 발생: {str(e)}")
-                        logger.error(f"데이터셋 분석 중 오류 발생: {str(e)}", exc_info=True)
+                        )
+                    
+                    if df is not None and not df.empty:
+                        st.session_state.analysis_data = df
+                        st.session_state.show_results = True
+                        st.session_state.last_dataset = selected_dataset['filename']
+                        st.session_state.last_models = selected_models
+                        
+                        # 진행 상황 컨테이너 제거
+                        progress_container.empty()
+                        status_container.empty()
+                        
+                        st.success("분석이 완료되었습니다!")
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"데이터셋 분석 중 오류 발생: {str(e)}")
+                    logger.error(f"데이터셋 분석 중 오류 발생: {str(e)}", exc_info=True)
 
+                # 캐시 초기화 버튼 위치 변경 및 메시지 개선
+            if st.sidebar.button("분석 캐시 초기화", type="primary"):
+                if clear_analysis_cache():
+                    st.sidebar.success("✅ 모든 분석 캐시가 초기화되었습니다. 페이지를 새로고침하세요.")
+                    time.sleep(1)
+                    st.rerun()
+                else:
+                    st.sidebar.error("❌ 캐시 초기화 중 오류가 발생했습니다.")
+    
     # 메인 영역 - 크롤링 모드일 때 상태 표시
     if dashboard_mode == "크롤링":
-        st.header("🤖 크롤링 상태 모니터링")
+        # 크롤링 상태 컨테이너 생성
+        status_container = st.empty()
         
-        # 크롤링 상태 확인
-        is_crawling = crawler_status['is_running']
-        
-        if is_crawling:
-            # 진행 상황 표시
-            st.subheader("진행 상황")
-            progress_value = float(crawler_status['progress'])
-            progress_bar = st.progress(progress_value, text=f"{int(progress_value * 100)}% 완료")
-            
-            # 현재 상태 메시지 표시
-            st.info(crawler_status['message'])
-            
-            # 플랫폼별 진행률 표시
-            if 'platform_progress' in crawler_status:
-                st.subheader("플랫폼별 진행률")
-                for platform, progress in crawler_status['platform_progress'].items():
-                    st.progress(progress, text=f"{platform.upper()}: {int(progress * 100)}%")
-            
-            # 경과 시간 및 예상 남은 시간 표시
-            if 'start_time' in crawler_status:
-                elapsed_time = time.time() - crawler_status['start_time']
-                if progress_value > 0 and progress_value < 1:
-                    # 예상 총 시간 계산 (현재까지의 진행률 기준)
-                    estimated_total = elapsed_time / progress_value
-                    remaining_time = estimated_total - elapsed_time
-                    
-                    # 수집된 항목 수 표시
-                    if 'total_items' in crawler_status:
-                        st.metric(
-                            "수집된 항목",
-                            f"{crawler_status['total_items']}개",
-                            f"예상 완료 시간: {format_time(remaining_time)} 남음"
-                        )
-                    else:
-                        st.metric(
-                            "예상 완료 시간",
-                            f"{format_time(remaining_time)} 남음",
-                            f"경과 시간: {format_time(elapsed_time)}"
-                        )
-                else:
-                    st.metric(
-                        "경과 시간",
-                        format_time(elapsed_time),
-                        "진행률 계산 중..."
-                    )
-            
-            # 명령어 표시
-            with st.expander("실행 중인 명령어 확인"):
-                st.code(crawler_status['command'])
+        # 크롤링 중이 아닐 때는 최근 결과 표시
+        if not crawler_status['is_running']:
+            with status_container.container():
+                st.subheader("최근 크롤링 결과")
+                results = load_latest_results()
                 
-            # 자동 새로고침 (5초마다)
-            time_since_update = time.time() - crawler_status['update_timestamp']
-            if time_since_update > 10:
-                st.warning(f"업데이트 없음: {int(time_since_update)}초 동안 상태 업데이트가 없습니다.")
-            
-            # 메타데이터
-            st.caption(f"마지막 업데이트: {datetime.fromtimestamp(crawler_status['update_timestamp']).strftime('%Y-%m-%d %H:%M:%S')}")
-        else:
-            # 최근 결과 표시
-            st.subheader("최근 크롤링 결과")
-            results = load_latest_results()
-            
-            if results:
-                # 결과 테이블 표시
-                st.write("최근 수집된 데이터셋:")
-                result_df = pd.DataFrame([
-                    {
-                        "플랫폼": r["platform"],
-                        "키워드": r["keywords"],
-                        "항목 수": r["items"],
-                        "수집 시간": r["modified"],
-                        "파일명": r["filename"]
-                    } for r in results
-                ])
-                st.dataframe(result_df, use_container_width=True)
-                
-                # 통계 표시
-                stats = get_latest_result_stats()
-                if stats:
-                    st.subheader("통계 요약")
-                    col1, col2 = st.columns(2)
+                if results:
+                    # 결과 테이블 표시
+                    st.write("최근 수집된 데이터셋:")
+                    result_df = pd.DataFrame([
+                        {
+                            "플랫폼": r["platform"],
+                            "키워드": r["keywords"],
+                            "항목 수": r["items"],
+                            "수집 시간": r["modified"],
+                            "파일명": r["filename"]
+                        } for r in results
+                    ])
+                    st.dataframe(result_df, use_container_width=True)
                     
-                    with col1:
-                        st.metric("총 수집 항목", stats['total'])
+                    # 통계 표시
+                    stats = get_latest_result_stats()
+                    if stats:
+                        st.subheader("통계 요약")
+                        col1, col2 = st.columns(2)
                         
-                        # 플랫폼별 항목 수
-                        st.write("플랫폼별 항목 수:")
-                        platform_data = [{"플랫폼": p, "항목 수": c} for p, c in stats['platform_counts'].items()]
-                        platform_df = pd.DataFrame(platform_data)
-                        st.dataframe(platform_df, use_container_width=True)
-                    
-                    with col2:
-                        # 감성 분포
-                        sentiment_data = [{"감성": s, "항목 수": c} for s, c in stats['sentiment_counts'].items()]
-                        sentiment_df = pd.DataFrame(sentiment_data)
-                        
-                        # 차트
-                        fig, ax = plt.subplots()
-                        bars = ax.bar(sentiment_df['감성'], sentiment_df['항목 수'])
-                        
-                        # 색상 설정
-                        colors = {'positive': 'green', 'neutral': 'gray', 'negative': 'red', 'unknown': 'lightgray'}
-                        for i, bar in enumerate(bars):
-                            sentiment = sentiment_df.iloc[i]['감성']
-                            bar.set_color(colors.get(sentiment, 'blue'))
+                        with col1:
+                            st.metric("총 수집 항목", stats['total'])
                             
-                        plt.title("감성 분포")
-                        st.pyplot(fig)
-                    
-                    # 최근 크롤링 시간
-                    st.caption(f"최근 크롤링: {results[0]['modified'] if results else '없음'}")
-            else:
-                st.info("아직 크롤링된 데이터가 없습니다. '크롤링 시작' 버튼을 눌러 데이터 수집을 시작하세요.")
+                            # 플랫폼별 항목 수
+                            st.write("플랫폼별 항목 수:")
+                            platform_data = [{"플랫폼": p, "항목 수": c} for p, c in stats['platform_counts'].items()]
+                            platform_df = pd.DataFrame(platform_data)
+                            st.dataframe(platform_df, use_container_width=True)
+                        
+                        with col2:
+                            # 감성 분포
+                            sentiment_data = [{"감성": s, "항목 수": c} for s, c in stats['sentiment_counts'].items()]
+                            sentiment_df = pd.DataFrame(sentiment_data)
+                            
+                            # 차트
+                            fig, ax = plt.subplots()
+                            bars = ax.bar(sentiment_df['감성'], sentiment_df['항목 수'])
+                            
+                            # 색상 설정
+                            colors = {'positive': 'green', 'neutral': 'gray', 'negative': 'red', 'unknown': 'lightgray'}
+                            for i, bar in enumerate(bars):
+                                sentiment = sentiment_df.iloc[i]['감성']
+                                bar.set_color(colors.get(sentiment, 'blue'))
+                                
+                            plt.title("감성 분포")
+                            st.pyplot(fig)
+                        
+                        # 최근 크롤링 시간
+                        st.caption(f"최근 크롤링: {results[0]['modified'] if results else '없음'}")
+                else:
+                    st.info("아직 크롤링된 데이터가 없습니다. '크롤링 시작' 버튼을 눌러 데이터 수집을 시작하세요.")
             
             # 데이터 위치 안내
             st.markdown("---")
             st.markdown("##### 수집된 데이터 위치")
             st.code("data/raw/*.json")
             st.caption("수집된 데이터는 위 경로에 JSON 형식으로 저장됩니다. 데이터 분석 모드에서 분석할 수 있습니다.")
+        else:
+            # 크롤링 중일 때는 상태 정보 표시
+            with status_container.container():
+                st.subheader("크롤링 상태")
+                
+                # 상태 정보 표시
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.metric(
+                        "상태",
+                        "실행 중",
+                        delta=None
+                    )
+                with col2:
+                    if crawler_status.get('start_time'):
+                        st.metric(
+                            "시작 시간",
+                            datetime.fromtimestamp(crawler_status['start_time']).strftime("%Y-%m-%d %H:%M:%S"),
+                            delta=None
+                        )
+                
+                # 플랫폼별 진행 상황
+                st.subheader("플랫폼별 진행 상황")
+                platform_progress = crawler_status.get('platform_progress', {})
+                
+                for platform, progress in platform_progress.items():
+                    col1, col2 = st.columns([3, 1])
+                    with col1:
+                        st.text(f"{platform.upper()}")
+                        st.progress(progress)
+                        st.text(f"{progress*100:.1f}%")
+                    with col2:
+                        if crawler_status.get('platform_times', {}).get(platform, {}).get('start'):
+                            start_time = datetime.strptime(
+                                crawler_status['platform_times'][platform]['start'],
+                                "%Y-%m-%d %H:%M:%S"
+                            )
+                            if crawler_status['platform_times'][platform].get('end'):
+                                end_time = datetime.strptime(
+                                    crawler_status['platform_times'][platform]['end'],
+                                    "%Y-%m-%d %H:%M:%S"
+                                )
+                                duration = end_time - start_time
+                                st.text(f"소요 시간: {duration}")
+                            else:
+                                elapsed = datetime.now() - start_time
+                                st.text(f"경과 시간: {elapsed}")
+                
+                # 크롤링 결과 요약
+                st.subheader("크롤링 결과 요약")
+                if crawler_status.get('total_items', 0) > 0:
+                    st.metric("총 수집 항목", crawler_status['total_items'])
+                    st.metric("처리된 항목", crawler_status.get('processed_items', 0))
+                
+                # 오류 메시지가 있는 경우 표시
+                if crawler_status.get('error'):
+                    st.error(f"오류 발생: {crawler_status['error']}")
+                
+                # 자동 새로고침을 위한 대기
+                time.sleep(1)
+                st.experimental_rerun()
     elif dashboard_mode == "데이터 분석":
         # 메인 화면에 분석 결과 표시
         # 분석 결과 파일 목록
@@ -1112,9 +1184,9 @@ def main():
                 sentiment_counts = df['sentiment'].value_counts()
                 total = len(df)
                 sentiment_distribution = {
-                    'negative': f"{sentiment_counts.get('negative', 0) / total * 100:.1f}%",
+                    'positive': f"{sentiment_counts.get('positive', 0) / total * 100:.1f}%",
                     'neutral': f"{sentiment_counts.get('neutral', 0) / total * 100:.1f}%",
-                    'positive': f"{sentiment_counts.get('positive', 0) / total * 100:.1f}%"
+                    'negative': f"{sentiment_counts.get('negative', 0) / total * 100:.1f}%"
                 }
                 
                 # 분석 정보 업데이트
@@ -1158,9 +1230,9 @@ def main():
                 
                 # 감성별로 색상 지정
                 sentiment_colors = {
-                    'positive': '🟢',
-                    'neutral': '⚪',
-                    'negative': '🔴'
+                    'positive': '🟢',  # 긍정: 초록색
+                    'neutral': '⚪',   # 중립: 흰색
+                    'negative': '🔴'   # 부정: 빨간색
                 }
                 
                 # 감성별 통계
@@ -1363,8 +1435,8 @@ def main():
                     mime='text/csv',
                     help="분석된 전체 데이터를 CSV 파일로 다운로드합니다."
                 )
-                
-                # 감성 분포 시각화
+        
+        # 감성 분포 시각화
                 st.markdown("### 📊 감성 분포")
                 if st.session_state.analysis_data is not None and isinstance(st.session_state.analysis_data, pd.DataFrame) and not st.session_state.analysis_data.empty:
                     df = st.session_state.analysis_data
@@ -1377,9 +1449,13 @@ def main():
                             bars = ax.bar(sentiment_counts.index, sentiment_counts.values)
                             
                             # 색상 설정
-                            colors = {'positive': 'green', 'neutral': 'gray', 'negative': 'red'}
+                            colors = {
+                                'positive': '#2ecc71',  # 긍정: 초록색
+                                'neutral': '#95a5a6',   # 중립: 회색
+                                'negative': '#e74c3c'   # 부정: 빨간색
+                            }
                             for bar, sentiment in zip(bars, sentiment_counts.index):
-                                bar.set_color(colors.get(sentiment, 'blue'))
+                                bar.set_color(colors.get(sentiment, '#3498db'))
                             
                             plt.title("감성 분포")
                             plt.xticks(rotation=45)
@@ -1388,15 +1464,20 @@ def main():
                         with col2:
                             # 파이 차트
                             fig, ax = plt.subplots(figsize=(10, 6))
-                            sentiment_counts.plot(kind='pie', autopct='%1.1f%%', ax=ax, colors=[colors.get(s, 'blue') for s in sentiment_counts.index])
+                            sentiment_counts.plot(
+                                kind='pie',
+                                autopct='%1.1f%%',
+                                ax=ax,
+                                colors=[colors.get(s, '#3498db') for s in sentiment_counts.index]
+                            )
                             plt.title("감성 분포 (비율)")
                             st.pyplot(fig)
                     else:
-                        st.warning("감성 분석 데이터가 없습니다.")
+                        st.info("감성 분석 데이터가 없습니다.")
                 else:
                     st.info("분석할 데이터가 없습니다.")
-                
-                # 시계열 트렌드
+        
+        # 시계열 트렌드
                 st.markdown("### 📈 시계열 감성 트렌드")
                 if st.session_state.analysis_data is not None and len(st.session_state.analysis_data) > 0:
                     df = pd.DataFrame(st.session_state.analysis_data)
@@ -1425,8 +1506,8 @@ def main():
                         st.warning("시계열 트렌드를 표시할 수 있는 유효한 날짜 데이터가 없습니다.")
                 else:
                     st.info("분석할 데이터가 없습니다.")
-                
-                # 워드클라우드
+        
+        # 워드클라우드
                 st.markdown("### ☁️ 키워드 워드클라우드")
                 if st.session_state.analysis_data is not None and len(st.session_state.analysis_data) > 0:
                     df = pd.DataFrame(st.session_state.analysis_data)
@@ -1435,7 +1516,7 @@ def main():
                         # 전체 컨텐츠 워드클라우드
                         text = ' '.join(df['content'])
                         if text.strip():
-                            wordcloud = WordCloud(width=800, height=400, background_color='white').generate(text)
+                            wordcloud = WordCloud(width=800, height=400, background_color='white', font_path=korean_font_path).generate(text)
                             fig, ax = plt.subplots(figsize=(10, 5))
                             ax.imshow(wordcloud, interpolation='bilinear')
                             ax.axis('off')
@@ -1447,7 +1528,7 @@ def main():
                         # 긍정 감성 워드클라우드
                         positive_text = ' '.join(df[df['sentiment'] == 'positive']['content'])
                         if positive_text.strip():
-                            wordcloud = WordCloud(width=800, height=400, background_color='white').generate(positive_text)
+                            wordcloud = WordCloud(width=800, height=400, background_color='white', font_path=korean_font_path).generate(positive_text)
                             fig, ax = plt.subplots(figsize=(10, 5))
                             ax.imshow(wordcloud, interpolation='bilinear')
                             ax.axis('off')
@@ -1457,8 +1538,8 @@ def main():
                             st.info("긍정 감성의 텍스트가 없습니다.")
                 else:
                     st.info("분석할 데이터가 없습니다.")
-                
-                # GPT 리포트 생성
+        
+        # GPT 리포트 생성
                 st.markdown("### 📝 정책 제안 리포트")
                 if st.session_state.analysis_data is not None and len(st.session_state.analysis_data) > 0:
                     try:

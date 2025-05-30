@@ -13,6 +13,8 @@ from crawlers.dcinside import DCInsideCrawler
 from crawlers.buan_gov import BuanGovCrawler
 # 나중에 다른 크롤러 임포트
 
+import asyncio
+
 # .env 파일 로드
 load_dotenv()
 
@@ -95,7 +97,8 @@ def crawl_platform(platform, keywords, max_pages, max_comments, no_sentiment, br
                 analyze_sentiment=False if no_sentiment else True,  # 기본값을 False로 변경
                 browser_type=browser_type
             )
-            results = crawler.crawl()
+            # 비동기 crawl() 호출
+            results = asyncio.run(crawler.crawl())
             logger.info(f"네이버에서 {len(results)}개 항목 수집 완료")
 
         elif platform == "youtube":

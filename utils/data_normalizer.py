@@ -114,17 +114,61 @@ class PlatformDataNormalizer:
         return str(value) if value is not None else ''
 
     def _normalize_date(self, date_str, platform):
-        """날짜 형식 통일"""
-        if not date_str:
-            return time.strftime("%Y%m%d")
+        """날짜 형식 정규화"""
+        if not date_str or not isinstance(date_str, str):
+            return None
         
         try:
-            # 8자리 숫자 형식 확인
-            if date_str.isdigit() and len(date_str) == 8:
-                return pd.to_datetime(date_str, format='%Y%m%d')
-            # 기타 형식 처리
-            return pd.to_datetime(date_str)
-        except:
+            # 잘못된 형식의 날짜 문자열 처리 (예: "12202517" -> "20251217")
+            if len(date_str) == 8 and date_str.isdigit():
+                # 연도가 2자리로 시작하는 경우 (예: 12xxxxxx)
+                if date_str.startswith(('12', '13', '14')):
+                    year = '20' + date_str[:2]
+                    month = date_str[2:4]
+                    day = date_str[4:6]
+                    date_str = f"{year}{month}{day}"
+            
+            # 다양한 날짜 형식 처리
+            date_formats = [
+                '%Y%m%d',  # 20250513
+                '%Y-%m-%d',  # 2025-05-13
+                '%Y.%m.%d',  # 2025.05.13
+                '%Y년%m월%d일',  # 2025년05월13일
+                '%Y/%m/%d',  # 2025/05/13
+                '%d/%m/%Y',  # 13/05/2025
+                '%m/%d/%Y',  # 05/13/2025
+            ]
+            
+            # 플랫폼별 특수 날짜 형식 처리
+            if platform == 'naver_news_api':
+                if date_str.startswith(('12', '13', '14')):
+                    year = '20' + date_str[:2]
+                    month = date_str[2:4]
+                    day = date_str[4:6]
+                    date_str = f"{year}{month}{day}"
+            
+            # 날짜 파싱 시도
+            parsed_date = None
+            for fmt in date_formats:
+                try:
+                    parsed_date = datetime.strptime(date_str, fmt)
+                    break
+                except ValueError:
+                    continue
+                
+            if parsed_date is None:
+                return None
+            
+            # 유효한 날짜 범위 체크 (2000년 ~ 현재)
+            current_year = datetime.now().year
+            if parsed_date.year < 2000 or parsed_date.year > current_year:
+                return None
+            
+            # YYYYMMDD 형식으로 반환
+            return parsed_date.strftime('%Y%m%d')
+        
+        except Exception as e:
+            logger.warning(f"날짜 정규화 중 오류 발생: {str(e)}, 원본: {date_str}")
             return None
 
     def _normalize_url(self, url, platform):

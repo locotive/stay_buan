@@ -65,18 +65,18 @@ class EnsembleSentimentAnalyzer:
             
             logger.info(f"앙상블 분석기 초기화 완료 (모델 수: {len(self.analyzers)}, 초기화된 모델: {initialized_models})")
             
-            # 레이블 매핑 정의
+            # 레이블 매핑 정의 (수정)
             self.label_map = {
-                0: "negative",
+                0: "negative",  # 0을 부정으로 변경
                 1: "neutral",
-                2: "positive"
+                2: "positive"   # 2를 긍정으로 변경
             }
             
-            # 숫자 레이블 매핑
+            # 숫자 레이블 매핑 (수정)
             self.numeric_label_map = {
-                "negative": 0,
+                "negative": 0,  # 부정을 0으로 변경
                 "neutral": 1,
-                "positive": 2
+                "positive": 2   # 긍정을 2로 변경
             }
             
             self._initialized = True
@@ -161,9 +161,12 @@ class EnsembleSentimentAnalyzer:
                     logger.warning(f"{model_name} 모델에 예측 메서드가 없습니다")
                     continue
                 
+                # 원본 예측 결과 로깅
+                logger.info(f"{model_name} 원본 예측 결과: {pred} ({self.label_map.get(pred, 'unknown')}, 신뢰도: {conf:.3f})")
+                
+                # 예측 결과는 그대로 사용 (라벨 매핑은 이미 수정됨)
                 predictions.append(pred)
                 confidences.append(conf)
-                logger.info(f"{model_name} 예측 결과: {pred} (신뢰도: {conf:.3f})")
                 
             except Exception as e:
                 logger.error(f"{model_name} 모델 예측 중 오류 발생: {str(e)}")
@@ -195,7 +198,8 @@ class EnsembleSentimentAnalyzer:
         # 평균 신뢰도 계산
         avg_confidence = label_counts[selected_label]['conf_sum'] / label_counts[selected_label]['count']
         
-        logger.info(f"앙상블 예측 결과: {selected_label} (신뢰도: {avg_confidence:.3f})")
+        # 최종 예측 결과 로깅
+        logger.info(f"앙상블 최종 예측 결과: {selected_label} ({self.label_map.get(selected_label, 'unknown')}, 신뢰도: {avg_confidence:.3f})")
         return selected_label, avg_confidence
 
     def analyze_text(self, text: str) -> Tuple[int, float]:

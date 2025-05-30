@@ -275,18 +275,6 @@ class DataProcessor:
         try:
             start_time = time.time()
             
-            # 파일이 이미 분석되었는지 확인
-            if self.sentiment_history.is_file_analyzed(input_file, models):
-                logger.info(f"파일이 이미 분석되었습니다: {input_file}")
-                # 이전 분석 결과 로드
-                analysis_history = self.sentiment_history.get_file_analysis_history(input_file)
-                if analysis_history:
-                    latest_analysis = max(analysis_history, key=lambda x: x['timestamp'])
-                    if os.path.exists(latest_analysis['output_files']['csv']):
-                        df = pd.read_csv(latest_analysis['output_files']['csv'])
-                        logger.info(f"이전 분석 결과를 로드했습니다: {latest_analysis['output_files']['csv']}")
-                        return df
-            
             # 데이터 로드 및 검증
             with open(input_file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
@@ -582,51 +570,6 @@ class DataProcessor:
             
         return True, "유효한 텍스트"
     
-    @lru_cache(maxsize=1000)  # 캐시 크기 증가
-    def get_cached_sentiment(self, text: str, analyzer_name: str) -> Optional[tuple]:
-        """감성 분석 결과 캐싱"""
-        try:
-            cache_file = os.path.join(self.cache_dir, f"sentiment_cache_{analyzer_name}.json")
-            
-            # 캐시 파일 로드
-            if os.path.exists(cache_file):
-                with open(cache_file, 'r', encoding='utf-8') as f:
-                    cache = json.load(f)
-            else:
-                cache = {}
-            
-            # 캐시된 결과가 있으면 반환
-            if text in cache:
-                return tuple(cache[text])
-            
-            return None
-            
-        except Exception as e:
-            logger.error(f"캐시 로드 중 오류: {str(e)}")
-            return None
-    
-    def save_sentiment_cache(self, text: str, result: tuple, analyzer_name: str):
-        """감성 분석 결과 캐시 저장"""
-        try:
-            cache_file = os.path.join(self.cache_dir, f"sentiment_cache_{analyzer_name}.json")
-            
-            # 캐시 파일 로드
-            if os.path.exists(cache_file):
-                with open(cache_file, 'r', encoding='utf-8') as f:
-                    cache = json.load(f)
-            else:
-                cache = {}
-            
-            # 결과 저장
-            cache[text] = list(result)
-            
-            # 캐시 파일 저장
-            with open(cache_file, 'w', encoding='utf-8') as f:
-                json.dump(cache, f, ensure_ascii=False, indent=2)
-                
-        except Exception as e:
-            logger.error(f"캐시 저장 중 오류: {str(e)}")
-    
     def analyze_sentiment_batch(self, texts: List[str], analyzer) -> List[Tuple[int, float]]:
         """배치 단위 감성 분석"""
         results = []
@@ -638,12 +581,6 @@ class DataProcessor:
                 if not is_valid:
                     logger.warning(f"감성 분석 제외: {reason}")
                     results.append((1, 0.0))  # 중립으로 처리
-                    continue
-                    
-                # 캐시 확인
-                cached_result = self.get_cached_sentiment(text, analyzer.__class__.__name__)
-                if cached_result:
-                    results.append(cached_result)
                     continue
                     
                 # 새로운 분석 요청
@@ -1026,3 +963,62 @@ class DataProcessor:
         except Exception as e:
             logger.error(f"결과 저장 중 오류 발생: {str(e)}")
             raise 
+
+    def validate_and_transform_data(self, df):
+        """데이터 유효성 검사 및 변환"""
+        if df.empty:
+            logger.warning("입력 데이터프레임이 비어있습니다.")
+            return pd.DataFrame()
+        
+        try:
+            # 필수 컬럼 확인
+            required_columns = ['title', 'content', 'published_date', 'platform']
+            missing_columns = [col for col in required_columns if col not in df.columns]
+            if missing_columns:
+                logger.error(f"필수 컬럼이 누락되었습니다: {missing_columns}")
+                return pd.DataFrame()
+            
+            # 날짜 데이터 처리
+            df['published_date'] = pd.to_datetime(df['published_date'], errors='coerce')
+            invalid_dates = df['published_date'].isna()
+            if invalid_dates.any():
+                logger.warning(f"유효하지 않은 날짜 데이터 {invalid_dates.sum()}개 발견")
+                df = df[~invalid_dates]
+            
+            # 현재 날짜보다 미래 날짜 필터링
+            current_date = pd.Timestamp.now()
+            future_dates = df['published_date'] > current_date
+            if future_dates.any():
+                logger.warning(f"미래 날짜 데이터 {future_dates.sum()}개 발견")
+                df = df[~future_dates]
+            
+            # 2000년 이전 데이터 필터링
+            old_dates = df['published_date'].dt.year < 2000
+            if old_dates.any():
+                logger.warning(f"2000년 이전 데이터 {old_dates.sum()}개 발견")
+                df = df[~old_dates]
+            
+            # 날짜 형식 통일 (YYYYMMDD)
+            df['published_date'] = df['published_date'].dt.strftime('%Y%m%d')
+            
+            # 제목과 내용 처리
+            df['title'] = df['title'].fillna('').astype(str)
+            df['content'] = df['content'].fillna('').astype(str)
+            
+            # 내용이 비어있는 경우 제목으로 대체
+            empty_content = df['content'].str.strip() == ''
+            if empty_content.any():
+                logger.warning(f"내용이 비어있는 데이터 {empty_content.sum()}개 발견")
+                df.loc[empty_content, 'content'] = df.loc[empty_content, 'title']
+            
+            # 중복 데이터 제거
+            initial_len = len(df)
+            df = df.drop_duplicates(subset=['title', 'content', 'published_date'])
+            if len(df) < initial_len:
+                logger.info(f"중복 데이터 {initial_len - len(df)}개 제거됨")
+            
+            return df
+        
+        except Exception as e:
+            logger.error(f"데이터 처리 중 오류 발생: {str(e)}")
+            return pd.DataFrame() 
