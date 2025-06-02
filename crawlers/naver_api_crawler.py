@@ -1,3 +1,5 @@
+import concurrent.futures
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 import os
 import json
@@ -7,7 +9,7 @@ from urllib.parse import quote
 import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
-from datetime import datetime
+from datetime import datetime, timedelta
 from utils.cache import JsonCache
 from core.base_crawler import BaseCrawler
 from utils.content_extractor import extract_content
@@ -272,45 +274,129 @@ class NaverSearchAPICrawler(BaseCrawler):
         if hasattr(self, 'blog_crawler') and self.blog_crawler:
             self.blog_crawler.close_driver()
 
+    def _normalize_date(self, date_str):
+        """날짜 문자열을 YYYYMMDD 형식으로 정규화"""
+        if not date_str:
+            return time.strftime("%Y%m%d")
+            
+        try:
+            # 이미 YYYYMMDD 형식인 경우
+            if date_str.isdigit() and len(date_str) == 8:
+                return date_str
+                
+            # 네이버 뉴스 API 특수 형식 처리 (DDYYYYMM 또는 DDYYYYM시간시간)
+            if date_str.isdigit() and len(date_str) >= 6:
+                try:
+                    # DDYYYYMM 형식 처리
+                    if len(date_str) == 8:
+                        day = int(date_str[:2])
+                        year = int(date_str[2:6])
+                        month = int(date_str[6:])
+                        if 1 <= day <= 31 and 2000 <= year <= 2100 and 1 <= month <= 12:
+                            return f"{year}{month:02d}{day:02d}"
+                    # DDYYYYM시간시간 형식 처리
+                    elif len(date_str) >= 7:
+                        day = int(date_str[:2])
+                        year = int(date_str[2:6])
+                        month = int(date_str[6])
+                        if 1 <= day <= 31 and 2000 <= year <= 2100 and 1 <= month <= 9:
+                            return f"{year}{month:02d}{day:02d}"
+                except ValueError:
+                    pass
+                    
+            # 다양한 날짜 형식 처리
+            date_formats = [
+                '%Y%m%d',           # 20240320
+                '%Y-%m-%d',         # 2024-03-20
+                '%Y/%m/%d',         # 2024/03/20
+                '%Y.%m.%d',         # 2024.03.20
+                '%Y년%m월%d일',      # 2024년03월20일
+                '%Y년 %m월 %d일',    # 2024년 03월 20일
+                '%Y-%m-%dT%H:%M:%S', # 2024-03-20T00:00:00
+                '%Y-%m-%d %H:%M:%S'  # 2024-03-20 00:00:00
+            ]
+            
+            # 각 형식 시도
+            for fmt in date_formats:
+                try:
+                    date_obj = datetime.strptime(date_str, fmt)
+                    return date_obj.strftime('%Y%m%d')
+                except:
+                    continue
+                    
+            # 상대적 날짜 처리 (예: "3일 전", "어제" 등)
+            if "전" in date_str or "일" in date_str:
+                try:
+                    days = int(''.join(filter(str.isdigit, date_str)))
+                    date_obj = datetime.now() - timedelta(days=days)
+                    return date_obj.strftime('%Y%m%d')
+                except:
+                    pass
+                    
+            self.logger.warning(f"날짜 형식을 인식할 수 없음: {date_str}")
+            return time.strftime("%Y%m%d")
+            
+        except Exception as e:
+            self.logger.error(f"날짜 정규화 중 오류: {str(e)}")
+            return time.strftime("%Y%m%d")
+
     def _postprocess(self, items, original_keywords):
         """수집된 아이템을 후처리하는 메서드"""
         processed_items = []
         filtered_count = 0
         
         for item in items:
-            # 1. 키워드 조건 확인 (완화된 조건)
-            combined_text = f"{item['title']} {item['content']}"
-            
-            # 필수 키워드(부안)는 반드시 포함
-            if not any(kw.lower() in combined_text.lower() for kw in self.filter_conditions['required_keywords']):
-                filtered_count += 1
-                continue
-                
-            # 제외 키워드가 있으면 제외
-            if any(kw.lower() in combined_text.lower() for kw in self.filter_conditions['exclude_keywords']):
-                filtered_count += 1
-                continue
-                
-            # 2. 중복 문서 확인
-            doc_id = hashlib.sha256((item['url'] + item['title']).encode()).hexdigest()
-            if doc_id in self.doc_ids:
-                filtered_count += 1
-                continue
-            
-            # 3. 날짜 범위 확인
             try:
-                pub_date = datetime.strptime(item['published_date'], '%Y%m%d')
-                if (datetime.now() - pub_date).days > self.filter_conditions['date_range']:
+                # 1. 키워드 조건 확인
+                combined_text = f"{item['title']} {item['content']}"
+                
+                # 필수 키워드(부안)는 반드시 포함
+                if not any(kw.lower() in combined_text.lower() for kw in self.filter_conditions['required_keywords']):
                     filtered_count += 1
                     continue
-            except:
-                pass
-            
-            # 문서 ID 추가
-            self.doc_ids.add(doc_id)
-            item['doc_id'] = doc_id
-            
-            processed_items.append(item)
+                    
+                # 제외 키워드가 있으면 제외
+                if any(kw.lower() in combined_text.lower() for kw in self.filter_conditions['exclude_keywords']):
+                    filtered_count += 1
+                    continue
+                    
+                # 2. 중복 문서 확인
+                doc_id = hashlib.sha256((item['url'] + item['title']).encode()).hexdigest()
+                if doc_id in self.doc_ids:
+                    filtered_count += 1
+                    continue
+                
+                # 3. 날짜 처리 및 검증
+                try:
+                    # 날짜 정규화
+                    normalized_date = self._normalize_date(item.get('published_date', ''))
+                    item['published_date'] = normalized_date
+                    
+                    # 날짜 객체 생성
+                    date_obj = datetime.strptime(normalized_date, '%Y%m%d')
+                    item['date_obj'] = date_obj.isoformat()
+                    
+                    # 미래 날짜 체크
+                    if date_obj > datetime.now():
+                        self.logger.warning(f"미래 날짜 발견: {normalized_date}")
+                        item['published_date'] = time.strftime("%Y%m%d")
+                        item['date_obj'] = datetime.now().isoformat()
+                        
+                except Exception as e:
+                    self.logger.error(f"날짜 처리 중 오류: {str(e)}")
+                    item['published_date'] = time.strftime("%Y%m%d")
+                    item['date_obj'] = datetime.now().isoformat()
+                
+                # 문서 ID 추가
+                self.doc_ids.add(doc_id)
+                item['doc_id'] = doc_id
+                
+                processed_items.append(item)
+                
+            except Exception as e:
+                self.logger.error(f"아이템 처리 중 오류: {str(e)}")
+                filtered_count += 1
+                continue
         
         # 필터링 비율 계산
         if items:
@@ -533,42 +619,47 @@ class NaverSearchAPICrawler(BaseCrawler):
                             
                             if not items:
                                 break
-                                
-                            for item in items:
-                                title = self.clean_text(item.get("title", ""))
-                                desc = self.clean_text(item.get("description", ""))
-                                url = item.get("link", "")
-                                blog_name = item.get("bloggername", item.get("author", ""))
-                                date = self._normalize_date(item.get("postdate", item.get("pubDate", "")))
-                                
-                                if url in seen_urls:
-                                    continue
-                                seen_urls.add(url)
-                                
-                                full_content = self.blog_crawler.get_blog_content(url)
-                                content = full_content if full_content else f"{title} {desc}"
-                                
-                                try:
-                                    date_obj = datetime.strptime(date, "%Y%m%d")
-                                except:
-                                    date_obj = datetime.now()
+                            # 병렬 콘텐츠 추출
+                            with ThreadPoolExecutor(max_workers=4) as executor:
+                                future_to_item = {executor.submit(self.blog_crawler.get_blog_content, item.get("link","")): item for item in items if item.get("link")}
+                                for future in as_completed(future_to_item):
+                                    item = future_to_item[future]
+                                    title = self.clean_text(item.get("title",""))
+                                    desc = self.clean_text(item.get("description",""))
+                                    url = item.get("link","")
+                                    blog_name = item.get("bloggername", item.get("author",""))
+                                    date = self._normalize_date(item.get("postdate", item.get("pubDate","")))
+                                    try:
+                                        full_content = future.result()
+                                    except Exception:
+                                        full_content = None
+                                    content = full_content if full_content else f"{title} {desc}"
                                     
-                                post_data = {
-                                    "title": title,
-                                    "content": content,
-                                    "url": url,
-                                    "blog_name": blog_name,
-                                    "published_date": date,
-                                    "date_obj": date_obj.isoformat(),
-                                    "platform": f"naver_{target}_api",
-                                    "keyword": keyword,
-                                    "original_keywords": ",".join(self.keywords),
-                                    "sentiment": None,
-                                    "crawled_at": time.strftime("%Y-%m-%d %H:%M:%S"),
-                                }
-                                keyword_results.append(post_data)
-                                self.cache.save(url)
-                                
+                                    if url in seen_urls:
+                                        continue
+                                    seen_urls.add(url)
+                                    
+                                    try:
+                                        date_obj = datetime.strptime(date, "%Y%m%d")
+                                    except:
+                                        date_obj = datetime.now()
+                                        
+                                    post_data = {
+                                        "title": title,
+                                        "content": content,
+                                        "url": url,
+                                        "blog_name": blog_name,
+                                        "published_date": date,
+                                        "date_obj": date_obj.isoformat(),
+                                        "platform": f"naver_{target}_api",
+                                        "keyword": keyword,
+                                        "original_keywords": ",".join(self.keywords),
+                                        "sentiment": None,
+                                        "crawled_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+                                    }
+                                    keyword_results.append(post_data)
+                                    self.cache.save(url)
+
                             page += 1
                             # 최적화된 대기 시간 적용
                             time.sleep(random.uniform(*self.filter_conditions['api_wait_time']))

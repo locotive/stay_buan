@@ -979,27 +979,116 @@ class DataProcessor:
                 return pd.DataFrame()
             
             # 날짜 데이터 처리
-            df['published_date'] = pd.to_datetime(df['published_date'], errors='coerce')
+            def normalize_date(date_str):
+                logger.info(f"날짜 변환 시작 - 입력값: {date_str}, 타입: {type(date_str)}")
+                
+                if pd.isna(date_str):
+                    logger.warning("날짜값이 NA입니다.")
+                    return None
+                    
+                try:
+                    # 문자열로 변환
+                    date_str = str(date_str).strip()
+                    logger.info(f"문자열 변환 후: {date_str}")
+                    
+                    # 이미 YYYYMMDD 형식인 경우
+                    if re.match(r'^\d{8}$', date_str):
+                        logger.info(f"YYYYMMDD 형식 감지: {date_str}")
+                        return date_str
+                    
+                    # 날짜 형식 변환 시도
+                    try:
+                        logger.info(f"pandas to_datetime 시도: {date_str}")
+                        dt = pd.to_datetime(date_str)
+                        result = dt.strftime('%Y%m%d')
+                        logger.info(f"변환 성공: {date_str} -> {result}")
+                        return result
+                    except Exception as e:
+                        logger.warning(f"pandas to_datetime 실패: {str(e)}")
+                        
+                        # 한글 날짜 형식 처리
+                        if '년' in date_str and '월' in date_str and '일' in date_str:
+                            logger.info(f"한글 날짜 형식 감지: {date_str}")
+                            try:
+                                normalized = date_str.replace('년', '-').replace('월', '-').replace('일', '')
+                                logger.info(f"한글 날짜 정규화: {normalized}")
+                                dt = pd.to_datetime(normalized)
+                                result = dt.strftime('%Y%m%d')
+                                logger.info(f"한글 날짜 변환 성공: {date_str} -> {result}")
+                                return result
+                            except Exception as e:
+                                logger.error(f"한글 날짜 변환 실패: {str(e)}")
+                        
+                        # 다른 형식 시도
+                        try:
+                            # YYYY-MM-DD 형식으로 변환 시도
+                            if re.match(r'\d{4}[-./]\d{1,2}[-./]\d{1,2}', date_str):
+                                logger.info(f"구분자 포함 날짜 형식 감지: {date_str}")
+                                normalized = re.sub(r'[-./]', '-', date_str)
+                                dt = pd.to_datetime(normalized)
+                                result = dt.strftime('%Y%m%d')
+                                logger.info(f"구분자 날짜 변환 성공: {date_str} -> {result}")
+                                return result
+                        except Exception as e:
+                            logger.warning(f"구분자 날짜 변환 실패: {str(e)}")
+                        
+                        logger.warning(f"모든 날짜 변환 시도 실패: {date_str}")
+                        return None
+                        
+                except Exception as e:
+                    logger.error(f"날짜 변환 중 예외 발생: {str(e)}, 입력값: {date_str}")
+                    return None
+            
+            # 날짜 변환 적용 전 로깅
+            logger.info("=== 날짜 변환 시작 ===")
+            logger.info(f"총 {len(df)}개의 날짜 데이터 처리 시작")
+            logger.info(f"날짜 데이터 샘플:\n{df['published_date'].head()}")
+            
+            # 날짜 변환 적용
+            df['published_date'] = df['published_date'].apply(normalize_date)
+            
+            # 변환 결과 로깅
             invalid_dates = df['published_date'].isna()
+            logger.info(f"=== 날짜 변환 결과 ===")
+            logger.info(f"총 데이터 수: {len(df)}")
+            logger.info(f"유효한 날짜 수: {len(df) - invalid_dates.sum()}")
+            logger.info(f"유효하지 않은 날짜 수: {invalid_dates.sum()}")
+            if invalid_dates.any():
+                logger.warning("유효하지 않은 날짜 샘플:")
+                invalid_samples = df[invalid_dates]['published_date'].head()
+                logger.warning(f"\n{invalid_samples}")
+            
+            # 유효하지 않은 날짜 필터링
             if invalid_dates.any():
                 logger.warning(f"유효하지 않은 날짜 데이터 {invalid_dates.sum()}개 발견")
                 df = df[~invalid_dates]
             
             # 현재 날짜보다 미래 날짜 필터링
-            current_date = pd.Timestamp.now()
+            current_date = pd.Timestamp.now().strftime('%Y%m%d')
             future_dates = df['published_date'] > current_date
             if future_dates.any():
                 logger.warning(f"미래 날짜 데이터 {future_dates.sum()}개 발견")
+                logger.warning("미래 날짜 샘플:")
+                future_samples = df[future_dates]['published_date'].head()
+                logger.warning(f"\n{future_samples}")
                 df = df[~future_dates]
             
             # 2000년 이전 데이터 필터링
-            old_dates = df['published_date'].dt.year < 2000
+            old_dates = df['published_date'].str[:4].astype(int) < 2000
             if old_dates.any():
                 logger.warning(f"2000년 이전 데이터 {old_dates.sum()}개 발견")
+                logger.warning("2000년 이전 날짜 샘플:")
+                old_samples = df[old_dates]['published_date'].head()
+                logger.warning(f"\n{old_samples}")
                 df = df[~old_dates]
             
-            # 날짜 형식 통일 (YYYYMMDD)
-            df['published_date'] = df['published_date'].dt.strftime('%Y%m%d')
+            # 최종 결과 로깅
+            logger.info("=== 최종 날짜 처리 결과 ===")
+            logger.info(f"최종 데이터 수: {len(df)}")
+            logger.info("날짜 범위:")
+            if not df.empty:
+                logger.info(f"시작: {df['published_date'].min()}")
+                logger.info(f"종료: {df['published_date'].max()}")
             
             # 제목과 내용 처리
             df['title'] = df['title'].fillna('').astype(str)

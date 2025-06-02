@@ -1484,24 +1484,76 @@ def main():
                     
                     # 날짜 형식 정규화 및 변환
                     valid_dates = []
+                    date_formats = [
+                        '%Y%m%d',      # 20250519
+                        '%Y-%m-%d',    # 2025-05-19
+                        '%Y/%m/%d',    # 2025/05/19
+                        '%Y.%m.%d',    # 2025.05.19
+                        '%Y년%m월%d일'  # 2025년05월19일
+                    ]
+                    
                     for idx, row in df.iterrows():
-                        try:
-                            date_str = row['published_date']
-                            if date_str.isdigit() and len(date_str) == 8:
-                                df.at[idx, 'date'] = pd.to_datetime(date_str, format='%Y%m%d')
+                        date_str = str(row['published_date']).strip()
+                        if not date_str or pd.isna(date_str):
+                            continue
+                            
+                        # 이미 datetime 객체인 경우
+                        if isinstance(date_str, (pd.Timestamp, datetime)):
+                            df.at[idx, 'date'] = pd.to_datetime(date_str)
+                            valid_dates.append(idx)
+                            continue
+                            
+                        # 다양한 날짜 형식 시도
+                        for date_format in date_formats:
+                            try:
+                                # 숫자만 있는 경우 YYYYMMDD 형식으로 처리
+                                if date_str.isdigit() and len(date_str) == 8:
+                                    df.at[idx, 'date'] = pd.to_datetime(date_str, format='%Y%m%d')
+                                    valid_dates.append(idx)
+                                    break
+                                    
+                                # 다른 형식 시도
+                                df.at[idx, 'date'] = pd.to_datetime(date_str, format=date_format)
                                 valid_dates.append(idx)
-                        except:
-                            pass
+                                break
+                            except:
+                                continue
                     
                     # 유효한 날짜만 포함된 데이터프레임 생성
                     df_valid = df.loc[valid_dates]
                     
                     if not df_valid.empty:
+                        # 날짜로 정렬
+                        df_valid = df_valid.sort_values('date')
+                        
+                        # 일별 감성 분포 계산
                         daily_sentiment = df_valid.groupby(['date', 'sentiment']).size().unstack(fill_value=0)
+                        
+                        # 시각화
                         fig, ax = plt.subplots(figsize=(12, 6))
-                        daily_sentiment.plot(kind='line', ax=ax)
-                        plt.title("일별 감성 트렌드")
+                        daily_sentiment.plot(kind='line', ax=ax, marker='o')
+                        
+                        # 그래프 스타일 설정
+                        plt.title("일별 감성 트렌드", pad=20)
+                        plt.xlabel("날짜")
+                        plt.ylabel("항목 수")
+                        plt.grid(True, linestyle='--', alpha=0.7)
+                        plt.legend(title="감성", bbox_to_anchor=(1.05, 1), loc='upper left')
+                        
+                        # x축 날짜 포맷 설정
+                        plt.gcf().autofmt_xdate()
+                        
+                        # 여백 조정
+                        plt.tight_layout()
+                        
                         st.pyplot(fig)
+                        
+                        # 날짜 범위 표시
+                        date_range = f"분석 기간: {df_valid['date'].min().strftime('%Y-%m-%d')} ~ {df_valid['date'].max().strftime('%Y-%m-%d')}"
+                        st.caption(date_range)
+                        
+                        # 처리된 날짜 수 표시
+                        st.info(f"총 {len(valid_dates)}개의 유효한 날짜 데이터가 처리되었습니다.")
                     else:
                         st.warning("시계열 트렌드를 표시할 수 있는 유효한 날짜 데이터가 없습니다.")
                 else:

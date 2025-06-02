@@ -10,6 +10,14 @@ import numpy as np
 import os
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+# 로깅 핸들러 설정
+if not logger.handlers:
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
 
 class EnsembleSentimentAnalyzer:
     """다양한 감성 분석 모델 앙상블"""
@@ -150,6 +158,8 @@ class EnsembleSentimentAnalyzer:
         predictions = []
         confidences = []
         
+        logger.info(f"입력 텍스트: {text[:100]}...")  # 텍스트 일부 로깅
+        
         for model_name, analyzer in self.analyzers.items():
             try:
                 # predict 또는 analyze_text 메서드 사용
@@ -161,10 +171,11 @@ class EnsembleSentimentAnalyzer:
                     logger.warning(f"{model_name} 모델에 예측 메서드가 없습니다")
                     continue
                 
-                # 원본 예측 결과 로깅
-                logger.info(f"{model_name} 원본 예측 결과: {pred} ({self.label_map.get(pred, 'unknown')}, 신뢰도: {conf:.3f})")
+                # 원본 예측 결과 상세 로깅
+                logger.info(f"{model_name} 모델 예측 결과:")
+                logger.info(f"  - 레이블: {pred} ({self.label_map.get(pred, 'unknown')})")
+                logger.info(f"  - 신뢰도: {conf:.3f}")
                 
-                # 예측 결과는 그대로 사용 (라벨 매핑은 이미 수정됨)
                 predictions.append(pred)
                 confidences.append(conf)
                 
@@ -176,13 +187,18 @@ class EnsembleSentimentAnalyzer:
             logger.warning("모든 모델 예측 실패")
             return 1, 0.0  # neutral, 0.0 confidence
 
-        # 다수결 투표
+        # 다수결 투표 결과 상세 로깅
         label_counts = {}
         for pred, conf in zip(predictions, confidences):
             if pred not in label_counts:
                 label_counts[pred] = {'count': 0, 'conf_sum': 0.0}
             label_counts[pred]['count'] += 1
             label_counts[pred]['conf_sum'] += conf
+            
+        logger.info("각 레이블별 투표 결과:")
+        for label, info in label_counts.items():
+            avg_conf = info['conf_sum'] / info['count']
+            logger.info(f"  - {self.label_map.get(label, 'unknown')}: {info['count']}표 (평균 신뢰도: {avg_conf:.3f})")
 
         # 가장 많은 표를 받은 라벨 선택
         max_count = max(label_counts.values(), key=lambda x: x['count'])['count']
@@ -192,6 +208,7 @@ class EnsembleSentimentAnalyzer:
         if len(candidates) > 1:
             selected_label = max(candidates, 
                                key=lambda x: label_counts[x]['conf_sum'] / label_counts[x]['count'])
+            logger.info(f"동률 발생: {[self.label_map.get(c, 'unknown') for c in candidates]}")
         else:
             selected_label = candidates[0]
             
