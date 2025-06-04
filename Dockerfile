@@ -16,6 +16,9 @@ RUN apt-get update && apt-get install -y \
     xvfb \
     libxi6 \
     libgconf-2-4 \
+    fonts-nanum \
+    fonts-nanum-coding \
+    fonts-nanum-extra \
     && apt-get clean
 
 # Firefox 및 GeckoDriver 설치
@@ -52,6 +55,9 @@ RUN apt-get update && apt-get install -y \
     xvfb \
     libxi6 \
     libgconf-2-4 \
+    fonts-nanum \
+    fonts-nanum-coding \
+    fonts-nanum-extra \
     && apt-get clean
 
 # 앱 작업 디렉토리 설정

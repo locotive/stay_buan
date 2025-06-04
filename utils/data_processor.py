@@ -312,7 +312,7 @@ class DataProcessor:
                     
                     # 감성 분석 수행
                     sentiment, confidence = analyzer.predict(text)
-                    
+                    logger.info(f"감성 분석 결과: {sentiment}, 신뢰도: {confidence:.3f}")
                     # 결과 저장
                     result = {
                         'title': item.get('title', ''),
@@ -418,7 +418,7 @@ class DataProcessor:
             try:
                 # URL에서 video_id 추출 시도
                 df['video_id'] = df['url'].apply(lambda x: self._extract_video_id(x) if isinstance(x, str) else None)
-                
+            
                 # 추출 실패한 경우 임의의 ID 생성
                 missing_ids = df['video_id'].isna()
                 if missing_ids.any():
@@ -461,7 +461,7 @@ class DataProcessor:
                         df.loc[idx, 'content'] = None  # 제목도 비어있는 경우 None으로 설정
                 # None 값이 있는 행 제거
                 df = df.dropna(subset=['content'])
-                
+
         return validation_results
 
     def _extract_video_id(self, url: str) -> str:
@@ -608,7 +608,7 @@ class DataProcessor:
                     results.append((1, 0.0))  # 오류 시 중립으로 처리
                     
         return results
-    
+
     def validate_content(self, content: str) -> bool:
         """컨텐츠 유효성 검사 (더 유연한 조건 적용)"""
         if not isinstance(content, str):
@@ -632,7 +632,7 @@ class DataProcessor:
                 return False
                 
         return True
-
+    
     def process_data(self, df: pd.DataFrame, platform: str, analyzer=None) -> pd.DataFrame:
         """데이터 전처리 파이프라인 실행"""
         if df is None or df.empty:

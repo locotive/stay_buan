@@ -504,7 +504,7 @@ def get_available_datasets():
                         keywords = '_'.join(parts[2:-2])
                     else:
                         count = parts[1]
-                        keywords = '_'.join(parts[2:-2])
+                        keywords = '_'.join(parts[2:-1])
                         
                     # 이미 분석된 파일인지 확인
                     is_analyzed = any(r['input_file'] == file for r in analysis_results)
@@ -847,6 +847,7 @@ def main():
                 datasets = get_available_datasets()
                 raw_datasets = datasets['raw_datasets']
                 
+                # 원본 데이터셋 목록이 비어있는 경우 경고 메시지 표시
                 if not raw_datasets:
                     st.warning("사용 가능한 원본 데이터셋이 없습니다.")
                 else:
@@ -1195,6 +1196,7 @@ def main():
                     with col1:
                         st.markdown(f"**분석 시간:** {selected_result['analysis_time']}")
                         st.markdown(f"**사용 모델:** {', '.join(selected_result['models'])}")
+                        st.markdown(f"**분석 파일:** {os.path.basename(selected_result['input_file'])}")
                     with col2:
                         st.markdown(f"**항목 수:** {len(df)}개")
                         st.markdown("**감성 분포:**")
@@ -1594,25 +1596,43 @@ def main():
         # GPT 리포트 생성
                 st.markdown("### 📝 정책 제안 리포트")
                 if st.session_state.analysis_data is not None and len(st.session_state.analysis_data) > 0:
-                    try:
-                        df = pd.DataFrame(st.session_state.analysis_data)
-                        report_generator = GPTReportGenerator(api_key=os.getenv("OPENAI_API_KEY"))
-                        report = report_generator.generate_report(df)
-                        st.text(report)
-                        
-                        # PDF 리포트 저장
-                        pdf_generator = PDFReportGenerator()
-                        pdf_path = pdf_generator.generate_pdf(report)
-                        if pdf_path:
-                            with open(pdf_path, "rb") as f:
-                                st.download_button(
-                                    "📄 PDF 리포트 다운로드",
-                                    f,
-                                    file_name=f"report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
-                                    mime='application/pdf'
-                                )
-                    except Exception as e:
-                        st.error(f"리포트 생성 중 오류 발생: {str(e)}")
+                    df = pd.DataFrame(st.session_state.analysis_data)
+                    
+                    # API 키 입력 필드 추가
+                    api_key = st.text_input(
+                        "OpenAI API 키",
+                        value=os.getenv("OPENAI_API_KEY", ""),
+                        type="password",
+                        help="OpenAI API 키를 입력하세요. API 키는 https://platform.openai.com/api-keys 에서 발급받을 수 있습니다."
+                    )
+                    
+                    if not api_key:
+                        st.warning("OpenAI API 키를 입력해주세요.")
+                    else:
+                        try:
+                            report_generator = GPTReportGenerator(api_key=api_key)
+                            report = report_generator.generate_report(df)
+                            # Truncate if report exceeds Streamlit markdown rendering limits (optional)
+                            # Streamlit markdown limit is ~1,000,000 characters, but we can truncate earlier if desired
+                            max_chars = 65000
+                            if len(report) > max_chars:
+                                report = report[:max_chars] + "\n\n(이 리포트는 Streamlit 표시 한도 때문에 잘렸습니다.)"
+                            st.markdown(report)
+                            
+                            # PDF 리포트 저장
+                            pdf_generator = PDFReportGenerator()
+                            pdf_path = pdf_generator.generate_pdf(report)
+                            if pdf_path:
+                                with open(pdf_path, "rb") as f:
+                                    st.download_button(
+                                        "📄 PDF 리포트 다운로드",
+                                        f,
+                                        file_name=f"report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
+                                        mime='application/pdf'
+                                    )
+                        except Exception as e:
+                            st.error(f"리포트 생성 중 오류 발생: {str(e)}")
+                            logger.error(f"리포트 생성 중 오류 발생: {str(e)}", exc_info=True)
                 else:
                     st.info("분석할 데이터가 없습니다.")
 

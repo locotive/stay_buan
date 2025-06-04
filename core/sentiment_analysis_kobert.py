@@ -109,13 +109,14 @@ class KoBERTSentimentAnalyzer:
                     probs = torch.softmax(logits, dim=-1)
                     pred = torch.argmax(probs, dim=-1).item()
                     confidence = probs[0][pred].item()
+                    logger.info(f"감성 분석 결과: {pred}, 신뢰도: {confidence:.3f}")
                     
-                # 신뢰도 검증
-                if confidence < 0.1:  # 신뢰도가 너무 낮은 경우
-                    logger.warning(f"신뢰도가 너무 낮습니다: {confidence:.3f}")
-                    return 1, 0.0
+                    # 신뢰도 검증
+                    if confidence < 0.1:  # 신뢰도가 너무 낮은 경우
+                        logger.warning(f"신뢰도가 너무 낮습니다: {confidence:.3f}")
+                        return 1, 0.0
                     
-                return pred, confidence
+                    return pred, confidence
                 
             except Exception as e:
                 logger.error(f"모델 추론 중 오류 발생: {str(e)}")

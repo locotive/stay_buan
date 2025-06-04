@@ -258,6 +258,63 @@
         "positive": "0.0%"
       },
       "processing_time": 16.408417224884033
+    },
+    {
+      "timestamp": "2025-06-02 12:17:23",
+      "file_path": "data/raw/youtube_10_부안_20250531_085155.json",
+      "models": [
+        "kobert",
+        "kcelectra-base-v2022"
+      ],
+      "item_count": 8,
+      "sentiment_distribution": {
+        "negative": "0.0%",
+        "neutral": "0.0%",
+        "positive": "0.0%"
+      },
+      "processing_time": 23.175108671188354
+    },
+    {
+      "timestamp": "2025-06-02 12:23:50",
+      "file_path": "data/raw/naver_cafearticle_31_부안_20250531_085507.json",
+      "models": [
+        "kobert"
+      ],
+      "item_count": 31,
+      "sentiment_distribution": {
+        "negative": "0.0%",
+        "neutral": "0.0%",
+        "positive": "0.0%"
+      },
+      "processing_time": 57.70207500457764
+    },
+    {
+      "timestamp": "2025-06-02 12:40:59",
+      "file_path": "data/raw/youtube_10_부안_20250531_085155.json",
+      "models": [
+        "kobert"
+      ],
+      "item_count": 8,
+      "sentiment_distribution": {
+        "negative": "0.0%",
+        "neutral": "0.0%",
+        "positive": "0.0%"
+      },
+      "processing_time": 13.867268085479736
+    },
+    {
+      "timestamp": "2025-06-02 12:49:18",
+      "file_path": "data/raw/youtube_10_부안_20250530_085854.json",
+      "models": [
+        "kobert"
+      ],
+      "item_count": 8,
+      "sentiment_distribution": {
+        "negative": "0.0%",
+        "neutral": "0.0%",
+        "positive": "0.0%"
+      },
+      "processing_time": 16.30570125579834
     }
   ]
 }
