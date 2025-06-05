@@ -1,0 +1,248 @@
+2025-06-04 04:51:42,169 - naver_crawler - INFO - 크롤링 로그 시작: data/logs/naver_crawler_20250604_045142.log
+2025-06-04 04:51:42,172 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:42,173 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:42,175 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:42,176 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:42,234 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 04:51:42,237 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 04:51:42,244 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 04:51:42,247 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 04:51:42,252 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 04:51:42,254 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 04:51:42,257 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 04:51:42,258 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 04:51:42,263 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 04:51:42,263 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 04:51:42,263 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 04:51:42,263 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 04:51:42,268 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 04:51:42,269 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 04:51:44,971 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:44,972 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:44,991 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 04:51:44,997 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 04:51:45,001 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 04:51:45,003 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 04:51:45,006 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 04:51:45,007 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 04:51:45,007 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 04:51:46,071 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:46,073 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:46,095 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 04:51:46,100 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 04:51:46,104 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 04:51:46,106 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 04:51:46,109 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 04:51:46,110 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 04:51:46,110 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 04:51:47,083 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:47,085 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:47,107 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 04:51:47,114 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 04:51:47,118 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 04:51:47,120 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 04:51:47,123 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 04:51:47,123 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 04:51:47,124 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 04:51:47,939 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:47,941 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:47,966 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 04:51:47,971 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 04:51:47,975 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 04:51:47,978 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 04:51:47,981 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 04:51:47,981 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 04:51:47,981 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 04:51:48,813 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:48,815 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:48,824 - dashboard - INFO - 크롤링 시작: python main.py --keywords 부안 --platform naver --max-pages 3 --max-comments 20 --no-sentiment --max-daily-queries 100
+2025-06-04 04:51:48,825 - dashboard - INFO - 크롤링 스레드 시작됨: Thread-12
+2025-06-04 04:51:48,828 - dashboard - INFO - 크롤링 상태 저장됨
+2025-06-04 04:51:48,828 - dashboard - INFO - 크롤링 명령 실행: python main.py --keywords 부안 --platform naver --max-pages 3 --max-comments 20 --no-sentiment --max-daily-queries 100
+2025-06-04 04:51:48,842 - dashboard - INFO - 크롤링 프로세스 시작됨, 출력 모니터링 중...
+2025-06-04 04:51:49,465 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:49,466 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:50,267 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:50,266 - naver_crawler - INFO - 크롤링 로그 시작: data/logs/naver_crawler_20250604_045150.log
+2025-06-04 04:51:50,274 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:50,273 - main - INFO -
+2025-06-04 04:51:50,274 - dashboard - INFO - 크롤링 출력: ==================================================
+2025-06-04 04:51:50,274 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:50,274 - main - INFO - 크롤링 시작
+2025-06-04 04:51:50,274 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:50,274 - main - INFO - 시작 시간: 2025-06-04 04:51:50
+2025-06-04 04:51:50,274 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:50,274 - main - INFO - 검색 키워드: ['부안']
+2025-06-04 04:51:50,275 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:50,274 - main - INFO - 브라우저: chrome
+2025-06-04 04:51:50,275 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:50,274 - main - INFO - 필터링 모드: 엄격 (AND 조건)
+2025-06-04 04:51:50,275 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:50,274 - main - INFO - robots.txt 정책: 무시
+2025-06-04 04:51:50,276 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:50,274 - main - INFO - 병렬 처리: 비활성화
+2025-06-04 04:51:50,276 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:50,275 - main - INFO - ==================================================
+2025-06-04 04:51:50,276 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:50,275 - main - INFO - 크롤링 대상 플랫폼: naver
+2025-06-04 04:51:50,276 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:50,275 - main - INFO -
+2025-06-04 04:51:50,277 - dashboard - INFO - 크롤링 출력: ==================== NAVER 크롤링 시작 ====================
+2025-06-04 04:51:50,277 - dashboard - INFO - 크롤링 상태 저장됨
+2025-06-04 04:51:50,278 - dashboard - INFO - 현재 플랫폼: NAVER 크롤링 중... (1/1)
+2025-06-04 04:51:50,278 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:50,276 - main - INFO - 키워드: [{'text': '부안', 'condition': 'AND'}]
+2025-06-04 04:51:50,278 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:50,276 - main - INFO - 최대 페이지: 3
+2025-06-04 04:51:50,278 - dashboard - INFO - 크롤링 출력: 
+2025-06-04 04:51:50,278 - dashboard - INFO - 크롤링 출력: 크롤링 진행률:   0%|          | 0/1 [00:00<?, ?it/s]2025-06-04 04:51:50,276 - main - INFO - 최대 댓글: 20
+2025-06-04 04:51:50,278 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:50,277 - main - INFO - 감성 분석: 비활성화
+2025-06-04 04:51:50,279 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:50,277 - main - INFO - 브라우저: chrome
+2025-06-04 04:51:50,279 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:50,278 - core.sentiment_analysis_ensemble - INFO - 선택된 모델 목록: ['kobert', 'kcelectra-base-v2022', 'kcelectra', 'kcbert-large', 'kosentencebert']
+2025-06-04 04:51:50,279 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:50,278 - core.sentiment_analysis_ensemble - INFO - 선택된 모델 목록: ['kobert', 'kcelectra-base-v2022', 'kcelectra', 'kcbert-large', 'kosentencebert']
+2025-06-04 04:51:50,575 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:50,577 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:50,855 - dashboard - INFO - 크롤링 출력: Some weights of BertForSequenceClassification were not initialized from the model checkpoint at data/models/kobert and are newly initialized: ['classifier.bias', 'classifier.weight']
+2025-06-04 04:51:50,860 - dashboard - INFO - 크롤링 출력: You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+2025-06-04 04:51:50,875 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:50,875 - core.sentiment_analysis_kobert - INFO - KoBERT 모델 초기화 완료
+2025-06-04 04:51:50,876 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:50,875 - core.sentiment_analysis_ensemble - INFO - kobert 모델 초기화 완료
+2025-06-04 04:51:50,876 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:50,875 - core.sentiment_analysis_ensemble - INFO - kobert 모델 초기화 완료
+2025-06-04 04:51:51,695 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:51,697 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:51,715 - dashboard - INFO - 크롤링 출력: Some weights of ElectraForSequenceClassification were not initialized from the model checkpoint at data/models/kcelectra-base-v2022 and are newly initialized: ['classifier.dense.bias', 'classifier.dense.weight', 'classifier.out_proj.bias', 'classifier.out_proj.weight']
+2025-06-04 04:51:51,716 - dashboard - INFO - 크롤링 출력: You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+2025-06-04 04:51:51,729 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:51,728 - core.sentiment_analysis_kcelectra - INFO - KcELECTRA 모델 초기화 완료
+2025-06-04 04:51:51,729 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:51,729 - core.sentiment_analysis_ensemble - INFO - kcelectra-base-v2022 모델 초기화 완료
+2025-06-04 04:51:51,729 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:51,729 - core.sentiment_analysis_ensemble - INFO - kcelectra-base-v2022 모델 초기화 완료
+2025-06-04 04:51:52,819 - dashboard - INFO - 크롤링 출력: Some weights of ElectraForSequenceClassification were not initialized from the model checkpoint at data/models/kcelectra and are newly initialized: ['classifier.dense.bias', 'classifier.dense.weight', 'classifier.out_proj.bias', 'classifier.out_proj.weight']
+2025-06-04 04:51:52,821 - dashboard - INFO - 크롤링 출력: You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+2025-06-04 04:51:52,821 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:52,818 - core.sentiment_analysis_kcelectra - INFO - KcELECTRA 모델 초기화 완료
+2025-06-04 04:51:52,822 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:52,818 - core.sentiment_analysis_ensemble - INFO - kcelectra 모델 초기화 완료
+2025-06-04 04:51:52,823 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:52,818 - core.sentiment_analysis_ensemble - INFO - kcelectra 모델 초기화 완료
+2025-06-04 04:51:52,823 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:52,823 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:52,820 - core.sentiment_analysis_kcbert_large - INFO - KcBERT-large 모델 파일 확인 완료: data/models/kcbert-large
+2025-06-04 04:51:52,824 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:53,960 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:53,968 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:55,108 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:55,121 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:55,461 - dashboard - INFO - 크롤링 출력: Some weights of BertForSequenceClassification were not initialized from the model checkpoint at data/models/kcbert-large and are newly initialized: ['classifier.bias', 'classifier.weight']
+2025-06-04 04:51:55,461 - dashboard - INFO - 크롤링 출력: You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+2025-06-04 04:51:55,492 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:55,492 - core.sentiment_analysis_kcbert_large - INFO - KcBERT-large 모델 초기화 완료 (device: cpu, path: data/models/kcbert-large)
+2025-06-04 04:51:55,493 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:55,492 - core.sentiment_analysis_ensemble - INFO - kcbert-large 모델 초기화 완료
+2025-06-04 04:51:55,493 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:55,492 - core.sentiment_analysis_ensemble - INFO - kcbert-large 모델 초기화 완료
+2025-06-04 04:51:56,349 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:56,361 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:56,492 - dashboard - INFO - 크롤링 출력: Some weights of BertForSequenceClassification were not initialized from the model checkpoint at data/models/kosentencebert and are newly initialized: ['classifier.bias', 'classifier.weight']
+2025-06-04 04:51:56,492 - dashboard - INFO - 크롤링 출력: You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+2025-06-04 04:51:56,506 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:56,505 - core.sentiment_analysis_kosentencebert - INFO - KoSentenceBERT 모델 초기화 완료
+2025-06-04 04:51:56,506 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:56,506 - core.sentiment_analysis_ensemble - INFO - kosentencebert 모델 초기화 완료
+2025-06-04 04:51:56,506 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:56,506 - core.sentiment_analysis_ensemble - INFO - kosentencebert 모델 초기화 완료
+2025-06-04 04:51:56,506 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:56,506 - core.sentiment_analysis_ensemble - INFO - 앙상블 분석기 초기화 완료 (모델 수: 5, 초기화된 모델: ['kobert', 'kcelectra-base-v2022', 'kcelectra', 'kcbert-large', 'kosentencebert'])
+2025-06-04 04:51:56,506 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:56,506 - core.sentiment_analysis_ensemble - INFO - 앙상블 분석기 초기화 완료 (모델 수: 5, 초기화된 모델: ['kobert', 'kcelectra-base-v2022', 'kcelectra', 'kcbert-large', 'kosentencebert'])
+2025-06-04 04:51:56,508 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:56,508 - naver_crawler - INFO - 크롤러 초기화 완료: 키워드=['부안'], 최대 페이지=3
+2025-06-04 04:51:56,509 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:56,508 - naver_crawler - INFO - ====== 크롤링 시작: 2025-06-04 04:51:56 ======
+2025-06-04 04:51:56,509 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:56,509 - naver_crawler - INFO -
+2025-06-04 04:51:56,509 - dashboard - INFO - 크롤링 출력: ===== 네이버 blog API 수집 시작 =====
+2025-06-04 04:51:56,509 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:56,509 - naver_crawler - INFO - 생성된 검색 쿼리 (1개): ['부안']
+2025-06-04 04:51:56,798 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:56,798 - naver_crawler - ERROR - API 요청 중 오류: 'NaverSearchAPICrawler' object has no attribute 'blog_crawler'
+2025-06-04 04:51:56,798 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:56,798 - naver_crawler - INFO - [SUMMARY] Found 0 items, filtered to 0 for '부안'
+2025-06-04 04:51:56,799 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:56,798 - naver_crawler - WARNING - No data saved for keyword '부안'
+2025-06-04 04:51:56,799 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:56,798 - naver_crawler - INFO -
+2025-06-04 04:51:56,800 - dashboard - INFO - 크롤링 출력: ===== 네이버 news API 수집 시작 =====
+2025-06-04 04:51:56,800 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:56,799 - naver_crawler - INFO - 생성된 검색 쿼리 (1개): ['부안']
+2025-06-04 04:51:56,935 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:56,934 - naver_crawler - ERROR - API 요청 중 오류: 'NaverSearchAPICrawler' object has no attribute 'blog_crawler'
+2025-06-04 04:51:56,935 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:56,935 - naver_crawler - INFO - [SUMMARY] Found 0 items, filtered to 0 for '부안'
+2025-06-04 04:51:56,936 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:56,935 - naver_crawler - WARNING - No data saved for keyword '부안'
+2025-06-04 04:51:56,937 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:56,935 - naver_crawler - INFO -
+2025-06-04 04:51:56,937 - dashboard - INFO - 크롤링 출력: ===== 네이버 cafearticle API 수집 시작 =====
+2025-06-04 04:51:56,937 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:56,935 - naver_crawler - INFO - 생성된 검색 쿼리 (1개): ['부안']
+2025-06-04 04:51:57,164 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:57,163 - naver_crawler - ERROR - API 요청 중 오류: 'NaverSearchAPICrawler' object has no attribute 'blog_crawler'
+2025-06-04 04:51:57,165 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:57,164 - naver_crawler - INFO - [SUMMARY] Found 0 items, filtered to 0 for '부안'
+2025-06-04 04:51:57,165 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:57,164 - naver_crawler - WARNING - No data saved for keyword '부안'
+2025-06-04 04:51:57,166 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:57,165 - naver_crawler - INFO - [FINAL SUMMARY] Total 0 items collected for all keywords
+2025-06-04 04:51:57,166 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:57,166 - main - ERROR - naver 크롤링 중 오류 발생: a coroutine was expected, got []
+2025-06-04 04:51:57,170 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:57,166 - main - ERROR - 상세 오류 정보:
+2025-06-04 04:51:57,170 - dashboard - INFO - 크롤링 출력: Traceback (most recent call last):
+2025-06-04 04:51:57,170 - dashboard - INFO - 크롤링 출력: File "/app/main.py", line 101, in crawl_platform
+2025-06-04 04:51:57,171 - dashboard - INFO - 크롤링 출력: results = asyncio.run(crawler.crawl())
+2025-06-04 04:51:57,171 - dashboard - INFO - 크롤링 출력: File "/usr/local/lib/python3.9/asyncio/runners.py", line 37, in run
+2025-06-04 04:51:57,171 - dashboard - INFO - 크롤링 출력: raise ValueError("a coroutine was expected, got {!r}".format(main))
+2025-06-04 04:51:57,171 - dashboard - INFO - 크롤링 출력: ValueError: a coroutine was expected, got []
+2025-06-04 04:51:57,173 - dashboard - INFO - 크롤링 출력: 
+2025-06-04 04:51:57,173 - dashboard - INFO - 크롤링 출력: 크롤링 진행률: 100%|██████████| 1/1 [00:06<00:00,  6.89s/it]
+2025-06-04 04:51:57,174 - dashboard - INFO - 크롤링 출력: 크롤링 진행률: 100%|██████████| 1/1 [00:06<00:00,  6.90s/it]
+2025-06-04 04:51:57,174 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:57,174 - main - INFO -
+2025-06-04 04:51:57,175 - dashboard - INFO - 크롤링 출력: ==================================================
+2025-06-04 04:51:57,175 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:57,174 - main - INFO - 결과 통합 및 저장 시작
+2025-06-04 04:51:57,175 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:57,174 - main - WARNING - 저장할 결과가 없습니다.
+2025-06-04 04:51:57,175 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:57,174 - main - WARNING - 수집된 결과가 없습니다.
+2025-06-04 04:51:57,176 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:57,175 - main - INFO -
+2025-06-04 04:51:57,176 - dashboard - INFO - 크롤링 출력: ==================================================
+2025-06-04 04:51:57,177 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:57,175 - main - INFO - 크롤링 종료
+2025-06-04 04:51:57,177 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:57,175 - main - INFO - 종료 시간: 2025-06-04 04:51:57
+2025-06-04 04:51:57,177 - dashboard - INFO - 크롤링 출력: 2025-06-04 04:51:57,175 - main - INFO - ==================================================
+2025-06-04 04:51:57,488 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:57,489 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:57,769 - dashboard - INFO - 크롤링 프로세스 종료, 리턴 코드: 0
+2025-06-04 04:51:57,770 - dashboard - INFO - 크롤링 상태 저장됨
+2025-06-04 04:51:57,770 - dashboard - INFO - 크롤링 상태 업데이트: 완료
+2025-06-04 04:51:57,771 - dashboard - INFO - 크롤링 로그 저장: crawl_log_20250604_045157.txt
+2025-06-04 04:51:58,600 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:58,601 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:58,648 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 04:51:58,654 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 04:51:58,658 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 04:51:58,660 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 04:51:58,663 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 04:51:58,663 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 04:51:58,663 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 04:52:37,279 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:52:37,280 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:52:37,295 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:52:37,297 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:52:37,327 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 04:52:37,331 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 04:52:37,335 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 04:52:37,343 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 04:52:37,347 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 04:52:37,351 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 04:52:37,353 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 04:52:37,355 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 04:52:37,359 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 04:52:37,359 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 04:52:37,359 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 04:52:37,387 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 04:52:37,391 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 04:52:37,391 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 04:52:37,583 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:52:37,586 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:52:37,765 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 04:52:37,772 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 04:52:37,776 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 04:52:37,779 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 04:52:37,877 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 04:52:37,877 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 04:52:37,878 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 04:53:00,101 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:53:00,222 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:53:00,242 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:53:00,248 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:53:00,249 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:53:00,280 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:53:00,280 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:53:00,292 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:53:00,369 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 04:53:00,376 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 04:53:00,383 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 04:53:00,387 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 04:53:00,397 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 04:53:00,407 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 04:53:00,411 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 04:53:00,416 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 04:53:00,425 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 04:53:00,430 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 04:53:00,433 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 04:53:00,435 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 04:53:00,438 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 04:53:00,440 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 04:53:00,445 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 04:53:00,447 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 04:53:00,450 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 04:53:00,450 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 04:53:00,450 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 04:53:00,474 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 04:53:00,476 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 04:53:00,483 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 04:53:00,528 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 04:53:00,533 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 04:53:00,534 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 04:53:00,561 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 04:53:00,561 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 04:53:00,561 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}

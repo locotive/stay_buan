@@ -1,0 +1,28 @@
+{
+  "timestamp": "2025-06-02 11:53:28",
+  "input_file": "data/raw/naver_news_104_부안_20250530_080227.json",
+  "models": [
+    "kobert"
+  ],
+  "item_count": 104,
+  "processing_time": 202.8069314956665,
+  "sentiment_distribution": {
+    "negative": "0.0%",
+    "neutral": "0.0%",
+    "positive": "0.0%"
+  },
+  "output_files": {
+    "csv": "data/processed/sentiment_analysis_20250602_115328.csv",
+    "json": "data/processed/sentiment_analysis_20250602_115328.json"
+  },
+  "analysis_parameters": {
+    "min_text_length": 30,
+    "max_text_length": 4096,
+    "min_confidence": 0.2,
+    "excluded_keywords": [
+      "광고",
+      "홍보",
+      "sponsored"
+    ]
+  }
+}

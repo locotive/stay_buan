@@ -1,0 +1,331 @@
+2025-06-04 06:24:50,278 - naver_crawler - INFO - 크롤링 로그 시작: data/logs/naver_crawler_20250604_062450.log
+2025-06-04 06:24:50,284 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:24:50,284 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:24:50,287 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:24:50,287 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:24:50,350 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 06:24:50,352 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 06:24:50,358 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 06:24:50,362 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 06:24:50,366 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 06:24:50,368 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 06:24:50,371 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 06:24:50,372 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 06:24:50,376 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 06:24:50,377 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 06:24:50,377 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 06:24:50,377 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 06:24:50,382 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 06:24:50,383 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 06:24:51,947 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:24:51,948 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:24:51,971 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 06:24:51,979 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 06:24:51,983 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 06:24:51,985 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 06:24:51,988 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 06:24:51,988 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 06:24:51,989 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 06:25:01,935 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:25:01,936 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:25:01,953 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 06:25:01,958 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 06:25:01,961 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 06:25:01,964 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 06:25:01,966 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 06:25:01,966 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 06:25:01,967 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 06:25:11,725 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:25:11,727 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:25:11,749 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 06:25:11,757 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 06:25:11,761 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 06:25:11,766 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 06:25:11,774 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 06:25:11,776 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 06:25:11,776 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 06:25:14,784 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:25:14,787 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:25:14,796 - dashboard - INFO - 크롤링 시작: python main.py --keywords 부안 --platform naver,youtube,google,dcinside,fmkorea,buan --max-pages 3 --max-comments 20 --no-sentiment --max-daily-queries 100
+2025-06-04 06:25:14,798 - dashboard - INFO - 크롤링 스레드 시작됨: Thread-13
+2025-06-04 06:25:14,802 - dashboard - INFO - 크롤링 상태 저장됨
+2025-06-04 06:25:14,803 - dashboard - INFO - 크롤링 명령 실행: python main.py --keywords 부안 --platform naver,youtube,google,dcinside,fmkorea,buan --max-pages 3 --max-comments 20 --no-sentiment --max-daily-queries 100
+2025-06-04 06:25:14,804 - naver_crawler - INFO - 크롤링 로그 시작: data/logs/naver_crawler_20250604_062514.log
+2025-06-04 06:25:14,804 - naver_crawler - INFO - 크롤러 초기화 완료: 키워드=['부안'], 최대 페이지=3
+2025-06-04 06:25:14,805 - naver_crawler - INFO - 크롤링 시작
+2025-06-04 06:25:14,805 - dashboard - ERROR - 크롤링 중 오류 발생: 'NaverSearchAPICrawler' object has no attribute 'status'
+Traceback (most recent call last):
+  File "/app/crawlers/naver_api_crawler.py", line 661, in crawl
+    self.status.update_phase("api_crawling")
+AttributeError: 'NaverSearchAPICrawler' object has no attribute 'status'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/app/visualization/dashboard.py", line 197, in run_crawler
+    results = crawler.crawl()
+  File "/app/crawlers/naver_api_crawler.py", line 701, in crawl
+    self.status.add_error(str(e))
+AttributeError: 'NaverSearchAPICrawler' object has no attribute 'status'
+2025-06-04 06:25:14,807 - dashboard - INFO - 크롤링 상태 저장됨
+2025-06-04 06:25:15,416 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:25:15,418 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:25:15,440 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 06:25:15,446 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 06:25:15,450 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 06:25:15,452 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 06:25:15,457 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 06:25:15,457 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 06:25:15,457 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 06:25:22,297 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:25:22,300 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:25:22,324 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 06:25:22,330 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 06:25:22,334 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 06:25:22,336 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 06:25:22,339 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 06:25:22,340 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 06:25:22,340 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 06:25:22,421 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:25:22,422 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:25:22,428 - dashboard - INFO - 크롤링 시작: python main.py --keywords 부안 여행 --platform naver,youtube,google,dcinside,fmkorea,buan --max-pages 3 --max-comments 20 --no-sentiment --max-daily-queries 100
+2025-06-04 06:25:22,429 - dashboard - INFO - 크롤링 스레드 시작됨: Thread-14
+2025-06-04 06:25:22,432 - dashboard - INFO - 크롤링 상태 저장됨
+2025-06-04 06:25:22,432 - dashboard - INFO - 크롤링 명령 실행: python main.py --keywords 부안 여행 --platform naver,youtube,google,dcinside,fmkorea,buan --max-pages 3 --max-comments 20 --no-sentiment --max-daily-queries 100
+2025-06-04 06:25:22,433 - naver_crawler - INFO - 크롤링 로그 시작: data/logs/naver_crawler_20250604_062522.log
+2025-06-04 06:25:22,433 - naver_crawler - INFO - 크롤러 초기화 완료: 키워드=['부안'], 최대 페이지=3
+2025-06-04 06:25:22,434 - naver_crawler - INFO - 크롤링 시작
+2025-06-04 06:25:22,434 - dashboard - ERROR - 크롤링 중 오류 발생: 'NaverSearchAPICrawler' object has no attribute 'status'
+Traceback (most recent call last):
+  File "/app/crawlers/naver_api_crawler.py", line 661, in crawl
+    self.status.update_phase("api_crawling")
+AttributeError: 'NaverSearchAPICrawler' object has no attribute 'status'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/app/visualization/dashboard.py", line 197, in run_crawler
+    results = crawler.crawl()
+  File "/app/crawlers/naver_api_crawler.py", line 701, in crawl
+    self.status.add_error(str(e))
+AttributeError: 'NaverSearchAPICrawler' object has no attribute 'status'
+2025-06-04 06:25:22,538 - dashboard - INFO - 크롤링 상태 저장됨
+2025-06-04 06:25:23,050 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:25:23,051 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:25:23,078 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 06:25:23,084 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 06:25:23,089 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 06:25:23,091 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 06:25:23,094 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 06:25:23,095 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 06:25:23,095 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 06:25:28,090 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:25:28,091 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:25:28,110 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 06:25:28,116 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 06:25:28,120 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 06:25:28,123 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 06:25:28,126 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 06:25:28,126 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 06:25:28,126 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 06:25:33,383 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:25:33,487 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:25:33,512 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:25:33,521 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:25:33,523 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:25:33,573 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:25:33,585 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:25:33,589 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:25:33,635 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 06:25:33,649 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 06:25:33,652 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 06:25:33,658 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 06:25:33,662 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 06:25:33,665 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 06:25:33,669 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 06:25:33,675 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 06:25:33,679 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 06:25:33,687 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 06:25:33,687 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 06:25:33,692 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 06:25:33,696 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 06:25:33,699 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 06:25:33,702 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 06:25:33,705 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 06:25:33,706 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 06:25:33,706 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 06:25:33,707 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 06:25:33,744 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 06:25:33,745 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 06:25:33,746 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 06:25:33,750 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 06:25:33,753 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 06:25:33,756 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 06:25:33,787 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 06:25:33,788 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 06:25:33,789 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 06:30:23,159 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:30:23,164 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:30:23,175 - dashboard - INFO - 크롤링 시작: python main.py --keywords 부안 --platform naver,youtube,google,dcinside,fmkorea,buan --max-pages 3 --max-comments 20 --no-sentiment --max-daily-queries 100
+2025-06-04 06:30:23,177 - dashboard - INFO - 크롤링 스레드 시작됨: Thread-15
+2025-06-04 06:30:23,179 - dashboard - INFO - 크롤링 상태 저장됨
+2025-06-04 06:30:23,179 - dashboard - INFO - 크롤링 명령 실행: python main.py --keywords 부안 --platform naver,youtube,google,dcinside,fmkorea,buan --max-pages 3 --max-comments 20 --no-sentiment --max-daily-queries 100
+2025-06-04 06:30:23,180 - naver_crawler - INFO - 크롤링 로그 시작: data/logs/naver_crawler_20250604_063023.log
+2025-06-04 06:30:23,181 - naver_crawler - INFO - 크롤러 초기화 완료: 키워드=['부안'], 최대 페이지=3
+2025-06-04 06:30:23,181 - naver_crawler - INFO - 크롤링 시작
+2025-06-04 06:30:23,181 - dashboard - ERROR - 크롤링 중 오류 발생: 'NaverSearchAPICrawler' object has no attribute 'status'
+Traceback (most recent call last):
+  File "/app/crawlers/naver_api_crawler.py", line 661, in crawl
+    self.status.update_phase("api_crawling")
+AttributeError: 'NaverSearchAPICrawler' object has no attribute 'status'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/app/visualization/dashboard.py", line 197, in run_crawler
+    results = crawler.crawl()
+  File "/app/crawlers/naver_api_crawler.py", line 701, in crawl
+    self.status.add_error(str(e))
+AttributeError: 'NaverSearchAPICrawler' object has no attribute 'status'
+2025-06-04 06:30:23,182 - dashboard - INFO - 크롤링 상태 저장됨
+2025-06-04 06:30:23,925 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:30:23,926 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:30:23,952 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 06:30:23,963 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 06:30:23,968 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 06:30:23,970 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 06:30:23,974 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 06:30:23,974 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 06:30:23,974 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 06:30:26,421 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:30:26,423 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:30:26,450 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 06:30:26,455 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 06:30:26,458 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 06:30:26,460 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 06:30:26,463 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 06:30:26,464 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 06:30:26,464 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 06:30:26,742 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:30:26,743 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:30:26,761 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 06:30:26,768 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 06:30:26,772 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 06:30:26,774 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 06:30:26,777 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 06:30:26,777 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 06:30:26,778 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 06:30:28,620 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:30:28,622 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:30:28,641 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 06:30:28,646 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 06:30:28,649 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 06:30:28,652 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 06:30:28,655 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 06:30:28,655 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 06:30:28,656 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 06:30:28,837 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:30:28,838 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:30:28,855 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 06:30:28,859 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 06:30:28,863 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 06:30:28,866 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 06:30:28,869 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 06:30:28,869 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 06:30:28,869 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 06:30:28,937 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:30:28,939 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:30:28,979 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 06:30:28,990 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 06:30:29,085 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:30:29,088 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 06:30:29,088 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:30:29,098 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 06:30:29,103 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 06:30:29,103 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 06:30:29,103 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 06:30:29,206 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 06:30:29,212 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 06:30:29,217 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 06:30:29,219 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 06:30:29,222 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 06:30:29,223 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 06:30:29,223 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 06:30:29,259 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:30:29,261 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:30:29,352 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 06:30:29,357 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 06:30:29,361 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 06:30:29,363 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 06:30:29,367 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 06:30:29,367 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 06:30:29,367 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 06:30:29,494 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:30:29,498 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:30:29,551 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:30:29,555 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 06:30:29,557 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:30:29,573 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 06:30:29,596 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 06:30:29,599 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 06:30:29,608 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 06:30:29,608 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 06:30:29,608 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 06:30:29,704 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 06:30:29,709 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 06:30:29,713 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 06:30:29,716 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:30:29,717 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 06:30:29,718 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:30:29,730 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 06:30:29,730 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 06:30:29,731 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 06:30:29,837 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 06:30:29,842 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 06:30:29,845 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 06:30:29,848 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 06:30:29,851 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 06:30:29,851 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 06:30:29,851 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 06:30:31,409 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:30:31,411 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:30:31,430 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 06:30:31,448 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 06:30:31,454 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 06:30:31,457 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 06:30:31,461 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 06:30:31,462 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 06:30:31,462 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 06:30:33,172 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:30:33,175 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:30:33,184 - dashboard - INFO - 크롤링 시작: python main.py --keywords 부안 --platform naver,youtube,google,dcinside,fmkorea,buan --max-pages 3 --max-comments 20 --no-sentiment --max-daily-queries 100
+2025-06-04 06:30:33,185 - dashboard - INFO - 크롤링 스레드 시작됨: Thread-16
+2025-06-04 06:30:33,188 - dashboard - INFO - 크롤링 상태 저장됨
+2025-06-04 06:30:33,189 - dashboard - INFO - 크롤링 명령 실행: python main.py --keywords 부안 --platform naver,youtube,google,dcinside,fmkorea,buan --max-pages 3 --max-comments 20 --no-sentiment --max-daily-queries 100
+2025-06-04 06:30:33,190 - naver_crawler - INFO - 크롤링 로그 시작: data/logs/naver_crawler_20250604_063033.log
+2025-06-04 06:30:33,190 - naver_crawler - INFO - 크롤러 초기화 완료: 키워드=['부안'], 최대 페이지=3
+2025-06-04 06:30:33,191 - naver_crawler - INFO - 크롤링 시작
+2025-06-04 06:30:33,191 - dashboard - ERROR - 크롤링 중 오류 발생: 'NaverSearchAPICrawler' object has no attribute 'status'
+Traceback (most recent call last):
+  File "/app/crawlers/naver_api_crawler.py", line 661, in crawl
+    self.status.update_phase("api_crawling")
+AttributeError: 'NaverSearchAPICrawler' object has no attribute 'status'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/app/visualization/dashboard.py", line 197, in run_crawler
+    results = crawler.crawl()
+  File "/app/crawlers/naver_api_crawler.py", line 701, in crawl
+    self.status.add_error(str(e))
+AttributeError: 'NaverSearchAPICrawler' object has no attribute 'status'
+2025-06-04 06:30:33,192 - dashboard - INFO - 크롤링 상태 저장됨
+2025-06-04 06:30:33,794 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:30:33,795 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 06:30:33,814 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 06:30:33,819 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 06:30:33,823 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 06:30:33,826 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 06:30:33,830 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 06:30:33,830 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 06:30:33,830 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}

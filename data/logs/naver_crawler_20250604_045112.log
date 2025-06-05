@@ -1,0 +1,77 @@
+2025-06-04 04:51:12,479 - naver_crawler - INFO - 크롤링 로그 시작: data/logs/naver_crawler_20250604_045112.log
+2025-06-04 04:51:12,482 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:12,484 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:12,532 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 04:51:12,540 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 04:51:12,544 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 04:51:12,546 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 04:51:12,549 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 04:51:12,549 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 04:51:12,549 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 04:51:13,815 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:13,817 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:13,853 - core.sentiment_analysis_ensemble - INFO - 선택된 모델 목록: ['kobert', 'kcelectra-base-v2022', 'kcelectra', 'kcbert-large', 'kosentencebert']
+2025-06-04 04:51:14,609 - core.sentiment_analysis_kobert - INFO - KoBERT 모델 초기화 완료
+2025-06-04 04:51:14,609 - core.sentiment_analysis_ensemble - INFO - kobert 모델 초기화 완료
+2025-06-04 04:51:15,741 - core.sentiment_analysis_kcelectra - INFO - KcELECTRA 모델 초기화 완료
+2025-06-04 04:51:15,741 - core.sentiment_analysis_ensemble - INFO - kcelectra-base-v2022 모델 초기화 완료
+2025-06-04 04:51:15,844 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:15,849 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:16,038 - core.sentiment_analysis_ensemble - INFO - 선택된 모델 목록: ['kobert', 'kcelectra-base-v2022', 'kcelectra', 'kcbert-large', 'kosentencebert']
+2025-06-04 04:51:16,962 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:17,023 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:17,383 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 04:51:17,599 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 04:51:17,679 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 04:51:17,738 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 04:51:17,815 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 04:51:17,817 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 04:51:17,821 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 04:51:17,889 - core.sentiment_analysis_kobert - INFO - KoBERT 모델 초기화 완료
+2025-06-04 04:51:17,890 - core.sentiment_analysis_ensemble - INFO - kobert 모델 초기화 완료
+2025-06-04 04:51:17,952 - core.sentiment_analysis_kcelectra - INFO - KcELECTRA 모델 초기화 완료
+2025-06-04 04:51:17,976 - core.sentiment_analysis_ensemble - INFO - kcelectra 모델 초기화 완료
+2025-06-04 04:51:17,982 - core.sentiment_analysis_kcbert_large - INFO - KcBERT-large 모델 파일 확인 완료: data/models/kcbert-large
+2025-06-04 04:51:19,050 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:19,060 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:19,099 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 04:51:19,106 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 04:51:19,110 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 04:51:19,116 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 04:51:19,121 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 04:51:19,121 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 04:51:19,122 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 04:51:19,173 - core.sentiment_analysis_kcelectra - INFO - KcELECTRA 모델 초기화 완료
+2025-06-04 04:51:19,175 - core.sentiment_analysis_ensemble - INFO - kcelectra-base-v2022 모델 초기화 완료
+2025-06-04 04:51:20,282 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:20,284 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:20,338 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:20,345 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:20,500 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 04:51:20,535 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 04:51:20,551 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 04:51:20,585 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 04:51:20,606 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 04:51:20,631 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 04:51:20,662 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 04:51:20,671 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 04:51:20,695 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 04:51:20,697 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 04:51:20,699 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 04:51:20,792 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 04:51:20,812 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 04:51:20,822 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
+2025-06-04 04:51:22,110 - core.sentiment_analysis_kcelectra - INFO - KcELECTRA 모델 초기화 완료
+2025-06-04 04:51:22,114 - core.sentiment_analysis_ensemble - INFO - kcelectra 모델 초기화 완료
+2025-06-04 04:51:22,133 - core.sentiment_analysis_kcbert_large - INFO - KcBERT-large 모델 파일 확인 완료: data/models/kcbert-large
+2025-06-04 04:51:22,898 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:22,918 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:22,954 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:22,966 - dashboard - INFO - 크롤링 상태 로드됨
+2025-06-04 04:51:23,747 - dashboard - INFO - 네이버 뉴스: 113개 항목 로드됨
+2025-06-04 04:51:23,830 - dashboard - INFO - 네이버 블로그: 144개 항목 로드됨
+2025-06-04 04:51:23,876 - dashboard - INFO - 네이버 카페: 70개 항목 로드됨
+2025-06-04 04:51:23,924 - dashboard - INFO - 유튜브: 30개 항목 로드됨
+2025-06-04 04:51:23,947 - dashboard - INFO - 총 357개 항목 처리됨
+2025-06-04 04:51:23,948 - dashboard - INFO - 플랫폼별 항목 수: {'네이버 뉴스': 113, '네이버 블로그': 144, '네이버 카페': 70, '유튜브': 30}
+2025-06-04 04:51:23,949 - dashboard - INFO - 감성별 항목 수: {'positive': 0, 'neutral': 0, 'negative': 0, 'unknown': 357}
