@@ -114,7 +114,6 @@ ENV/
 .idea/
 .vscode/
 
-
 # Data files
 data/models/
 
@@ -126,3 +125,47 @@ config/config.py
 
 사용법.txt
 start_dashboard.bat
+
+# 로그 파일
+logs/
+*.log
+data/logs/
+data/status/
+
+# 데이터 파일
+data/raw/
+data/processed/
+data/attachments/
+data/cache/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 데이터 및 로그 폴더 전체 제외
+data/
+logs/
+*.log
+crawler.log
+
+# 환경 설정
+.env
+.venv
+venv/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
