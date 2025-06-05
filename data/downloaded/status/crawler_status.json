@@ -1,1 +1,0 @@
-{"message": "\u2705 \ud06c\ub864\ub9c1 \uc644\ub8cc!", "progress": 1.0, "result": "", "is_running": false, "update_timestamp": 1747169320.7814996, "command": "python main.py --keywords \ubd80\uc548 --platform naver,youtube --max-pages 3 --max-comments 10 --parallel --no-sentiment --respect-robots --max-daily-queries 10"}
