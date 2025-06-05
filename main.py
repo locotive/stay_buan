@@ -19,16 +19,43 @@ import asyncio
 load_dotenv()
 
 def setup_logger():
-    """로거 설정"""
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        handlers=[
-            logging.FileHandler("crawler.log"),
-            logging.StreamHandler()
-        ]
+    """로거 설정 - 파일과 스트림 모두에 로깅"""
+    # 로그 디렉토리 생성
+    log_dir = "logs"
+    os.makedirs(log_dir, exist_ok=True)
+    
+    # 로거 생성
+    logger = logging.getLogger("main")
+    logger.setLevel(logging.INFO)
+    
+    # 포맷터 설정
+    formatter = logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
-    return logging.getLogger("main")
+    
+    # 파일 핸들러 (일반 로그)
+    file_handler = logging.FileHandler(
+        os.path.join(log_dir, "main.log"),
+        encoding='utf-8'
+    )
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+    
+    # 파일 핸들러 (에러 로그)
+    error_handler = logging.FileHandler(
+        os.path.join(log_dir, "main_error.log"),
+        encoding='utf-8'
+    )
+    error_handler.setLevel(logging.ERROR)
+    error_handler.setFormatter(formatter)
+    logger.addHandler(error_handler)
+    
+    # 스트림 핸들러 (콘솔 출력)
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(formatter)
+    logger.addHandler(stream_handler)
+    
+    return logger
 
 def parse_keywords(keywords_list):
     """키워드 목록을 NaverSearchAPICrawler가 요구하는 형식으로 변환"""

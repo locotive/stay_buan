@@ -117,7 +117,7 @@ def load_crawler_status():
         if os.path.exists("data/status/crawler_status.json"):
             with open("data/status/crawler_status.json", "r") as f:
                 status = json.load(f)
-            logger.info("크롤링 상태 로드됨")
+            # 로깅 제거 (중복 로깅 방지)
             return status
         else:
             return {
@@ -148,133 +148,166 @@ def run_crawler(cmd):
     global crawler_status
     
     try:
-        # 초기 상태 업데이트
-        crawler_status['message'] = "크롤링 준비 중..."
-        crawler_status['progress'] = 0.0
-        crawler_status['result'] = ""
-        crawler_status['is_running'] = True
-        crawler_status['update_timestamp'] = time.time()
-        crawler_status['start_time'] = time.time()
-        crawler_status['command'] = cmd
-        crawler_status['platform_progress'] = {}  # 플랫폼별 진행률 저장
-        crawler_status['total_items'] = 0  # 전체 항목 수
-        crawler_status['processed_items'] = 0  # 처리된 항목 수
+        logger.info(f"크롤링 시작 - 명령어: {cmd}")
+        
+        # 초기 상태 업데이트 (에러 메시지 초기화 포함)
+        crawler_status = {
+            'message': "크롤링 준비 중...",
+            'progress': 0.0,
+            'result': "",
+            'is_running': True,
+            'update_timestamp': time.time(),
+            'start_time': time.time(),
+            'command': cmd,
+            'platform_progress': {},  # 플랫폼별 진행률 저장
+            'total_items': 0,  # 전체 항목 수
+            'processed_items': 0,  # 처리된 항목 수
+            'error': None  # 에러 메시지 초기화
+        }
         save_crawler_status(crawler_status)
         
-        logger.info(f"크롤링 명령 실행: {cmd}")
+        # 명령어 실행 전 현재 디렉토리 확인
+        current_dir = os.getcwd()
+        logger.info(f"현재 작업 디렉토리: {current_dir}")
         
-        with subprocess.Popen(
+        # 명령어 실행
+        logger.info("크롤링 프로세스 시작...")
+        process = subprocess.Popen(
             cmd, 
             stdout=subprocess.PIPE, 
             stderr=subprocess.STDOUT,
             bufsize=1,
             universal_newlines=True,
-            shell=True
-        ) as process:
-            # 플랫폼별 진행 상황 표시 - 명령어에서 플랫폼 정보 추출
-            all_platforms = ["naver", "youtube", "google", "dcinside", "fmkorea", "buan"]
-            
-            # 명령어에서 platform 파라미터 찾기
-            platform_param = ""
-            for part in cmd.split():
-                if part.startswith("--platform"):
-                    platform_param = part.split("=")[1] if "=" in part else cmd.split()[cmd.split().index(part) + 1]
-                    break
-            
-            # 플랫폼 목록 결정
-            if platform_param == "all" or not platform_param:
-                platforms = all_platforms
-            else:
-                platforms = platform_param.split(",")
-                
-            # 플랫폼별 진행률 초기화
-            for platform in platforms:
-                crawler_status['platform_progress'][platform] = 0.0
-            
-            current_platform = None
-            platform_index = 0
-            lines = []
-            
-            logger.info("크롤링 프로세스 시작됨, 출력 모니터링 중...")
-            
-            for line in process.stdout:
-                line = line.strip()
-                lines.append(line)
-                logger.info(f"크롤링 출력: {line}")
-                
-                # 진행률 업데이트
-                if "크롤링 시작" in line:
-                    for platform in platforms:
-                        if platform.upper() in line:
-                            current_platform = platform
-                            platform_index += 1
-                            status_msg = f"현재 플랫폼: {current_platform.upper()} 크롤링 중... ({platform_index}/{len(platforms)})"
-                            crawler_status['message'] = status_msg
-                            crawler_status['update_timestamp'] = time.time()
-                            save_crawler_status(crawler_status)
-                            logger.info(status_msg)
-                            break
-                
-                # 항목 수 업데이트
-                if "수집된 항목:" in line:
-                    try:
-                        items_count = int(line.split("수집된 항목:")[1].strip())
-                        crawler_status['total_items'] = max(crawler_status['total_items'], items_count)
-                        if current_platform:
-                            crawler_status['platform_progress'][current_platform] = min(0.99, items_count / 100)  # 임시 진행률
-                        save_crawler_status(crawler_status)
-                    except:
-                        pass
-                
-                # 플랫폼별 완료 확인
-                if "크롤링 완료" in line:
-                    for platform in platforms:
-                        if platform.upper() in line:
-                            crawler_status['platform_progress'][platform] = 1.0
-                            crawler_status['processed_items'] += 1
-                            # 전체 진행률 계산
-                            total_progress = sum(crawler_status['platform_progress'].values()) / len(platforms)
-                            crawler_status['progress'] = total_progress
-                            crawler_status['update_timestamp'] = time.time()
-                            save_crawler_status(crawler_status)
-                            break
-                
-                # 최종 결과 확인
-                if "통합 결과 저장 경로" in line:
-                    result_path = line.split("통합 결과 저장 경로:")[1].strip()
-                    crawler_status['result'] = f"✅ 크롤링 완료! 결과 저장 경로: {result_path}"
-                    crawler_status['progress'] = 1.0
-                    crawler_status['update_timestamp'] = time.time()
-                    save_crawler_status(crawler_status)
-                    logger.info(f"크롤링 완료, 결과 저장 경로: {result_path}")
-            
-            # 프로세스가 완료될 때까지 기다림
-            return_code = process.wait()
-            logger.info(f"크롤링 프로세스 종료, 리턴 코드: {return_code}")
-            
-            # 크롤링 완료
-            crawler_status['progress'] = 1.0
-            crawler_status['message'] = "✅ 크롤링 완료!"
+            shell=True,
+            cwd=current_dir  # 현재 디렉토리에서 실행
+        )
+        
+        # 프로세스 시작 확인
+        if process.poll() is None:
+            logger.info("크롤링 프로세스가 성공적으로 시작됨")
+        else:
+            error_msg = f"크롤링 프로세스 시작 실패 (종료 코드: {process.returncode})"
+            logger.error(error_msg)
+            crawler_status['error'] = error_msg
             crawler_status['is_running'] = False
-            crawler_status['update_timestamp'] = time.time()
             save_crawler_status(crawler_status)
-            logger.info("크롤링 상태 업데이트: 완료")
+            return
+        
+        # 플랫폼별 진행 상황 표시 - 명령어에서 플랫폼 정보 추출
+        all_platforms = ["naver", "youtube", "google", "dcinside", "fmkorea", "buan"]
+        
+        # 명령어에서 platform 파라미터 찾기
+        platform_param = ""
+        for part in cmd.split():
+            if part.startswith("--platform"):
+                platform_param = part.split("=")[1] if "=" in part else cmd.split()[cmd.split().index(part) + 1]
+                break
+        
+        # 플랫폼 목록 결정
+        if platform_param == "all" or not platform_param:
+            platforms = all_platforms
+        else:
+            platforms = platform_param.split(",")
+        
+        logger.info(f"크롤링할 플랫폼: {platforms}")
+        
+        # 플랫폼별 진행률 초기화
+        for platform in platforms:
+            crawler_status['platform_progress'][platform] = 0.0
+        
+        current_platform = None
+        platform_index = 0
+        lines = []
+        
+        logger.info("크롤링 출력 모니터링 시작...")
+        
+        for line in process.stdout:
+            line = line.strip()
+            lines.append(line)
+            logger.info(f"크롤링 출력: {line}")
             
-            # 전체 로그 파일로 저장
-            log_filename = f"crawl_log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
-            os.makedirs("data/logs", exist_ok=True)
-            with open(f"data/logs/{log_filename}", "w") as f:
-                f.write("\n".join(lines))
-            logger.info(f"크롤링 로그 저장: {log_filename}")
-    
-    except Exception as e:
-        error_msg = f"❌ 크롤링 중 오류 발생: {str(e)}"
-        crawler_status['message'] = error_msg
+            # 진행률 업데이트
+            if "크롤링 시작" in line:
+                for platform in platforms:
+                    if platform.upper() in line:
+                        current_platform = platform
+                        platform_index += 1
+                        status_msg = f"현재 플랫폼: {current_platform.upper()} 크롤링 중... ({platform_index}/{len(platforms)})"
+                        crawler_status['message'] = status_msg
+                        crawler_status['update_timestamp'] = time.time()
+                        save_crawler_status(crawler_status)
+                        logger.info(status_msg)
+                        break
+            
+            # 항목 수 업데이트
+            if "수집된 항목:" in line:
+                try:
+                    items_count = int(line.split("수집된 항목:")[1].strip())
+                    crawler_status['total_items'] = max(crawler_status['total_items'], items_count)
+                    if current_platform:
+                        crawler_status['platform_progress'][current_platform] = min(0.99, items_count / 100)  # 임시 진행률
+                    save_crawler_status(crawler_status)
+                    logger.info(f"수집된 항목 수 업데이트: {items_count}")
+                except Exception as e:
+                    logger.error(f"항목 수 파싱 중 오류: {str(e)}")
+            
+            # 플랫폼별 완료 확인
+            if "크롤링 완료" in line:
+                for platform in platforms:
+                    if platform.upper() in line:
+                        crawler_status['platform_progress'][platform] = 1.0
+                        crawler_status['processed_items'] += 1
+                        # 전체 진행률 계산
+                        total_progress = sum(crawler_status['platform_progress'].values()) / len(platforms)
+                        crawler_status['progress'] = total_progress
+                        crawler_status['update_timestamp'] = time.time()
+                        save_crawler_status(crawler_status)
+                        logger.info(f"{platform.upper()} 크롤링 완료")
+                        break
+            
+            # 최종 결과 확인
+            if "통합 결과 저장 경로" in line:
+                result_path = line.split("통합 결과 저장 경로:")[1].strip()
+                crawler_status['result'] = f"✅ 크롤링 완료! 결과 저장 경로: {result_path}"
+                crawler_status['progress'] = 1.0
+                crawler_status['update_timestamp'] = time.time()
+                save_crawler_status(crawler_status)
+                logger.info(f"크롤링 완료, 결과 저장 경로: {result_path}")
+        
+        # 프로세스가 완료될 때까지 기다림
+        return_code = process.wait()
+        logger.info(f"크롤링 프로세스 종료, 리턴 코드: {return_code}")
+        
+        if return_code != 0:
+            error_msg = f"크롤링 프로세스가 비정상 종료됨 (종료 코드: {return_code})"
+            logger.error(error_msg)
+            crawler_status['error'] = error_msg
+        else:
+            logger.info("크롤링이 정상적으로 완료됨")
+        
+        # 크롤링 완료
         crawler_status['progress'] = 1.0
+        crawler_status['message'] = "✅ 크롤링 완료!" if return_code == 0 else f"❌ 크롤링 실패 (종료 코드: {return_code})"
         crawler_status['is_running'] = False
         crawler_status['update_timestamp'] = time.time()
         save_crawler_status(crawler_status)
+        
+        # 전체 로그 파일로 저장
+        log_filename = f"crawl_log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+        os.makedirs("data/logs", exist_ok=True)
+        with open(f"data/logs/{log_filename}", "w") as f:
+            f.write("\n".join(lines))
+        logger.info(f"크롤링 로그 저장: {log_filename}")
+    
+    except Exception as e:
+        error_msg = f"❌ 크롤링 중 오류 발생: {str(e)}"
         logger.error(error_msg, exc_info=True)
+        crawler_status['message'] = error_msg
+        crawler_status['progress'] = 1.0
+        crawler_status['is_running'] = False
+        crawler_status['error'] = error_msg
+        crawler_status['update_timestamp'] = time.time()
+        save_crawler_status(crawler_status)
         
         # 오류 로그 저장
         error_log_filename = f"crawl_error_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
@@ -378,7 +411,7 @@ def get_latest_result_stats():
                         if isinstance(data, list):
                             all_results.extend(data)
                             platform_counts[platforms[platform]] = len(data)
-                            logger.info(f"{platforms[platform]}: {len(data)}개 항목 로드됨")
+                            # 로깅 제거 (중복 로깅 방지)
                 except Exception as e:
                     logger.error(f"{platform} 결과 파일 로드 중 오류: {str(e)}")
         
@@ -414,10 +447,8 @@ def get_latest_result_stats():
                 date = 'unknown'
             date_counts[date] = date_counts.get(date, 0) + 1
         
-        # 결과 로깅
-        logger.info(f"총 {len(all_results)}개 항목 처리됨")
-        logger.info(f"플랫폼별 항목 수: {platform_counts}")
-        logger.info(f"감성별 항목 수: {sentiment_counts}")
+        # 결과 로깅 (한 번만 로깅)
+        logger.info(f"데이터 통계 - 총 {len(all_results)}개 항목, 플랫폼별: {platform_counts}, 감성별: {sentiment_counts}")
         
         return {
             'total': len(all_results),
@@ -608,6 +639,22 @@ def update_analysis_progress(progress_bar, status_text, current, total, start_ti
         status_text.text(f"진행률: 0% (0/{total} 항목)\n"
                         f"경과 시간: {format_time(elapsed_time)}")
 
+def check_crawler_process():
+    """실행 중인 크롤링 프로세스 확인"""
+    try:
+        # macOS/Linux
+        if os.name == 'posix':
+            cmd = "ps aux | grep 'python main.py' | grep -v grep"
+        # Windows
+        else:
+            cmd = "tasklist /FI \"IMAGENAME eq python.exe\" /FO CSV"
+        
+        process = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+        return process.stdout.strip() != ""
+    except Exception as e:
+        logger.error(f"프로세스 확인 중 오류: {str(e)}")
+        return False
+
 def main():
     """대시보드 메인 함수"""
     global crawler_status
@@ -615,7 +662,33 @@ def main():
     # 시작 시 크롤링 상태 파일에서 로드
     crawler_status = load_crawler_status()
     
+    # 실제 프로세스 상태 확인
+    is_process_running = check_crawler_process()
+    
+    # 상태 파일과 실제 프로세스 상태가 다른 경우 상태 업데이트
+    if crawler_status['is_running'] != is_process_running:
+        crawler_status['is_running'] = is_process_running
+        if not is_process_running:
+            crawler_status['message'] = "크롤링이 비정상적으로 종료되었습니다."
+            crawler_status['error'] = "프로세스가 실행 중이지 않습니다."
+        save_crawler_status(crawler_status)
+    
+    # 크롤링이 방금 시작되었는지 확인 (5초 이내)
+    is_just_started = crawler_status.get('start_time') and time.time() - crawler_status['start_time'] < 5
+    
+    # 크롤링이 시작되면 자동 새로고침
+    if is_just_started and crawler_status['is_running']:
+        time.sleep(0.5)  # 상태가 저장될 시간을 주기 위해 잠시 대기
+        st.rerun()
+    
+    # 크롤링이 방금 종료되었는지 확인 (5초 이내)
+    is_just_finished = crawler_status.get('update_timestamp') and time.time() - crawler_status['update_timestamp'] < 5 and not crawler_status['is_running']
+    
     st.title("부안군 감성 분석 대시보드")
+    
+    # 서버 시간 표시 (우측 상단)
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    st.sidebar.markdown(f"<div style='text-align: right; font-size: 0.8em; color: gray;'>서버 시간: {current_time}</div>", unsafe_allow_html=True)
     
     # 세션 상태 초기화
     if 'analysis_data' not in st.session_state:
@@ -1016,10 +1089,87 @@ def main():
         # 크롤링 상태 컨테이너 생성
         status_container = st.empty()
         
-        # 크롤링 중이 아닐 때는 최근 결과 표시
-        if not crawler_status['is_running']:
+        # 크롤링 중이거나 크롤링이 방금 시작된 경우 (5초 이내) 이전 결과를 표시하지 않음
+        if crawler_status['is_running'] or is_just_started:
+            with status_container.container():
+                if crawler_status['is_running']:
+                    st.subheader("크롤링 상태")
+                    
+                    # 프로세스 상태 표시
+                    process_status = "실행 중" if check_crawler_process() else "프로세스 없음"
+                    st.markdown(f"##### 프로세스 상태: {process_status}")
+                    
+                    # 실행 중인 명령어 표시
+                    st.markdown("##### 실행 중인 명령어")
+                    st.code(crawler_status.get('command', '명령어 정보 없음'), language="bash")
+                    
+                    # 상태 정보 표시
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.metric(
+                            "상태",
+                            "실행 중",
+                            delta=None
+                        )
+                    with col2:
+                        if crawler_status.get('start_time'):
+                            elapsed_time = time.time() - crawler_status['start_time']
+                            st.metric(
+                                "시작 시간",
+                                datetime.fromtimestamp(crawler_status['start_time']).strftime("%Y-%m-%d %H:%M:%S"),
+                                delta=f"경과: {format_time(elapsed_time)}"
+                            )
+                    
+                    # 플랫폼별 진행 상황
+                    st.subheader("플랫폼별 진행 상황")
+                    platform_progress = crawler_status.get('platform_progress', {})
+                    
+                    for platform, progress in platform_progress.items():
+                        col1, col2 = st.columns([3, 1])
+                        with col1:
+                            st.text(f"{platform.upper()}")
+                            st.progress(progress)
+                            st.text(f"{progress*100:.1f}%")
+                        with col2:
+                            if crawler_status.get('platform_times', {}).get(platform, {}).get('start'):
+                                start_time = datetime.strptime(
+                                    crawler_status['platform_times'][platform]['start'],
+                                    "%Y-%m-%d %H:%M:%S"
+                                )
+                                if crawler_status['platform_times'][platform].get('end'):
+                                    end_time = datetime.strptime(
+                                        crawler_status['platform_times'][platform]['end'],
+                                        "%Y-%m-%d %H:%M:%S"
+                                    )
+                                    duration = end_time - start_time
+                                    st.text(f"소요 시간: {duration}")
+                                else:
+                                    elapsed = datetime.now() - start_time
+                                    st.text(f"경과 시간: {elapsed}")
+                    
+                    # 크롤링 결과 요약
+                    st.subheader("크롤링 결과 요약")
+                    if crawler_status.get('total_items', 0) > 0:
+                        st.metric("총 수집 항목", crawler_status['total_items'])
+                        st.metric("처리된 항목", crawler_status.get('processed_items', 0))
+                    
+                    # 오류 메시지가 있는 경우 표시
+                    if crawler_status.get('error'):
+                        st.error(f"오류 발생: {crawler_status['error']}")
+                    
+                else:
+                    st.info("크롤링이 시작되었습니다. 잠시만 기다려주세요...")
+        else:
             with status_container.container():
                 st.subheader("최근 크롤링 결과")
+                
+                # 크롤링이 방금 종료된 경우 새로고침 버튼 표시
+                if is_just_finished:
+                    st.success("크롤링이 완료되었습니다!")
+                    if st.button("🔄 결과 보기", use_container_width=True):
+                        st.rerun()
+                    return
+                
                 results = load_latest_results()
                 
                 if results:
@@ -1073,73 +1223,12 @@ def main():
                         st.caption(f"최근 크롤링: {results[0]['modified'] if results else '없음'}")
                 else:
                     st.info("아직 크롤링된 데이터가 없습니다. '크롤링 시작' 버튼을 눌러 데이터 수집을 시작하세요.")
-            
-            # 데이터 위치 안내
-            st.markdown("---")
-            st.markdown("##### 수집된 데이터 위치")
-            st.code("data/raw/*.json")
-            st.caption("수집된 데이터는 위 경로에 JSON 형식으로 저장됩니다. 데이터 분석 모드에서 분석할 수 있습니다.")
-        else:
-            # 크롤링 중일 때는 상태 정보 표시
-            with status_container.container():
-                st.subheader("크롤링 상태")
                 
-                # 상태 정보 표시
-                col1, col2 = st.columns(2)
-                with col1:
-                    st.metric(
-                        "상태",
-                        "실행 중",
-                        delta=None
-                    )
-                with col2:
-                    if crawler_status.get('start_time'):
-                        st.metric(
-                            "시작 시간",
-                            datetime.fromtimestamp(crawler_status['start_time']).strftime("%Y-%m-%d %H:%M:%S"),
-                            delta=None
-                        )
-                
-                # 플랫폼별 진행 상황
-                st.subheader("플랫폼별 진행 상황")
-                platform_progress = crawler_status.get('platform_progress', {})
-                
-                for platform, progress in platform_progress.items():
-                    col1, col2 = st.columns([3, 1])
-                    with col1:
-                        st.text(f"{platform.upper()}")
-                        st.progress(progress)
-                        st.text(f"{progress*100:.1f}%")
-                    with col2:
-                        if crawler_status.get('platform_times', {}).get(platform, {}).get('start'):
-                            start_time = datetime.strptime(
-                                crawler_status['platform_times'][platform]['start'],
-                                "%Y-%m-%d %H:%M:%S"
-                            )
-                            if crawler_status['platform_times'][platform].get('end'):
-                                end_time = datetime.strptime(
-                                    crawler_status['platform_times'][platform]['end'],
-                                    "%Y-%m-%d %H:%M:%S"
-                                )
-                                duration = end_time - start_time
-                                st.text(f"소요 시간: {duration}")
-                            else:
-                                elapsed = datetime.now() - start_time
-                                st.text(f"경과 시간: {elapsed}")
-                
-                # 크롤링 결과 요약
-                st.subheader("크롤링 결과 요약")
-                if crawler_status.get('total_items', 0) > 0:
-                    st.metric("총 수집 항목", crawler_status['total_items'])
-                    st.metric("처리된 항목", crawler_status.get('processed_items', 0))
-                
-                # 오류 메시지가 있는 경우 표시
-                if crawler_status.get('error'):
-                    st.error(f"오류 발생: {crawler_status['error']}")
-                
-                # 자동 새로고침을 위한 대기
-                time.sleep(1)
-                st.experimental_rerun()
+                # 데이터 위치 안내
+                st.markdown("---")
+                st.markdown("##### 수집된 데이터 위치")
+                st.code("data/raw/*.json")
+                st.caption("수집된 데이터는 위 경로에 JSON 형식으로 저장됩니다. 데이터 분석 모드에서 분석할 수 있습니다.")
     elif dashboard_mode == "데이터 분석":
         # 메인 화면에 분석 결과 표시
         # 분석 결과 파일 목록

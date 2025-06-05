@@ -361,11 +361,18 @@ class FMKoreaCrawler(BaseCrawler):
             return None, []
     
     def crawl(self):
-        """FMKorea 데이터 수집"""
+        """크롤링 실행 - 예외 처리 강화"""
+        driver = None
         try:
             # 크롤링 시작 시간 기록
             start_time = time.time()
             self.logger.info(f"====== 크롤링 시작: {time.strftime('%Y-%m-%d %H:%M:%S')} ======")
+            
+            # 드라이버 초기화
+            driver = self.init_driver()
+            if not driver:
+                self.logger.error("드라이버 초기화 실패로 크롤링을 중단합니다.")
+                return []
             
             # 검색 결과 수집
             all_posts = []
@@ -448,18 +455,27 @@ class FMKoreaCrawler(BaseCrawler):
                     json.dump(filtered_posts, f, ensure_ascii=False, indent=2)
                 self.logger.info(f"Saved results to {filepath}")
                 
-            # 크롤링 종료 시간 기록 및 요약
+            return filtered_posts
+            
+        except Exception as e:
+            self.logger.error(f"크롤링 중 예상치 못한 오류 발생: {str(e)}")
+            self.logger.error("상세 오류 정보:", exc_info=True)
+            return []
+        
+        finally:
+            # 드라이버 정리
+            if driver:
+                try:
+                    driver.quit()
+                    self.logger.info("드라이버 정상 종료")
+                except Exception as e:
+                    self.logger.error(f"드라이버 종료 중 오류: {str(e)}")
+            
+            # 크롤링 종료 시간 기록
             end_time = time.time()
             elapsed_time = end_time - start_time
             self.logger.info(f"크롤링 종료: {time.strftime('%Y-%m-%d %H:%M:%S')}")
             self.logger.info(f"소요 시간: {elapsed_time:.2f}초 ({elapsed_time/60:.2f}분)")
-            self.logger.info(f"수집된 총 문서: {len(filtered_posts)}개")
-            
-            return filtered_posts
-            
-        except Exception as e:
-            self.logger.error(f"크롤링 중 오류 발생: {str(e)}")
-            return []
 
     def validate_platform_data(self, df, platform):
         """플랫폼별 데이터 유효성 검사"""

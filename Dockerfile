@@ -19,6 +19,12 @@ RUN apt-get update && apt-get install -y \
     fonts-nanum \
     fonts-nanum-coding \
     fonts-nanum-extra \
+    fonts-liberation \
+    libnss3 \
+    libxss1 \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libgtk-3-0 \
     && apt-get clean
 
 # Firefox 및 GeckoDriver 설치
@@ -58,6 +64,12 @@ RUN apt-get update && apt-get install -y \
     fonts-nanum \
     fonts-nanum-coding \
     fonts-nanum-extra \
+    fonts-liberation \
+    libnss3 \
+    libxss1 \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libgtk-3-0 \
     && apt-get clean
 
 # 앱 작업 디렉토리 설정

@@ -22,8 +22,7 @@ class GPTReportGenerator:
         Args:
             api_key (str): OpenAI API 키
         """
-        import openai
-        openai.api_key = api_key
+        self.client = openai.OpenAI(api_key=api_key)
         # API 키 길이 및 일부 마스킹해서 로깅
         masked = api_key[:4] + '*' * (len(api_key) - 8) + api_key[-4:]
         logger.debug(f"OpenAI API key configured: {masked}")
@@ -118,7 +117,7 @@ class GPTReportGenerator:
             
             # GPT 호출
             try:
-                response = openai.ChatCompletion.create(
+                response = self.client.chat.completions.create(
                     model="gpt-3.5-turbo",
                     messages=[
                         {"role": "system", "content": "당신은 부안군의 정책 제안 전문가입니다. 데이터에 기반한 구체적이고 실현 가능한 정책을 제안해주세요."},

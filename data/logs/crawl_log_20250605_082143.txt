@@ -1,0 +1,616 @@
+2025-06-05 08:18:15,809 - main - INFO -
+==================================================
+2025-06-05 08:18:15,809 - main - INFO - 크롤링 시작
+2025-06-05 08:18:15,809 - main - INFO - 시작 시간: 2025-06-05 08:18:15
+2025-06-05 08:18:15,809 - main - INFO - 검색 키워드: ['부안']
+2025-06-05 08:18:15,810 - main - INFO - 브라우저: chrome
+2025-06-05 08:18:15,810 - main - INFO - 필터링 모드: 엄격 (AND 조건)
+2025-06-05 08:18:15,810 - main - INFO - robots.txt 정책: 무시
+2025-06-05 08:18:15,810 - main - INFO - 병렬 처리: 비활성화
+2025-06-05 08:18:15,810 - main - INFO - ==================================================
+2025-06-05 08:18:15,810 - main - INFO - 크롤링 대상 플랫폼: naver
+2025-06-05 08:18:15,811 - main - INFO -
+==================== NAVER 크롤링 시작 ====================
+2025-06-05 08:18:15,811 - main - INFO - 키워드: [{'text': '부안', 'condition': 'AND'}]
+2025-06-05 08:18:15,811 - main - INFO - 최대 페이지: 3
+2025-06-05 08:18:15,811 - main - INFO - 최대 댓글: 20
+2025-06-05 08:18:15,812 - main - INFO - 감성 분석: 비활성화
+2025-06-05 08:18:15,812 - main - INFO - 브라우저: chrome
+
+크롤링 진행률:   0%|          | 0/1 [00:00<?, ?it/s]2025-06-05 08:18:36,372 - naversearchapi - INFO - 필터링 비율: 3.8% (5/132)
+2025-06-05 08:18:36,373 - naversearchapi - INFO - 키워드 '부안' 결과: 132개 중 127개 필터링됨
+2025-06-05 08:18:36,704 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 16:46:00 +0900
+2025-06-05 08:18:36,806 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 17:12:00 +0900
+2025-06-05 08:18:36,825 - WDM - INFO - ====== WebDriver manager ======
+2025-06-05 08:18:36,896 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 16:46:00 +0900
+2025-06-05 08:18:36,979 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 16:40:00 +0900
+2025-06-05 08:18:37,005 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-06-05 08:18:37,041 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 16:34:00 +0900
+2025-06-05 08:18:37,055 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 16:34:00 +0900
+2025-06-05 08:18:37,057 - WDM - INFO - ====== WebDriver manager ======
+2025-06-05 08:18:37,239 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 16:12:00 +0900
+2025-06-05 08:18:37,320 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 16:10:00 +0900
+2025-06-05 08:18:37,344 - WDM - INFO - Get LATEST geckodriver version for 128.11 firefox
+2025-06-05 08:18:37,480 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 16:06:00 +0900
+2025-06-05 08:18:37,515 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 16:04:00 +0900
+2025-06-05 08:18:37,608 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 15:52:00 +0900
+2025-06-05 08:18:37,660 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 16:10:00 +0900
+2025-06-05 08:18:38,003 - WDM - INFO - Get LATEST geckodriver version for 128.11 firefox
+2025-06-05 08:18:38,065 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 15:44:00 +0900
+2025-06-05 08:18:38,120 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 15:46:00 +0900
+2025-06-05 08:18:38,166 - WDM - INFO - There is no [linux64] geckodriver "v0.36.0" for browser firefox "128.11" in cache
+2025-06-05 08:18:38,174 - WDM - INFO - Get LATEST geckodriver version for 128.11 firefox
+2025-06-05 08:18:38,211 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 16:03:00 +0900
+2025-06-05 08:18:38,244 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 15:28:00 +0900
+2025-06-05 08:18:38,277 - WDM - INFO - Getting latest mozilla release info for v0.36.0
+2025-06-05 08:18:38,350 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 15:28:00 +0900
+2025-06-05 08:18:38,405 - WDM - INFO - ====== WebDriver manager ======
+2025-06-05 08:18:38,499 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 15:28:00 +0900
+2025-06-05 08:18:38,517 - WDM - INFO - Get LATEST chromedriver version for google-chrome
+2025-06-05 08:18:38,518 - WDM - INFO - ====== WebDriver manager ======
+2025-06-05 08:18:38,686 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 15:22:00 +0900
+2025-06-05 08:18:38,688 - WDM - INFO - About to download new driver from https://github.com/mozilla/geckodriver/releases/download/v0.36.0/geckodriver-v0.36.0-linux64.tar.gz
+2025-06-05 08:18:38,744 - WDM - INFO - Get LATEST geckodriver version for 128.11 firefox
+2025-06-05 08:18:38,807 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 15:10:00 +0900
+2025-06-05 08:18:38,832 - WDM - INFO - Get LATEST geckodriver version for 128.11 firefox
+2025-06-05 08:18:38,895 - WDM - INFO - There is no [linux64] geckodriver "v0.36.0" for browser firefox "128.11" in cache
+2025-06-05 08:18:38,895 - WDM - INFO - Get LATEST geckodriver version for 128.11 firefox
+2025-06-05 08:18:38,945 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 15:06:00 +0900
+2025-06-05 08:18:38,972 - WDM - INFO - Getting latest mozilla release info for v0.36.0
+2025-06-05 08:18:39,037 - WDM - INFO - About to download new driver from https://github.com/mozilla/geckodriver/releases/download/v0.36.0/geckodriver-v0.36.0-linux64.tar.gz
+2025-06-05 08:18:39,116 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 15:00:00 +0900
+2025-06-05 08:18:39,809 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 15:38:00 +0900
+2025-06-05 08:18:39,819 - WDM - INFO - Driver downloading response is 200
+2025-06-05 08:18:39,957 - WDM - INFO - Driver downloading response is 200
+2025-06-05 08:18:40,065 - WDM - INFO - Get LATEST geckodriver version for 128.11 firefox
+2025-06-05 08:18:40,148 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 14:53:00 +0900
+2025-06-05 08:18:40,252 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 14:58:00 +0900
+2025-06-05 08:18:40,324 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 14:51:00 +0900
+2025-06-05 08:18:40,354 - WDM - INFO - Driver has been saved in cache [/root/.wdm/drivers/geckodriver/linux64/v0.36.0]
+2025-06-05 08:18:40,460 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 14:48:00 +0900
+2025-06-05 08:18:40,491 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 14:46:00 +0900
+2025-06-05 08:18:40,493 - WDM - INFO - Get LATEST geckodriver version for 128.11 firefox
+2025-06-05 08:18:40,734 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 14:45:00 +0900
+2025-06-05 08:18:40,796 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 14:44:00 +0900
+2025-06-05 08:18:40,856 - WDM - INFO - Driver has been saved in cache [/root/.wdm/drivers/geckodriver/linux64/v0.36.0]
+드라이버 초기화 실패: 'NoneType' object has no attribute 'split'
+두 번째 시도 실패: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+동적 크롤링이 비활성화됩니다. 정적 크롤링만 사용합니다.
+2025-06-05 08:18:40,869 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 16:44:00 +0900
+2025-06-05 08:18:40,934 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 14:43:00 +0900
+2025-06-05 08:18:40,998 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 14:27:00 +0900
+2025-06-05 08:18:41,103 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 14:16:00 +0900
+2025-06-05 08:18:41,171 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 13:59:00 +0900
+2025-06-05 08:18:41,229 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 13:42:00 +0900
+2025-06-05 08:18:41,308 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 13:02:00 +0900
+2025-06-05 08:18:41,340 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 12:20:00 +0900
+2025-06-05 08:18:41,512 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 11:58:00 +0900
+2025-06-05 08:18:41,590 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 11:58:00 +0900
+2025-06-05 08:18:41,641 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 11:56:00 +0900
+2025-06-05 08:18:41,701 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 11:56:00 +0900
+2025-06-05 08:18:41,843 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 11:42:00 +0900
+2025-06-05 08:18:41,845 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 11:24:00 +0900
+2025-06-05 08:18:41,901 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 11:36:00 +0900
+2025-06-05 08:18:42,157 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 11:04:00 +0900
+2025-06-05 08:18:42,159 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 11:11:00 +0900
+2025-06-05 08:18:42,223 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 11:04:00 +0900
+2025-06-05 08:18:42,387 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 11:02:00 +0900
+2025-06-05 08:18:44,156 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 15:28:00 +0900
+2025-06-05 08:18:44,586 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 10:50:00 +0900
+2025-06-05 08:18:44,620 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 10:56:00 +0900
+2025-06-05 08:18:44,649 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 10:58:00 +0900
+2025-06-05 08:18:44,755 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 08:50:00 +0900
+2025-06-05 08:18:44,845 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 08:18:00 +0900
+2025-06-05 08:18:45,929 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 10:46:00 +0900
+2025-06-05 08:18:47,201 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:18:47,416 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:18:47,911 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:18:48,066 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 09:14:00 +0900
+2025-06-05 08:18:48,234 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 08:01:00 +0900
+2025-06-05 08:18:48,282 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 06:00:00 +0900
+2025-06-05 08:18:49,091 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:18:49,167 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 08:18:00 +0900
+2025-06-05 08:18:49,177 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:18:49,179 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 06:11:00 +0900
+2025-06-05 08:18:49,448 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 03:34:00 +0900
+2025-06-05 08:18:49,546 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 23:44:00 +0900
+2025-06-05 08:18:49,641 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 05:00:00 +0900
+2025-06-05 08:18:49,677 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 23:38:00 +0900
+2025-06-05 08:18:49,753 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 22:22:00 +0900
+2025-06-05 08:18:49,794 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 21:50:00 +0900
+2025-06-05 08:18:49,977 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 21:44:00 +0900
+2025-06-05 08:18:50,024 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 20:12:00 +0900
+2025-06-05 08:18:50,327 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:18:50,475 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Thu, 05 Jun 2025 05:00:00 +0900
+2025-06-05 08:18:50,597 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 19:24:00 +0900
+2025-06-05 08:18:50,599 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 19:24:00 +0900
+2025-06-05 08:18:50,663 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 19:24:00 +0900
+2025-06-05 08:18:51,177 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 19:24:00 +0900
+2025-06-05 08:18:51,261 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 19:24:00 +0900
+2025-06-05 08:18:51,274 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 19:24:00 +0900
+2025-06-05 08:18:51,313 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 20:30:00 +0900
+2025-06-05 08:18:51,545 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 19:24:00 +0900
+2025-06-05 08:18:51,598 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 19:24:00 +0900
+2025-06-05 08:18:51,609 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 19:24:00 +0900
+2025-06-05 08:18:51,610 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 19:24:00 +0900
+2025-06-05 08:18:51,860 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 19:24:00 +0900
+2025-06-05 08:18:51,868 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 19:24:00 +0900
+2025-06-05 08:18:51,893 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 19:24:00 +0900
+2025-06-05 08:18:51,999 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 18:58:00 +0900
+2025-06-05 08:18:52,033 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 18:54:00 +0900
+2025-06-05 08:18:52,077 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 19:02:00 +0900
+2025-06-05 08:18:52,175 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 18:36:00 +0900
+2025-06-05 08:18:52,218 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 18:30:00 +0900
+2025-06-05 08:18:52,381 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 18:20:00 +0900
+2025-06-05 08:18:52,720 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 18:16:00 +0900
+2025-06-05 08:18:52,841 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 18:00:00 +0900
+2025-06-05 08:18:53,081 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 17:54:00 +0900
+2025-06-05 08:18:53,442 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 17:50:00 +0900
+2025-06-05 08:18:53,802 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 17:50:00 +0900
+2025-06-05 08:18:54,170 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 17:40:00 +0900
+2025-06-05 08:18:54,263 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 17:34:00 +0900
+2025-06-05 08:18:54,275 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:18:54,834 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:18:55,342 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 18:53:00 +0900
+2025-06-05 08:18:55,849 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 18:28:00 +0900
+2025-06-05 08:18:56,048 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 19:04:00 +0900
+2025-06-05 08:18:56,548 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 17:34:00 +0900
+2025-06-05 08:18:56,584 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 17:34:00 +0900
+2025-06-05 08:18:56,710 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 17:32:00 +0900
+2025-06-05 08:18:56,862 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 17:12:00 +0900
+2025-06-05 08:18:56,863 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 17:28:00 +0900
+2025-06-05 08:18:56,910 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 17:11:00 +0900
+2025-06-05 08:18:57,116 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 17:00:00 +0900
+2025-06-05 08:18:57,341 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 17:08:00 +0900
+2025-06-05 08:18:57,428 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 17:06:00 +0900
+2025-06-05 08:18:57,584 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 16:44:00 +0900
+2025-06-05 08:18:57,617 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 17:12:00 +0900
+2025-06-05 08:18:57,792 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 16:57:00 +0900
+2025-06-05 08:18:57,885 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 16:52:00 +0900
+2025-06-05 08:18:57,887 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 16:38:00 +0900
+2025-06-05 08:18:57,932 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 16:36:00 +0900
+2025-06-05 08:18:58,065 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 16:28:00 +0900
+2025-06-05 08:18:58,095 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 16:28:00 +0900
+2025-06-05 08:18:58,209 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 16:28:00 +0900
+2025-06-05 08:18:58,338 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 16:27:00 +0900
+2025-06-05 08:18:58,430 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 16:18:00 +0900
+2025-06-05 08:18:58,492 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 16:16:00 +0900
+2025-06-05 08:18:58,590 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 16:26:00 +0900
+2025-06-05 08:18:58,775 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 15:58:00 +0900
+2025-06-05 08:18:58,788 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 15:52:00 +0900
+2025-06-05 08:18:59,062 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 15:28:00 +0900
+2025-06-05 08:18:59,090 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 15:26:00 +0900
+2025-06-05 08:18:59,283 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 15:16:00 +0900
+2025-06-05 08:18:59,329 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 15:20:00 +0900
+2025-06-05 08:18:59,649 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 15:14:00 +0900
+2025-06-05 08:19:00,062 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:00,608 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:00,771 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 15:36:00 +0900
+2025-06-05 08:19:00,776 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:00,788 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 16:26:00 +0900
+2025-06-05 08:19:00,924 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 15:02:00 +0900
+2025-06-05 08:19:00,928 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 15:15:00 +0900
+2025-06-05 08:19:01,113 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 15:02:00 +0900
+2025-06-05 08:19:01,430 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 15:02:00 +0900
+2025-06-05 08:19:01,594 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 15:09:00 +0900
+2025-06-05 08:19:01,629 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 14:48:00 +0900
+2025-06-05 08:19:01,846 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 14:38:00 +0900
+2025-06-05 08:19:01,884 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 14:50:00 +0900
+2025-06-05 08:19:02,031 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 14:06:00 +0900
+2025-06-05 08:19:02,402 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 15:06:00 +0900
+2025-06-05 08:19:02,404 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 14:00:00 +0900
+2025-06-05 08:19:02,567 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 13:52:00 +0900
+2025-06-05 08:19:02,637 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 13:58:00 +0900
+2025-06-05 08:19:02,801 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 13:42:00 +0900
+2025-06-05 08:19:03,087 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 14:14:00 +0900
+2025-06-05 08:19:03,187 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 13:40:00 +0900
+2025-06-05 08:19:03,257 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 14:44:00 +0900
+2025-06-05 08:19:03,317 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 13:24:00 +0900
+2025-06-05 08:19:04,025 - naversearchapi - WARNING - 날짜 형식을 인식할 수 없음: Wed, 04 Jun 2025 13:43:00 +0900
+2025-06-05 08:19:04,188 - naversearchapi - INFO - 필터링 비율: 43.6% (65/149)
+2025-06-05 08:19:04,188 - naversearchapi - INFO - 키워드 '부안' 결과: 149개 중 84개 필터링됨
+2025-06-05 08:19:06,503 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:07,105 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:07,814 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:08,575 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:09,202 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:10,893 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:12,167 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:12,299 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:13,734 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:13,787 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:14,758 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:14,796 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:15,319 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:16,035 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:16,918 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:18,090 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+Failed to extract from cafe iframe: Message: Unable to locate frame for element: [object HTMLIFrameElement]
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:193:5
+NoSuchFrameError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:572:5
+switchToFrame@chrome://remote/content/marionette/actors/MarionetteCommandsChild.sys.mjs:557:15
+receiveMessage@chrome://remote/content/marionette/actors/MarionetteCommandsChild.sys.mjs:155:31
+
+2025-06-05 08:19:18,339 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:19,120 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:19,195 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:20,197 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:20,282 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:21,125 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:21,153 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:21,864 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:22,841 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:23,469 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:24,370 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:25,393 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+Failed to extract from cafe iframe: Message: Unable to locate element: [id="cafe_main"]; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#no-such-element-exception
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:193:5
+NoSuchElementError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:511:5
+dom.find/</<@chrome://remote/content/shared/DOM.sys.mjs:136:16
+
+2025-06-05 08:19:27,156 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:27,161 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:28,123 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:28,960 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:29,585 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:30,137 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:32,452 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+Failed to extract from cafe iframe: Message: Unable to locate frame for element: [object HTMLIFrameElement]
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:193:5
+NoSuchFrameError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:572:5
+switchToFrame@chrome://remote/content/marionette/actors/MarionetteCommandsChild.sys.mjs:557:15
+receiveMessage@chrome://remote/content/marionette/actors/MarionetteCommandsChild.sys.mjs:155:31
+
+2025-06-05 08:19:35,423 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:36,032 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:36,095 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:38,709 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+Failed to extract from cafe iframe: Message: Unable to locate frame for element: [object HTMLIFrameElement]
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:193:5
+NoSuchFrameError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:572:5
+switchToFrame@chrome://remote/content/marionette/actors/MarionetteCommandsChild.sys.mjs:557:15
+receiveMessage@chrome://remote/content/marionette/actors/MarionetteCommandsChild.sys.mjs:155:31
+
+2025-06-05 08:19:38,792 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:40,408 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:41,385 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:42,036 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:42,884 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:43,635 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:44,504 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:45,913 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+Failed to extract from cafe iframe: Message: The element with the reference f01ce259-5334-4034-9992-4d43487b78a1 is stale; either its node document is not the active document, or it is no longer connected to the DOM; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#stale-element-reference-exception
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:193:5
+StaleElementReferenceError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:725:5
+getKnownElement@chrome://remote/content/marionette/json.sys.mjs:401:11
+deserializeJSON@chrome://remote/content/marionette/json.sys.mjs:259:20
+cloneObject@chrome://remote/content/marionette/json.sys.mjs:59:24
+deserializeJSON@chrome://remote/content/marionette/json.sys.mjs:289:16
+json.deserialize@chrome://remote/content/marionette/json.sys.mjs:293:10
+receiveMessage@chrome://remote/content/marionette/actors/MarionetteCommandsChild.sys.mjs:73:30
+
+2025-06-05 08:19:45,986 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:46,590 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:46,668 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:48,677 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+Failed to extract from cafe iframe: Message: Unable to locate frame for element: [object HTMLIFrameElement]
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:193:5
+NoSuchFrameError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:572:5
+switchToFrame@chrome://remote/content/marionette/actors/MarionetteCommandsChild.sys.mjs:557:15
+receiveMessage@chrome://remote/content/marionette/actors/MarionetteCommandsChild.sys.mjs:155:31
+
+2025-06-05 08:19:48,891 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:49,768 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:49,776 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:50,661 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:50,794 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:54,996 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:55,567 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:56,074 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:58,040 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:58,102 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:58,935 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:19:58,939 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 0
+2025-06-05 08:19:59,116 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:00,476 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:01,288 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:02,163 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:02,816 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:03,494 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:04,872 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:05,506 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:06,170 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:07,478 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+Failed to extract from cafe iframe: Message: Unable to locate element: [id="cafe_main"]; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#no-such-element-exception
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:193:5
+NoSuchElementError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:511:5
+dom.find/</<@chrome://remote/content/shared/DOM.sys.mjs:136:16
+
+2025-06-05 08:20:07,580 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:09,691 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+Failed to extract from cafe iframe: Message: Unable to locate frame for element: [object HTMLIFrameElement]
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:193:5
+NoSuchFrameError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:572:5
+switchToFrame@chrome://remote/content/marionette/actors/MarionetteCommandsChild.sys.mjs:557:15
+receiveMessage@chrome://remote/content/marionette/actors/MarionetteCommandsChild.sys.mjs:155:31
+
+Failed to extract from cafe iframe: Message: Unable to locate element: [id="cafe_main"]; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#no-such-element-exception
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:193:5
+NoSuchElementError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:511:5
+dom.find/</<@chrome://remote/content/shared/DOM.sys.mjs:136:16
+
+Failed to extract from cafe iframe: Message: Unable to locate element: [id="cafe_main"]; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#no-such-element-exception
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:193:5
+NoSuchElementError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:511:5
+dom.find/</<@chrome://remote/content/shared/DOM.sys.mjs:136:16
+
+2025-06-05 08:20:12,462 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:12,515 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:12,522 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:13,286 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:14,435 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:14,440 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:16,316 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+Failed to extract from cafe iframe: Message: Unable to locate element: [id="cafe_main"]; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#no-such-element-exception
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:193:5
+NoSuchElementError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:511:5
+dom.find/</<@chrome://remote/content/shared/DOM.sys.mjs:136:16
+
+2025-06-05 08:20:21,355 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:21,359 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+Failed to extract from cafe iframe: Message: Unable to locate frame for element: [object HTMLIFrameElement]
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:193:5
+NoSuchFrameError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:572:5
+switchToFrame@chrome://remote/content/marionette/actors/MarionetteCommandsChild.sys.mjs:557:15
+receiveMessage@chrome://remote/content/marionette/actors/MarionetteCommandsChild.sys.mjs:155:31
+
+2025-06-05 08:20:21,454 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:22,264 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:23,190 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+Failed to extract from cafe iframe: Message: The element with the reference 760b7139-af61-46b0-840a-d31b2d570077 is stale; either its node document is not the active document, or it is no longer connected to the DOM; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#stale-element-reference-exception
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:193:5
+StaleElementReferenceError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:725:5
+getKnownElement@chrome://remote/content/marionette/json.sys.mjs:401:11
+deserializeJSON@chrome://remote/content/marionette/json.sys.mjs:259:20
+cloneObject@chrome://remote/content/marionette/json.sys.mjs:59:24
+deserializeJSON@chrome://remote/content/marionette/json.sys.mjs:289:16
+json.deserialize@chrome://remote/content/marionette/json.sys.mjs:293:10
+receiveMessage@chrome://remote/content/marionette/actors/MarionetteCommandsChild.sys.mjs:73:30
+
+2025-06-05 08:20:23,876 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:24,870 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:26,086 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+Failed to extract from cafe iframe: Message: Unable to locate element: [id="cafe_main"]; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#no-such-element-exception
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:193:5
+NoSuchElementError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:511:5
+dom.find/</<@chrome://remote/content/shared/DOM.sys.mjs:136:16
+
+2025-06-05 08:20:26,178 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:26,826 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:27,637 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:28,343 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:29,001 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:30,676 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:31,657 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+Failed to extract from cafe iframe: Message: Unable to locate element: [id="cafe_main"]; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#no-such-element-exception
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:193:5
+NoSuchElementError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:511:5
+dom.find/</<@chrome://remote/content/shared/DOM.sys.mjs:136:16
+
+2025-06-05 08:20:34,407 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+Failed to extract from cafe iframe: Message: Unable to locate frame for element: [object HTMLIFrameElement]
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:193:5
+NoSuchFrameError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:572:5
+switchToFrame@chrome://remote/content/marionette/actors/MarionetteCommandsChild.sys.mjs:557:15
+receiveMessage@chrome://remote/content/marionette/actors/MarionetteCommandsChild.sys.mjs:155:31
+
+2025-06-05 08:20:35,022 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:35,084 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:35,645 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:37,485 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:38,695 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:38,830 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:40,673 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:40,742 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:40,743 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+Failed to extract from cafe iframe: Message: Unable to locate frame for element: [object HTMLIFrameElement]
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:193:5
+NoSuchFrameError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:572:5
+switchToFrame@chrome://remote/content/marionette/actors/MarionetteCommandsChild.sys.mjs:557:15
+receiveMessage@chrome://remote/content/marionette/actors/MarionetteCommandsChild.sys.mjs:155:31
+
+2025-06-05 08:20:41,476 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:41,529 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:43,330 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:44,334 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+Failed to extract from cafe iframe: Message: Unable to locate element: [id="cafe_main"]; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#no-such-element-exception
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:193:5
+NoSuchElementError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:511:5
+dom.find/</<@chrome://remote/content/shared/DOM.sys.mjs:136:16
+
+2025-06-05 08:20:44,539 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:49,954 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:50,651 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:51,558 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:52,673 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+Failed to extract from cafe iframe: Message: Unable to locate frame for element: [object HTMLIFrameElement]
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:193:5
+NoSuchFrameError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:572:5
+switchToFrame@chrome://remote/content/marionette/actors/MarionetteCommandsChild.sys.mjs:557:15
+receiveMessage@chrome://remote/content/marionette/actors/MarionetteCommandsChild.sys.mjs:155:31
+
+2025-06-05 08:20:52,890 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:54,769 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+Failed to extract from cafe iframe: Message: Unable to locate frame for element: [object HTMLIFrameElement]
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:193:5
+NoSuchFrameError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:572:5
+switchToFrame@chrome://remote/content/marionette/actors/MarionetteCommandsChild.sys.mjs:557:15
+receiveMessage@chrome://remote/content/marionette/actors/MarionetteCommandsChild.sys.mjs:155:31
+
+2025-06-05 08:20:54,812 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:55,502 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:56,086 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:57,259 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:57,522 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:58,655 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:58,820 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:59,710 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:20:59,778 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:00,408 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:01,409 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:02,289 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:02,550 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:03,403 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:03,465 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:05,081 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:05,821 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:06,842 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:07,267 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:08,486 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:08,550 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:10,039 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:10,045 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:10,997 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:11,974 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:12,877 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:12,995 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:13,627 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:14,309 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:15,549 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:16,539 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:16,642 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:17,563 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:17,600 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:18,193 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:19,091 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:20,742 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+Failed to extract from cafe iframe: Message: The element with the reference 2b6ef80f-4075-457b-9378-01fc4ddad84e is stale; either its node document is not the active document, or it is no longer connected to the DOM; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#stale-element-reference-exception
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:193:5
+StaleElementReferenceError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:725:5
+getKnownElement@chrome://remote/content/marionette/json.sys.mjs:401:11
+deserializeJSON@chrome://remote/content/marionette/json.sys.mjs:259:20
+cloneObject@chrome://remote/content/marionette/json.sys.mjs:59:24
+deserializeJSON@chrome://remote/content/marionette/json.sys.mjs:289:16
+json.deserialize@chrome://remote/content/marionette/json.sys.mjs:293:10
+receiveMessage@chrome://remote/content/marionette/actors/MarionetteCommandsChild.sys.mjs:73:30
+
+2025-06-05 08:21:20,813 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:21,380 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:21,421 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:21,999 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:23,766 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:24,516 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+Failed to extract from cafe iframe: Message: Unable to locate element: [id="cafe_main"]; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#no-such-element-exception
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:193:5
+NoSuchElementError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:511:5
+dom.find/</<@chrome://remote/content/shared/DOM.sys.mjs:136:16
+
+2025-06-05 08:21:27,897 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:27,903 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+Failed to extract from cafe iframe: Message: Unable to locate frame for element: [object HTMLIFrameElement]
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:193:5
+NoSuchFrameError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:572:5
+switchToFrame@chrome://remote/content/marionette/actors/MarionetteCommandsChild.sys.mjs:557:15
+receiveMessage@chrome://remote/content/marionette/actors/MarionetteCommandsChild.sys.mjs:155:31
+
+2025-06-05 08:21:27,989 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:28,804 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:29,505 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:30,682 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:31,034 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:34,171 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+Failed to extract from cafe iframe: Message: Unable to locate frame for element: [object HTMLIFrameElement]
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:193:5
+NoSuchFrameError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:572:5
+switchToFrame@chrome://remote/content/marionette/actors/MarionetteCommandsChild.sys.mjs:557:15
+receiveMessage@chrome://remote/content/marionette/actors/MarionetteCommandsChild.sys.mjs:155:31
+
+2025-06-05 08:21:34,284 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:34,328 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:35,312 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:36,137 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:37,178 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:38,491 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+Failed to extract from cafe iframe: Message: Unable to locate frame for element: [object HTMLIFrameElement]
+Stacktrace:
+RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:193:5
+NoSuchFrameError@chrome://remote/content/shared/webdriver/Errors.sys.mjs:572:5
+switchToFrame@chrome://remote/content/marionette/actors/MarionetteCommandsChild.sys.mjs:557:15
+receiveMessage@chrome://remote/content/marionette/actors/MarionetteCommandsChild.sys.mjs:155:31
+
+2025-06-05 08:21:38,825 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:39,710 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:39,782 - urllib3.connectionpool - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-06-05 08:21:42,122 - naversearchapi - INFO - 필터링 비율: 51.3% (77/150)
+2025-06-05 08:21:42,122 - naversearchapi - INFO - 키워드 '부안' 결과: 150개 중 73개 필터링됨
+2025-06-05 08:21:42,123 - naversearchapi - ERROR - 크롤링 중 오류 발생: 'NaverSearchAPICrawler' object has no attribute 'save_results'
+2025-06-05 08:21:42,125 - main - ERROR - naver 크롤링 중 오류 발생: a coroutine was expected, got []
+2025-06-05 08:21:42,125 - main - ERROR - 상세 오류 정보:
+Traceback (most recent call last):
+File "/app/main.py", line 101, in crawl_platform
+results = asyncio.run(crawler.crawl())
+File "/usr/local/lib/python3.9/asyncio/runners.py", line 37, in run
+raise ValueError("a coroutine was expected, got {!r}".format(main))
+ValueError: a coroutine was expected, got []
+
+크롤링 진행률: 100%|██████████| 1/1 [03:26<00:00, 206.84s/it]
+크롤링 진행률: 100%|██████████| 1/1 [03:26<00:00, 206.84s/it]
+2025-06-05 08:21:42,654 - main - INFO -
+==================================================
+2025-06-05 08:21:42,654 - main - INFO - 결과 통합 및 저장 시작
+2025-06-05 08:21:42,654 - main - WARNING - 저장할 결과가 없습니다.
+2025-06-05 08:21:42,654 - main - WARNING - 수집된 결과가 없습니다.
+2025-06-05 08:21:42,654 - main - INFO -
+==================================================
+2025-06-05 08:21:42,655 - main - INFO - 크롤링 종료
+2025-06-05 08:21:42,655 - main - INFO - 종료 시간: 2025-06-05 08:21:42
+2025-06-05 08:21:42,655 - main - INFO - ==================================================

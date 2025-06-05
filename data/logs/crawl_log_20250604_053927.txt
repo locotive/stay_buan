@@ -1,0 +1,573 @@
+2025-06-04 05:39:17,431 - naver_crawler - INFO - 크롤링 로그 시작: data/logs/naver_crawler_20250604_053917.log
+2025-06-04 05:39:17,438 - main - INFO -
+==================================================
+2025-06-04 05:39:17,439 - main - INFO - 크롤링 시작
+2025-06-04 05:39:17,439 - main - INFO - 시작 시간: 2025-06-04 05:39:17
+2025-06-04 05:39:17,439 - main - INFO - 검색 키워드: ['부안']
+2025-06-04 05:39:17,439 - main - INFO - 브라우저: chrome
+2025-06-04 05:39:17,439 - main - INFO - 필터링 모드: 엄격 (AND 조건)
+2025-06-04 05:39:17,439 - main - INFO - robots.txt 정책: 무시
+2025-06-04 05:39:17,439 - main - INFO - 병렬 처리: 비활성화
+2025-06-04 05:39:17,439 - main - INFO - ==================================================
+2025-06-04 05:39:17,439 - main - INFO - 크롤링 대상 플랫폼: naver
+2025-06-04 05:39:17,440 - main - INFO -
+==================== NAVER 크롤링 시작 ====================
+
+크롤링 진행률:   0%|          | 0/1 [00:00<?, ?it/s]2025-06-04 05:39:17,440 - main - INFO - 키워드: [{'text': '부안', 'condition': 'AND'}]
+2025-06-04 05:39:17,441 - main - INFO - 최대 페이지: 3
+2025-06-04 05:39:17,442 - main - INFO - 최대 댓글: 20
+2025-06-04 05:39:17,442 - main - INFO - 감성 분석: 비활성화
+2025-06-04 05:39:17,442 - main - INFO - 브라우저: chrome
+2025-06-04 05:39:17,442 - core.sentiment_analysis_ensemble - INFO - 선택된 모델 목록: ['kobert', 'kcelectra-base-v2022', 'kcelectra', 'kcbert-large', 'kosentencebert']
+2025-06-04 05:39:17,442 - core.sentiment_analysis_ensemble - INFO - 선택된 모델 목록: ['kobert', 'kcelectra-base-v2022', 'kcelectra', 'kcbert-large', 'kosentencebert']
+Some weights of BertForSequenceClassification were not initialized from the model checkpoint at data/models/kobert and are newly initialized: ['classifier.bias', 'classifier.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+2025-06-04 05:39:18,455 - core.sentiment_analysis_kobert - INFO - KoBERT 모델 초기화 완료
+2025-06-04 05:39:18,456 - core.sentiment_analysis_ensemble - INFO - kobert 모델 초기화 완료
+2025-06-04 05:39:18,456 - core.sentiment_analysis_ensemble - INFO - kobert 모델 초기화 완료
+Some weights of ElectraForSequenceClassification were not initialized from the model checkpoint at data/models/kcelectra-base-v2022 and are newly initialized: ['classifier.dense.bias', 'classifier.dense.weight', 'classifier.out_proj.bias', 'classifier.out_proj.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+2025-06-04 05:39:19,693 - core.sentiment_analysis_kcelectra - INFO - KcELECTRA 모델 초기화 완료
+2025-06-04 05:39:19,694 - core.sentiment_analysis_ensemble - INFO - kcelectra-base-v2022 모델 초기화 완료
+2025-06-04 05:39:19,694 - core.sentiment_analysis_ensemble - INFO - kcelectra-base-v2022 모델 초기화 완료
+Some weights of ElectraForSequenceClassification were not initialized from the model checkpoint at data/models/kcelectra and are newly initialized: ['classifier.dense.bias', 'classifier.dense.weight', 'classifier.out_proj.bias', 'classifier.out_proj.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+2025-06-04 05:39:21,321 - core.sentiment_analysis_kcelectra - INFO - KcELECTRA 모델 초기화 완료
+2025-06-04 05:39:21,321 - core.sentiment_analysis_ensemble - INFO - kcelectra 모델 초기화 완료
+2025-06-04 05:39:21,321 - core.sentiment_analysis_ensemble - INFO - kcelectra 모델 초기화 완료
+2025-06-04 05:39:21,323 - core.sentiment_analysis_kcbert_large - INFO - KcBERT-large 모델 파일 확인 완료: data/models/kcbert-large
+Some weights of BertForSequenceClassification were not initialized from the model checkpoint at data/models/kcbert-large and are newly initialized: ['classifier.bias', 'classifier.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+2025-06-04 05:39:24,803 - core.sentiment_analysis_kcbert_large - INFO - KcBERT-large 모델 초기화 완료 (device: cpu, path: data/models/kcbert-large)
+2025-06-04 05:39:24,806 - core.sentiment_analysis_ensemble - INFO - kcbert-large 모델 초기화 완료
+2025-06-04 05:39:24,806 - core.sentiment_analysis_ensemble - INFO - kcbert-large 모델 초기화 완료
+Some weights of BertForSequenceClassification were not initialized from the model checkpoint at data/models/kosentencebert and are newly initialized: ['classifier.bias', 'classifier.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+2025-06-04 05:39:26,006 - core.sentiment_analysis_kosentencebert - INFO - KoSentenceBERT 모델 초기화 완료
+2025-06-04 05:39:26,006 - core.sentiment_analysis_ensemble - INFO - kosentencebert 모델 초기화 완료
+2025-06-04 05:39:26,006 - core.sentiment_analysis_ensemble - INFO - kosentencebert 모델 초기화 완료
+2025-06-04 05:39:26,006 - core.sentiment_analysis_ensemble - INFO - 앙상블 분석기 초기화 완료 (모델 수: 5, 초기화된 모델: ['kobert', 'kcelectra-base-v2022', 'kcelectra', 'kcbert-large', 'kosentencebert'])
+2025-06-04 05:39:26,006 - core.sentiment_analysis_ensemble - INFO - 앙상블 분석기 초기화 완료 (모델 수: 5, 초기화된 모델: ['kobert', 'kcelectra-base-v2022', 'kcelectra', 'kcbert-large', 'kosentencebert'])
+2025-06-04 05:39:26,010 - naver_crawler - INFO - 크롤러 초기화 완료: 키워드=['부안'], 최대 페이지=3
+2025-06-04 05:39:26,011 - naver_crawler - INFO - 크롤링 시작 (동기 인터페이스)
+2025-06-04 05:39:26,014 - naver_crawler - INFO - 크롤링 시작
+
+
+전체 진행률:   0%|          | 0/3 [00:00<?, ?it/s][A2025-06-04 05:39:26,019 - naver_crawler - INFO - 타겟 크롤링 시작: blog - 키워드=부안
+2025-06-04 05:39:26,019 - naver_crawler - INFO - API 요청: blog - 키워드=부안, 페이지=1
+2025-06-04 05:39:26,023 - naver_crawler - INFO - 타겟 크롤링 시작: news - 키워드=부안
+2025-06-04 05:39:26,024 - naver_crawler - INFO - API 요청: news - 키워드=부안, 페이지=1
+2025-06-04 05:39:26,024 - naver_crawler - INFO - 타겟 크롤링 시작: cafearticle - 키워드=부안
+2025-06-04 05:39:26,024 - naver_crawler - INFO - API 요청: cafearticle - 키워드=부안, 페이지=1
+2025-06-04 05:39:26,226 - naver_crawler - INFO - API 응답 성공: news - 50개 항목 수신
+2025-06-04 05:39:26,226 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,226 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,226 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,227 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,227 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,227 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,227 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,227 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,228 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,228 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,228 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,228 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,228 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,228 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,229 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,229 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,229 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,229 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,229 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,229 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,229 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,230 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,230 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,230 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,230 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,230 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,230 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,231 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,231 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,231 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,231 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,231 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,231 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,231 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,231 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,231 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,232 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,232 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,232 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,232 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,232 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,232 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,232 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,232 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,233 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,233 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,233 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,233 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,233 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,233 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,272 - naver_crawler - INFO - API 응답 성공: blog - 50개 항목 수신
+2025-06-04 05:39:26,273 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,273 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,273 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,273 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,274 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,274 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,274 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,274 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,274 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,274 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,275 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,275 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,275 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,275 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,275 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,276 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,276 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,276 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,276 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,276 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,276 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,277 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,277 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,277 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,277 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,277 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,278 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,278 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,278 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,278 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,278 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,278 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,278 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,278 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,279 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,279 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,279 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,279 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,280 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,280 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,280 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,280 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,280 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,281 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,281 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,281 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,281 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,281 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,281 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,281 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,329 - naver_crawler - INFO - API 응답 성공: cafearticle - 50개 항목 수신
+2025-06-04 05:39:26,329 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,330 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,330 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,330 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,330 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,331 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,331 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,331 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,331 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,331 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,331 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,332 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,332 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,332 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,332 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,332 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,333 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,333 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,333 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,333 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,333 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,333 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,333 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,334 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,334 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,334 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,334 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,334 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,335 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,335 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,335 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,335 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,335 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,335 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,336 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,336 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,336 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,336 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,336 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,336 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,337 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,337 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,337 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,337 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,337 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,337 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,338 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,338 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,338 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,338 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,465 - naver_crawler - INFO - API 요청: news - 키워드=부안, 페이지=2
+2025-06-04 05:39:26,472 - naver_crawler - INFO - API 요청: cafearticle - 키워드=부안, 페이지=2
+2025-06-04 05:39:26,541 - naver_crawler - INFO - API 요청: blog - 키워드=부안, 페이지=2
+2025-06-04 05:39:26,555 - naver_crawler - INFO - API 응답 성공: news - 50개 항목 수신
+2025-06-04 05:39:26,556 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,556 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,556 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,556 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,557 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,557 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,557 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,557 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,557 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,557 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,557 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,557 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,558 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,558 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,558 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,559 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,559 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,559 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,560 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,560 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,560 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,560 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,560 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,560 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,561 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,561 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,561 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,561 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,561 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,561 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,562 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,562 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,562 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,562 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,562 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,562 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,562 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,562 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,562 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,563 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,563 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,563 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,563 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,563 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,564 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,564 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,564 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,564 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,564 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,564 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,662 - naver_crawler - INFO - API 응답 성공: cafearticle - 50개 항목 수신
+2025-06-04 05:39:26,663 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,663 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,663 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,663 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,664 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,664 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,664 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,665 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,665 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,665 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,666 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,666 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,666 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,667 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,667 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,668 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,668 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,668 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,668 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,668 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,668 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,669 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,669 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,669 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,669 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,670 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,670 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,670 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,670 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,670 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,670 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,671 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,671 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,671 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,671 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,672 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,672 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,672 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,673 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,673 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,673 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,674 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,674 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,674 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,675 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,675 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,675 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,675 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,676 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,676 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:26,677 - naver_crawler - INFO - API 응답 성공: blog - 50개 항목 수신
+2025-06-04 05:39:26,679 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,679 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,679 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,680 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,680 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,680 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,680 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,680 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,680 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,681 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,681 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,681 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,681 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,681 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,681 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,682 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,682 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,682 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,682 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,683 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,683 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,683 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,683 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,683 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,683 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,684 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,684 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,684 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,684 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,684 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,684 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,684 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,684 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,685 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,685 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,685 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,685 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,685 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,686 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,686 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,686 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,686 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,686 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,686 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,686 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,687 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,687 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,687 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,687 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,687 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,822 - naver_crawler - INFO - API 요청: news - 키워드=부안, 페이지=3
+2025-06-04 05:39:26,860 - naver_crawler - INFO - API 요청: blog - 키워드=부안, 페이지=3
+2025-06-04 05:39:26,901 - naver_crawler - INFO - API 요청: cafearticle - 키워드=부안, 페이지=3
+2025-06-04 05:39:26,918 - naver_crawler - INFO - API 응답 성공: news - 50개 항목 수신
+2025-06-04 05:39:26,919 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,920 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,920 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,920 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,920 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,920 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,920 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,920 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,920 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,921 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,921 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,921 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,921 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,921 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,922 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,922 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,922 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,922 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,923 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,923 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,923 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,924 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,924 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,924 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,925 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,925 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,925 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,925 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,926 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,926 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,926 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,926 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,927 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,927 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,927 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,927 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,928 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,928 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,928 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,929 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,929 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,929 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,930 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,930 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,931 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,931 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,932 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,932 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,932 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,932 - naver_crawler - ERROR - 항목 처리 중 오류 발생: news - 'url'
+2025-06-04 05:39:26,985 - naver_crawler - INFO - API 응답 성공: blog - 50개 항목 수신
+2025-06-04 05:39:26,985 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,985 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,985 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,986 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,986 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,986 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,986 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,986 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,986 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,987 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,987 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,987 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,987 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,988 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,988 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,988 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,988 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,988 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,989 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,989 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,989 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,989 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,989 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,989 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,990 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,990 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,990 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,990 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,990 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,990 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,990 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,990 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,991 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,991 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,991 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,991 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,991 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,992 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,992 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,992 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,992 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,992 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,992 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,992 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,992 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,992 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,993 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,993 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,993 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:26,993 - naver_crawler - ERROR - 항목 처리 중 오류 발생: blog - 'url'
+2025-06-04 05:39:27,050 - naver_crawler - INFO - API 응답 성공: cafearticle - 50개 항목 수신
+2025-06-04 05:39:27,051 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,051 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,051 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,052 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,052 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,052 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,052 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,052 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,053 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,053 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,053 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,053 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,053 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,053 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,054 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,054 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,054 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,054 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,054 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,055 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,055 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,055 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,055 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,055 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,056 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,056 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,056 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,056 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,056 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,056 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,057 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,057 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,057 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,057 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,057 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,057 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,058 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,058 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,058 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,058 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,059 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,059 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,059 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,059 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,059 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,060 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,060 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,060 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,060 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+2025-06-04 05:39:27,060 - naver_crawler - ERROR - 항목 처리 중 오류 발생: cafearticle - 'url'
+
+
+
+blog 처리 중:   0%|          | 0/150 [00:00<?, ?it/s][A[A
+blog 처리 중: 100%|██████████| 150/150 [00:00<00:00, 143117.74it/s]
+2025-06-04 05:39:27,096 - naver_crawler - INFO - 타겟 크롤링 완료: blog - 0개 항목 수집
+
+
+전체 진행률:  33%|███▎      | 1/3 [00:01<00:02,  1.08s/it][A
+
+
+news 처리 중:   0%|          | 0/150 [00:00<?, ?it/s][A[A
+news 처리 중: 100%|██████████| 150/150 [00:00<00:00, 217096.48it/s]
+2025-06-04 05:39:27,159 - naver_crawler - INFO - 타겟 크롤링 완료: news - 0개 항목 수집
+
+
+
+cafearticle 처리 중:   0%|          | 0/150 [00:00<?, ?it/s][A[A
+cafearticle 처리 중: 100%|██████████| 150/150 [00:00<00:00, 208810.36it/s]
+2025-06-04 05:39:27,261 - naver_crawler - INFO - 타겟 크롤링 완료: cafearticle - 0개 항목 수집
+
+
+전체 진행률: 100%|██████████| 3/3 [00:01<00:00,  2.94it/s][A
+전체 진행률: 100%|██████████| 3/3 [00:01<00:00,  2.41it/s]
+2025-06-04 05:39:27,262 - naver_crawler - WARNING - 수집된 데이터가 없습니다.
+2025-06-04 05:39:27,262 - naver_crawler - INFO - 크롤링 소요 시간: 1.25초
+2025-06-04 05:39:27,277 - main - ERROR - naver 크롤링 중 오류 발생: a coroutine was expected, got []
+2025-06-04 05:39:27,278 - main - ERROR - 상세 오류 정보:
+Traceback (most recent call last):
+File "/app/main.py", line 101, in crawl_platform
+results = asyncio.run(crawler.crawl())
+File "/usr/local/lib/python3.9/asyncio/runners.py", line 37, in run
+raise ValueError("a coroutine was expected, got {!r}".format(main))
+ValueError: a coroutine was expected, got []
+
+크롤링 진행률: 100%|██████████| 1/1 [00:09<00:00,  9.85s/it]
+크롤링 진행률: 100%|██████████| 1/1 [00:09<00:00,  9.85s/it]
+2025-06-04 05:39:27,288 - main - INFO -
+==================================================
+2025-06-04 05:39:27,288 - main - INFO - 결과 통합 및 저장 시작
+2025-06-04 05:39:27,288 - main - WARNING - 저장할 결과가 없습니다.
+2025-06-04 05:39:27,289 - main - WARNING - 수집된 결과가 없습니다.
+2025-06-04 05:39:27,289 - main - INFO -
+==================================================
+2025-06-04 05:39:27,289 - main - INFO - 크롤링 종료
+2025-06-04 05:39:27,289 - main - INFO - 종료 시간: 2025-06-04 05:39:27
+2025-06-04 05:39:27,289 - main - INFO - ==================================================

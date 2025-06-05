@@ -1,0 +1,90 @@
+2025-06-04 04:44:21,702 - main - INFO -
+==================================================
+2025-06-04 04:44:21,703 - main - INFO - 크롤링 시작
+2025-06-04 04:44:21,703 - main - INFO - 시작 시간: 2025-06-04 04:44:21
+2025-06-04 04:44:21,703 - main - INFO - 검색 키워드: ['부안']
+2025-06-04 04:44:21,703 - main - INFO - 브라우저: chrome
+2025-06-04 04:44:21,703 - main - INFO - 필터링 모드: 엄격 (AND 조건)
+2025-06-04 04:44:21,703 - main - INFO - robots.txt 정책: 무시
+2025-06-04 04:44:21,704 - main - INFO - 병렬 처리: 비활성화
+2025-06-04 04:44:21,704 - main - INFO - ==================================================
+2025-06-04 04:44:21,704 - main - INFO - 크롤링 대상 플랫폼: naver
+2025-06-04 04:44:21,704 - main - INFO -
+==================== NAVER 크롤링 시작 ====================
+2025-06-04 04:44:21,704 - main - INFO - 키워드: [{'text': '부안', 'condition': 'AND'}]
+2025-06-04 04:44:21,704 - main - INFO - 최대 페이지: 3
+2025-06-04 04:44:21,705 - main - INFO - 최대 댓글: 20
+2025-06-04 04:44:21,705 - main - INFO - 감성 분석: 비활성화
+2025-06-04 04:44:21,706 - main - INFO - 브라우저: chrome
+
+크롤링 진행률:   0%|          | 0/1 [00:00<?, ?it/s]2025-06-04 04:44:21,707 - core.sentiment_analysis_ensemble - INFO - 선택된 모델 목록: ['kobert', 'kcelectra-base-v2022', 'kcelectra', 'kcbert-large', 'kosentencebert']
+2025-06-04 04:44:21,707 - core.sentiment_analysis_ensemble - INFO - 선택된 모델 목록: ['kobert', 'kcelectra-base-v2022', 'kcelectra', 'kcbert-large', 'kosentencebert']
+Some weights of BertForSequenceClassification were not initialized from the model checkpoint at data/models/kobert and are newly initialized: ['classifier.bias', 'classifier.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+2025-06-04 04:44:22,504 - core.sentiment_analysis_kobert - INFO - KoBERT 모델 초기화 완료
+2025-06-04 04:44:22,504 - core.sentiment_analysis_ensemble - INFO - kobert 모델 초기화 완료
+2025-06-04 04:44:22,504 - core.sentiment_analysis_ensemble - INFO - kobert 모델 초기화 완료
+Some weights of ElectraForSequenceClassification were not initialized from the model checkpoint at data/models/kcelectra-base-v2022 and are newly initialized: ['classifier.dense.bias', 'classifier.dense.weight', 'classifier.out_proj.bias', 'classifier.out_proj.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+2025-06-04 04:44:23,679 - core.sentiment_analysis_kcelectra - INFO - KcELECTRA 모델 초기화 완료
+2025-06-04 04:44:23,680 - core.sentiment_analysis_ensemble - INFO - kcelectra-base-v2022 모델 초기화 완료
+2025-06-04 04:44:23,680 - core.sentiment_analysis_ensemble - INFO - kcelectra-base-v2022 모델 초기화 완료
+Some weights of ElectraForSequenceClassification were not initialized from the model checkpoint at data/models/kcelectra and are newly initialized: ['classifier.dense.bias', 'classifier.dense.weight', 'classifier.out_proj.bias', 'classifier.out_proj.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+2025-06-04 04:44:24,972 - core.sentiment_analysis_kcelectra - INFO - KcELECTRA 모델 초기화 완료
+2025-06-04 04:44:24,973 - core.sentiment_analysis_ensemble - INFO - kcelectra 모델 초기화 완료
+2025-06-04 04:44:24,973 - core.sentiment_analysis_ensemble - INFO - kcelectra 모델 초기화 완료
+2025-06-04 04:44:24,975 - core.sentiment_analysis_kcbert_large - INFO - KcBERT-large 모델 파일 확인 완료: data/models/kcbert-large
+Some weights of BertForSequenceClassification were not initialized from the model checkpoint at data/models/kcbert-large and are newly initialized: ['classifier.bias', 'classifier.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+2025-06-04 04:44:28,441 - core.sentiment_analysis_kcbert_large - INFO - KcBERT-large 모델 초기화 완료 (device: cpu, path: data/models/kcbert-large)
+2025-06-04 04:44:28,441 - core.sentiment_analysis_ensemble - INFO - kcbert-large 모델 초기화 완료
+2025-06-04 04:44:28,441 - core.sentiment_analysis_ensemble - INFO - kcbert-large 모델 초기화 완료
+Some weights of BertForSequenceClassification were not initialized from the model checkpoint at data/models/kosentencebert and are newly initialized: ['classifier.bias', 'classifier.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+2025-06-04 04:44:29,513 - core.sentiment_analysis_kosentencebert - INFO - KoSentenceBERT 모델 초기화 완료
+2025-06-04 04:44:29,513 - core.sentiment_analysis_ensemble - INFO - kosentencebert 모델 초기화 완료
+2025-06-04 04:44:29,513 - core.sentiment_analysis_ensemble - INFO - kosentencebert 모델 초기화 완료
+2025-06-04 04:44:29,513 - core.sentiment_analysis_ensemble - INFO - 앙상블 분석기 초기화 완료 (모델 수: 5, 초기화된 모델: ['kobert', 'kcelectra-base-v2022', 'kcelectra', 'kcbert-large', 'kosentencebert'])
+2025-06-04 04:44:29,513 - core.sentiment_analysis_ensemble - INFO - 앙상블 분석기 초기화 완료 (모델 수: 5, 초기화된 모델: ['kobert', 'kcelectra-base-v2022', 'kcelectra', 'kcbert-large', 'kosentencebert'])
+2025-06-04 04:44:29,516 - naversearchapi - INFO - ====== 크롤링 시작: 2025-06-04 04:44:29 ======
+2025-06-04 04:44:29,516 - naversearchapi - INFO -
+===== 네이버 blog API 수집 시작 =====
+2025-06-04 04:44:29,516 - naversearchapi - INFO - 생성된 검색 쿼리 (1개): ['부안']
+2025-06-04 04:44:29,800 - naversearchapi - ERROR - API 요청 중 오류: 'NaverSearchAPICrawler' object has no attribute 'blog_crawler'
+2025-06-04 04:44:29,800 - naversearchapi - INFO - [SUMMARY] Found 0 items, filtered to 0 for '부안'
+2025-06-04 04:44:29,801 - naversearchapi - WARNING - No data saved for keyword '부안'
+2025-06-04 04:44:29,801 - naversearchapi - INFO -
+===== 네이버 news API 수집 시작 =====
+2025-06-04 04:44:29,801 - naversearchapi - INFO - 생성된 검색 쿼리 (1개): ['부안']
+2025-06-04 04:44:29,937 - naversearchapi - ERROR - API 요청 중 오류: 'NaverSearchAPICrawler' object has no attribute 'blog_crawler'
+2025-06-04 04:44:29,937 - naversearchapi - INFO - [SUMMARY] Found 0 items, filtered to 0 for '부안'
+2025-06-04 04:44:29,937 - naversearchapi - WARNING - No data saved for keyword '부안'
+2025-06-04 04:44:29,937 - naversearchapi - INFO -
+===== 네이버 cafearticle API 수집 시작 =====
+2025-06-04 04:44:29,937 - naversearchapi - INFO - 생성된 검색 쿼리 (1개): ['부안']
+2025-06-04 04:44:30,195 - naversearchapi - ERROR - API 요청 중 오류: 'NaverSearchAPICrawler' object has no attribute 'blog_crawler'
+2025-06-04 04:44:30,196 - naversearchapi - INFO - [SUMMARY] Found 0 items, filtered to 0 for '부안'
+2025-06-04 04:44:30,196 - naversearchapi - WARNING - No data saved for keyword '부안'
+2025-06-04 04:44:30,196 - naversearchapi - INFO - [FINAL SUMMARY] Total 0 items collected for all keywords
+2025-06-04 04:44:30,197 - main - ERROR - naver 크롤링 중 오류 발생: a coroutine was expected, got []
+2025-06-04 04:44:30,197 - main - ERROR - 상세 오류 정보:
+Traceback (most recent call last):
+File "/app/main.py", line 101, in crawl_platform
+results = asyncio.run(crawler.crawl())
+File "/usr/local/lib/python3.9/asyncio/runners.py", line 37, in run
+raise ValueError("a coroutine was expected, got {!r}".format(main))
+ValueError: a coroutine was expected, got []
+
+크롤링 진행률: 100%|██████████| 1/1 [00:08<00:00,  8.49s/it]
+크롤링 진행률: 100%|██████████| 1/1 [00:08<00:00,  8.50s/it]
+2025-06-04 04:44:30,204 - main - INFO -
+==================================================
+2025-06-04 04:44:30,204 - main - INFO - 결과 통합 및 저장 시작
+2025-06-04 04:44:30,204 - main - WARNING - 저장할 결과가 없습니다.
+2025-06-04 04:44:30,204 - main - WARNING - 수집된 결과가 없습니다.
+2025-06-04 04:44:30,205 - main - INFO -
+==================================================
+2025-06-04 04:44:30,205 - main - INFO - 크롤링 종료
+2025-06-04 04:44:30,205 - main - INFO - 종료 시간: 2025-06-04 04:44:30
+2025-06-04 04:44:30,205 - main - INFO - ==================================================

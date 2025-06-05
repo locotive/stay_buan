@@ -4,13 +4,15 @@ import random
 import json
 import logging
 import hashlib
+import requests
 from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from selenium.common.exceptions import TimeoutException, NoSuchElementException, StaleElementReferenceException
+from selenium.webdriver.chrome.service import Service as ChromeService
 
 from core.base_crawler import BaseCrawler
 from core.sentiment_analysis_ensemble import EnsembleSentimentAnalyzer
@@ -33,17 +35,41 @@ class BuanGovCrawler(BaseCrawler):
         self.base_url = "https://www.buan.go.kr"
         self.browser_type = browser_type
         
-        # 크롤링할 게시판 목록
+        # 게시판 설정 개선 - 선택자와 대기 조건을 포함
         self.boards = [
             {
                 "name": "공지사항",
                 "url": "/board/list.buan?boardId=BBS_0000002&listPage=true",
-                "id": "BBS_0000002"
+                "id": "BBS_0000002",
+                "selectors": {
+                    "list": ".bbs_list table tbody tr",
+                    "title": "td.title a, td:nth-child(2) a",
+                    "date": "td:nth-child(5), td:nth-child(4)",
+                    "author": "td:nth-child(3), td:nth-child(4)",
+                    "content": ".bbs_content, .view_contents, .content",
+                    "attachments": ".bbs_file a, .view_file a"
+                },
+                "wait_conditions": {
+                    "list": (By.CSS_SELECTOR, ".bbs_list table tbody tr"),
+                    "content": (By.CSS_SELECTOR, ".bbs_content, .view_contents, .content")
+                }
             },
             {
                 "name": "보도자료",
                 "url": "/board/list.buanNews",
-                "id": "buanNews"
+                "id": "buanNews",
+                "selectors": {
+                    "list": ".container.sub .table_list tbody tr",
+                    "title": "td.title a, td:nth-child(2) a",
+                    "date": "td:nth-child(5), td:nth-child(4)",
+                    "author": "td:nth-child(3), td:nth-child(4)",
+                    "content": ".bbs_content, .view_contents, .content",
+                    "attachments": ".bbs_file a, .view_file a"
+                },
+                "wait_conditions": {
+                    "list": (By.CSS_SELECTOR, ".container.sub .table_list tbody tr"),
+                    "content": (By.CSS_SELECTOR, ".bbs_content, .view_contents, .content")
+                }
             },
             {
                 "name": "군정소식",
@@ -110,6 +136,18 @@ class BuanGovCrawler(BaseCrawler):
             # 문자열 리스트인 경우 형식 변환
             self.keywords = keywords if isinstance(keywords, list) else [keywords]
             self.original_keywords = [{'text': k, 'condition': 'AND'} for k in self.keywords]
+        
+        # 첨부파일 저장 디렉토리
+        self.attachment_dir = os.path.join(save_dir, "attachments")
+        os.makedirs(self.attachment_dir, exist_ok=True)
+        
+        # 동적 대기 시간 설정
+        self.wait_config = {
+            "min_wait": 0.5,  # 최소 대기 시간
+            "max_wait": 2.0,  # 최대 대기 시간
+            "timeout": 10,    # 요소 대기 타임아웃
+            "retry_count": 3  # 재시도 횟수
+        }
     
     def _get_sentiment_analyzer(self):
         """감성 분석기 지연 로딩"""
@@ -131,23 +169,186 @@ class BuanGovCrawler(BaseCrawler):
             return None, None
     
     def init_driver(self):
-        """웹드라이버 초기화"""
+        """웹드라이버 초기화 - Docker 환경 고려"""
         try:
             if self.browser_type == "chrome":
-                driver = webdriver.Chrome(options=self.options)
+                # Chrome 옵션 설정
+                chrome_options = webdriver.ChromeOptions()
+                
+                # 필수 headless 옵션
+                chrome_options.add_argument('--headless=new')  # 새로운 headless 모드
+                chrome_options.add_argument('--no-sandbox')
+                chrome_options.add_argument('--disable-dev-shm-usage')
+                chrome_options.add_argument('--disable-gpu')
+                chrome_options.add_argument('--window-size=1920,1080')
+                chrome_options.add_argument('--disable-extensions')
+                chrome_options.add_argument('--disable-notifications')
+                
+                # Docker 환경 감지 및 드라이버 경로 설정
+                if os.getenv('DOCKER_ENV'):
+                    self.logger.info("Docker 환경에서 실행 중")
+                    driver_path = "/usr/bin/chromium-driver"
+                    # Docker 환경에서 필요한 추가 옵션
+                    chrome_options.add_argument('--disable-software-rasterizer')
+                    chrome_options.add_argument('--disable-setuid-sandbox')
+                    chrome_options.binary_location = "/usr/bin/chromium"
+                else:
+                    self.logger.info("로컬 환경에서 실행 중")
+                    driver_path = "chromedriver"
+                
+                try:
+                    # Chrome 서비스 설정
+                    chrome_service = ChromeService(executable_path=driver_path)
+                    self.logger.info(f"Chrome 드라이버 경로: {driver_path}")
+                    
+                    # 드라이버 초기화
+                    driver = webdriver.Chrome(
+                        service=chrome_service,
+                        options=chrome_options
+                    )
+                    
+                    # 타임아웃 설정
+                    driver.set_page_load_timeout(30)
+                    driver.set_script_timeout(30)
+                    
+                    self.logger.info("Chrome 드라이버 초기화 성공")
+                    return driver
+                    
+                except Exception as e:
+                    self.logger.error(f"Chrome 드라이버 초기화 실패: {str(e)}")
+                    self.logger.error("상세 오류 정보:", exc_info=True)
+                    return None
+                
             elif self.browser_type == "firefox":
-                driver = webdriver.Firefox(options=self.options)
+                # Firefox 옵션 설정
+                firefox_options = webdriver.FirefoxOptions()
+                firefox_options.add_argument('--headless')
+                firefox_options.add_argument('--width=1920')
+                firefox_options.add_argument('--height=1080')
+                
+                try:
+                    driver = webdriver.Firefox(options=firefox_options)
+                    driver.set_page_load_timeout(30)
+                    self.logger.info("Firefox 드라이버 초기화 성공")
+                    return driver
+                except Exception as e:
+                    self.logger.error(f"Firefox 드라이버 초기화 실패: {str(e)}")
+                    self.logger.error("상세 오류 정보:", exc_info=True)
+                    return None
+                
             else:
-                raise ValueError(f"지원되지 않는 브라우저 타입: {self.browser_type}")
+                self.logger.error(f"지원하지 않는 브라우저 타입: {self.browser_type}")
+                return None
             
-            driver.set_page_load_timeout(30)
-            return driver
         except Exception as e:
-            self.logger.error(f"드라이버 초기화 실패: {str(e)}")
+            self.logger.error(f"드라이버 초기화 중 예상치 못한 오류: {str(e)}")
+            self.logger.error("상세 오류 정보:", exc_info=True)
             return None
     
+    def _download_attachment(self, url, filename):
+        """첨부파일 다운로드"""
+        try:
+            # 파일 경로 생성
+            filepath = os.path.join(self.attachment_dir, filename)
+            
+            # 이미 다운로드된 파일이면 스킵
+            if os.path.exists(filepath):
+                return filepath
+                
+            # 다운로드
+            response = requests.get(url, stream=True)
+            response.raise_for_status()
+            
+            # 파일 저장
+            with open(filepath, 'wb') as f:
+                for chunk in response.iter_content(chunk_size=8192):
+                    if chunk:
+                        f.write(chunk)
+                        
+            return filepath
+            
+        except Exception as e:
+            self.logger.error(f"첨부파일 다운로드 실패: {url} - {str(e)}")
+            return None
+
+    def _wait_for_element(self, driver, condition, timeout=None):
+        """요소가 나타날 때까지 동적으로 대기"""
+        if timeout is None:
+            timeout = self.wait_config['timeout']
+            
+        try:
+            element = WebDriverWait(driver, timeout).until(
+                EC.presence_of_element_located(condition)
+            )
+            return element
+        except TimeoutException:
+            self.logger.warning(f"요소 대기 시간 초과: {condition}")
+            return None
+
+    def _get_post_details(self, driver, post_url, board_config):
+        """게시글 상세 정보 수집 (개선된 버전)"""
+        try:
+            # 페이지 로드
+            driver.get(post_url)
+            
+            # 동적 대기 시간 적용
+            time.sleep(random.uniform(self.wait_config['min_wait'], self.wait_config['max_wait']))
+            
+            # 본문 내용 대기 및 추출
+            content_el = self._wait_for_element(driver, board_config['wait_conditions']['content'])
+            if not content_el:
+                return None
+                
+            content = content_el.text.strip()
+            
+            # 첨부파일 처리
+            attachments = []
+            attach_elements = driver.find_elements(By.CSS_SELECTOR, board_config['selectors']['attachments'])
+            
+            for attach in attach_elements:
+                try:
+                    file_url = attach.get_attribute("href")
+                    if not file_url:
+                        continue
+                        
+                    # 파일명 추출
+                    filename = attach.text.strip() or os.path.basename(file_url)
+                    if not filename:
+                        continue
+                        
+                    # 다운로드
+                    local_path = self._download_attachment(file_url, filename)
+                    if local_path:
+                        attachments.append({
+                            "original_name": filename,
+                            "local_path": local_path,
+                            "url": file_url
+                        })
+                except Exception as e:
+                    self.logger.error(f"첨부파일 처리 중 오류: {str(e)}")
+            
+            # 작성일 재확인
+            date_el = driver.find_elements(By.CSS_SELECTOR, ".bbs_view th:contains('등록일'), .view_info span:contains('작성일')")
+            published_date = None
+            if date_el:
+                try:
+                    date_text = date_el[0].find_element(By.XPATH, "following-sibling::*").text.strip()
+                    published_date = self._format_date(date_text)
+                except:
+                    pass
+            
+            return {
+                "content": content,
+                "attachments": attachments,
+                "published_date": published_date
+            }
+            
+        except Exception as e:
+            self.logger.error(f"게시글 상세 정보 추출 중 오류: {str(e)}")
+            return None
+
     def _search_board(self, driver, board, keyword, page=1):
-        """특정 게시판에서 키워드로 검색"""
+        """게시판 검색 (개선된 버전)"""
         try:
             # 게시판 URL 생성
             board_url = f"{self.base_url}{board['url']}"
@@ -160,107 +361,55 @@ class BuanGovCrawler(BaseCrawler):
             
             # 페이지 로드
             driver.get(search_url)
-            time.sleep(3)  # 페이지 로딩 대기
+            
+            # 동적 대기 적용
+            time.sleep(random.uniform(self.wait_config['min_wait'], self.wait_config['max_wait']))
+            
+            # 게시글 목록 대기
+            list_elements = self._wait_for_element(driver, board['wait_conditions']['list'])
+            if not list_elements:
+                return []
             
             # 게시글 목록 추출
             posts = []
+            article_elements = driver.find_elements(By.CSS_SELECTOR, board['selectors']['list'])
             
-            try:
-                # 게시판 유형에 따라 선택자 다르게 적용
-                if board['id'] == 'buanNews':
-                    # 보도자료 게시판
-                    article_elements = driver.find_elements(By.CSS_SELECTOR, ".container.sub .table_list tbody tr")
-                else:
-                    # 일반 게시판
-                    article_elements = driver.find_elements(By.CSS_SELECTOR, ".bbs_list table tbody tr")
-                
-                if not article_elements:
-                    self.logger.warning(f"게시글 목록을 찾을 수 없습니다: {board['name']}")
-                    return []
-                
-                for article in article_elements:
-                    try:
-                        # 공지사항과 같은 고정 게시글은 스킵
-                        notice_tag = article.find_elements(By.CSS_SELECTOR, ".noti")
-                        if notice_tag:
-                            continue
-                        
-                        # 제목 및 링크
-                        title_el = article.find_element(By.CSS_SELECTOR, "td.title a, td:nth-child(2) a")
-                        title = title_el.text.strip()
-                        href = title_el.get_attribute("href")
-                        
-                        # 작성일
-                        date_el = article.find_elements(By.CSS_SELECTOR, "td:nth-child(5), td:nth-child(4)")
-                        date_text = date_el[0].text.strip() if date_el else ""
-                        
-                        # 작성자
-                        author_el = article.find_elements(By.CSS_SELECTOR, "td:nth-child(3), td:nth-child(4)")
-                        author = author_el[0].text.strip() if author_el else "부안군"
-                        
-                        if title and href:
-                            posts.append({
-                                "title": title,
-                                "url": href,
-                                "published_date": date_text,
-                                "author": author,
-                                "board": board['name']
-                            })
-                    except Exception as e:
-                        self.logger.error(f"게시글 항목 파싱 중 오류: {str(e)}")
-                
-                return posts
-                
-            except Exception as e:
-                self.logger.error(f"게시글 목록 추출 중 오류: {str(e)}")
-                return []
+            for article in article_elements:
+                try:
+                    # 공지사항 스킵
+                    if article.find_elements(By.CSS_SELECTOR, ".noti"):
+                        continue
+                    
+                    # 제목 및 링크
+                    title_el = article.find_element(By.CSS_SELECTOR, board['selectors']['title'])
+                    title = title_el.text.strip()
+                    href = title_el.get_attribute("href")
+                    
+                    # 작성일
+                    date_el = article.find_elements(By.CSS_SELECTOR, board['selectors']['date'])
+                    date_text = date_el[0].text.strip() if date_el else ""
+                    
+                    # 작성자
+                    author_el = article.find_elements(By.CSS_SELECTOR, board['selectors']['author'])
+                    author = author_el[0].text.strip() if author_el else "부안군"
+                    
+                    if title and href:
+                        posts.append({
+                            "title": title,
+                            "url": href,
+                            "published_date": date_text,
+                            "author": author,
+                            "board": board['name']
+                        })
+                except Exception as e:
+                    self.logger.error(f"게시글 항목 파싱 중 오류: {str(e)}")
+                    continue
+            
+            return posts
             
         except Exception as e:
             self.logger.error(f"게시판 검색 중 오류: {str(e)}")
             return []
-    
-    def _get_post_details(self, driver, post_url):
-        """게시글 상세 정보 수집"""
-        try:
-            # 페이지 로드
-            driver.get(post_url)
-            time.sleep(2)  # 페이지 로딩 대기
-            
-            try:
-                # 본문 내용 추출
-                content_el = WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located((By.CSS_SELECTOR, ".bbs_content, .view_contents, .content"))
-                )
-                content = content_el.text.strip()
-                
-                # 첨부파일 URL (있는 경우)
-                attach_urls = []
-                attach_elements = driver.find_elements(By.CSS_SELECTOR, ".bbs_file a, .view_file a")
-                for attach in attach_elements:
-                    file_url = attach.get_attribute("href")
-                    if file_url:
-                        attach_urls.append(file_url)
-                
-                # 작성일 재확인 (없으면 원래 가져온 값 사용)
-                date_el = driver.find_elements(By.CSS_SELECTOR, ".bbs_view th:contains('등록일'), .view_info span:contains('작성일')")
-                published_date = None
-                if date_el:
-                    date_text = date_el[0].find_element(By.XPATH, "following-sibling::*").text.strip()
-                    published_date = date_text
-                
-                return {
-                    "content": content,
-                    "attachment_urls": attach_urls,
-                    "published_date": published_date
-                }
-                
-            except (TimeoutException, NoSuchElementException) as e:
-                self.logger.error(f"게시글 상세 정보 추출 중 오류: {str(e)}")
-                return None
-                
-        except Exception as e:
-            self.logger.error(f"게시글 상세 페이지 로드 중 오류: {str(e)}")
-            return None
     
     def _format_date(self, date_text):
         """날짜 텍스트를 표준 형식으로 변환"""
@@ -378,7 +527,7 @@ class BuanGovCrawler(BaseCrawler):
                                 self.logger.info(f"게시글 {i+1}/{len(posts)}: '{post['title'][:20]}...' 처리 중")
                                 
                                 # 상세 정보 가져오기
-                                post_details = self._get_post_details(driver, post['url'])
+                                post_details = self._get_post_details(driver, post['url'], board)
                                 
                                 if not post_details:
                                     self.logger.warning(f"게시글 상세 정보를 가져올 수 없습니다: {post['url']}")
@@ -389,7 +538,7 @@ class BuanGovCrawler(BaseCrawler):
                                     post['published_date'] = post_details['published_date']
                                 
                                 post['content'] = post_details.get('content', '')
-                                post['attachment_urls'] = post_details.get('attachment_urls', [])
+                                post['attachments'] = post_details.get('attachments', [])
                                 
                                 # 날짜 형식 통일
                                 formatted_date = self._format_date(post['published_date'])
@@ -432,7 +581,7 @@ class BuanGovCrawler(BaseCrawler):
                                     'original_keywords': ','.join(self.keywords),
                                     'published_date': formatted_date,
                                     'date_obj': date_obj.isoformat(),
-                                    'attachment_urls': post.get('attachment_urls', []),
+                                    'attachments': post.get('attachments', []),
                                     'sentiment': sentiment,
                                     'confidence': confidence,
                                     'crawled_at': time.strftime("%Y-%m-%d %H:%M:%S")

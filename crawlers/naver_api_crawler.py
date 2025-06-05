@@ -105,6 +105,17 @@ class NaverBlogCrawler:
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         }
+        # HTTP 세션 설정
+        self.session = requests.Session()
+        adapter = requests.adapters.HTTPAdapter(
+            pool_connections=10,
+            pool_maxsize=10,
+            max_retries=3,
+            pool_block=False
+        )
+        self.session.mount('http://', adapter)
+        self.session.mount('https://', adapter)
+        
         # Selenium 웹드라이버 설정
         self.chrome_options = Options()
         self.chrome_options.add_argument("--headless")
@@ -112,6 +123,11 @@ class NaverBlogCrawler:
         self.chrome_options.add_argument("--disable-dev-shm-usage")
         self.driver = None
         self.init_attempts = 0  # 드라이버 초기화 시도 횟수
+        
+        # iframe 처리 관련 설정
+        self.iframe_wait_time = 10  # iframe 로딩 대기 시간
+        self.max_retries = 3        # 최대 재시도 횟수
+        self.retry_delay = 1.0      # 재시도 간 대기 시간
         
     def init_driver(self):
         """필요시 드라이버 초기화"""
@@ -160,10 +176,7 @@ class NaverBlogCrawler:
             self.driver = None
 
     def get_blog_content(self, url):
-        """
-        블로그 콘텐츠 추출을 위한 메서드
-        content_extractor 모듈을 사용하여 URL에서 콘텐츠 추출
-        """
+        """블로그 콘텐츠 추출을 위한 메서드"""
         if not url:
             return None
             
@@ -203,6 +216,72 @@ class NaverBlogCrawler:
         
         return content.strip()
 
+    def _handle_iframe(self, driver, url, max_retries=3):
+        """iframe 처리 메서드"""
+        from selenium.webdriver.support.ui import WebDriverWait
+        from selenium.webdriver.support import expected_conditions as EC
+        from selenium.webdriver.common.by import By
+        from selenium.common.exceptions import (
+            TimeoutException, 
+            NoSuchElementException,
+            StaleElementReferenceException,
+            NoSuchFrameException
+        )
+        
+        for attempt in range(max_retries):
+            try:
+                # 페이지 로드
+                driver.get(url)
+                
+                # 로그인 팝업 처리
+                try:
+                    close_btn = WebDriverWait(driver, 5).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, ".close_btn, .btn_close"))
+                    )
+                    close_btn.click()
+                except (TimeoutException, NoSuchElementException):
+                    pass  # 로그인 팝업이 없는 경우 무시
+                
+                # iframe 대기 및 전환
+                iframe = WebDriverWait(driver, self.iframe_wait_time).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, "#cafe_main, #mainFrame"))
+                )
+                driver.switch_to.frame(iframe)
+                
+                # 콘텐츠 컨테이너 대기
+                content = WebDriverWait(driver, self.iframe_wait_time).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, "div.se-main-container, div.article_container"))
+                )
+                
+                return content.text.strip()
+                
+            except (TimeoutException, NoSuchElementException, StaleElementReferenceException, NoSuchFrameException) as e:
+                if attempt < max_retries - 1:
+                    time.sleep(self.retry_delay)
+                    driver.switch_to.default_content()  # 컨텍스트 복귀
+                    continue
+                else:
+                    print(f"iframe 처리 실패 ({attempt + 1}/{max_retries}): {str(e)}")
+                    return None
+                    
+            finally:
+                try:
+                    driver.switch_to.default_content()  # 컨텍스트 복귀
+                except:
+                    pass
+                    
+        return None
+
+    def __del__(self):
+        """소멸자: 세션과 드라이버 정리"""
+        if hasattr(self, 'session'):
+            self.session.close()
+        if hasattr(self, 'driver') and self.driver:
+            try:
+                self.driver.quit()
+            except:
+                pass
+
 class NaverSearchAPICrawler(BaseCrawler):
     def __init__(self, keywords, max_pages=5, save_dir="data/raw", analyze_sentiment=True, browser_type="chrome"):
         """
@@ -220,6 +299,17 @@ class NaverSearchAPICrawler(BaseCrawler):
         self.doc_ids = set()
         self.analyze_sentiment = analyze_sentiment
         
+        # HTTP 세션 설정
+        self.session = requests.Session()
+        adapter = requests.adapters.HTTPAdapter(
+            pool_connections=10,
+            pool_maxsize=10,
+            max_retries=3,
+            pool_block=False
+        )
+        self.session.mount('http://', adapter)
+        self.session.mount('https://', adapter)
+        
         # 필터링 조건 완화 및 최적화
         self.filter_conditions = {
             'min_acceptable_results': 0,      # 최소 결과 수 제한 제거
@@ -232,7 +322,10 @@ class NaverSearchAPICrawler(BaseCrawler):
             'api_display': 50,                # API 한 번 요청당 결과 수 (100 -> 50으로 감소)
             'api_wait_time': (0.1, 0.3),      # API 요청 간 대기 시간 감소
             'direct_wait_time': (0.2, 0.5),   # 직접 크롤링 대기 시간 감소
-            'content_wait_time': 0.5          # 콘텐츠 추출 대기 시간 감소
+            'content_wait_time': 0.5,         # 콘텐츠 추출 대기 시간 감소
+            'max_retries': 3,                 # 최대 재시도 횟수
+            'retry_delay': 1.0,               # 재시도 간 대기 시간
+            'skip_cafe_iframe': False         # 카페 iframe 스킵 여부
         }
         
         # ContentExtractor 초기화
@@ -580,23 +673,16 @@ class NaverSearchAPICrawler(BaseCrawler):
         return results
 
     def crawl(self):
+        """네이버 검색 API를 통한 데이터 수집"""
         combined_results = []
         direct_crawl_results = []
         
         try:
-            # 크롤링 시작 시간 기록
-            start_time = time.time()
-            self.logger.info(f"====== 크롤링 시작: {time.strftime('%Y-%m-%d %H:%M:%S')} ======")
-            
-            # 1. API 기반 크롤링
+            # API 요청 시 세션 사용
             for target in self.targets:
-                self.logger.info(f"\n===== 네이버 {target} API 수집 시작 =====")
-                api_url = f"https://openapi.naver.com/v1/search/{target}.json"
+                api_url = f"{self.base_url}/{target}.json"
                 
-                keyword_variations = self.generate_keyword_variations(self.original_keywords)
-                self.logger.info(f"생성된 검색 쿼리 ({len(keyword_variations)}개): {keyword_variations}")
-                
-                for keyword in keyword_variations:
+                for keyword in self.keywords:
                     keyword_results = []
                     page = 1
                     seen_urls = set()
@@ -605,11 +691,12 @@ class NaverSearchAPICrawler(BaseCrawler):
                         try:
                             params = {
                                 "query": keyword,
-                                "display": self.filter_conditions['api_display'],  # 최적화된 display 값 사용
+                                "display": self.filter_conditions['api_display'],
                                 "start": (page - 1) * self.filter_conditions['api_display'] + 1
                             }
                             
-                            response = requests.get(api_url, headers=self.headers, params=params)
+                            # 세션을 사용한 API 요청
+                            response = self.session.get(api_url, headers=self.headers, params=params)
                             if response.status_code != 200:
                                 self.logger.error(f"API 요청 실패: {response.status_code}")
                                 break
@@ -619,20 +706,30 @@ class NaverSearchAPICrawler(BaseCrawler):
                             
                             if not items:
                                 break
-                            # 병렬 콘텐츠 추출
+                            
+                            # 병렬 콘텐츠 추출 (최대 4개 동시 처리)
                             with ThreadPoolExecutor(max_workers=4) as executor:
-                                future_to_item = {executor.submit(self.blog_crawler.get_blog_content, item.get("link","")): item for item in items if item.get("link")}
+                                future_to_item = {
+                                    executor.submit(self.blog_crawler.get_blog_content, item.get("link","")): item 
+                                    for item in items 
+                                    if item.get("link")
+                                }
+                                
                                 for future in as_completed(future_to_item):
                                     item = future_to_item[future]
+                                    try:
+                                        full_content = future.result()
+                                    except Exception as e:
+                                        self.logger.error(f"콘텐츠 추출 실패: {str(e)}")
+                                        full_content = None
+                                        
+                                    # 결과 처리
                                     title = self.clean_text(item.get("title",""))
                                     desc = self.clean_text(item.get("description",""))
                                     url = item.get("link","")
                                     blog_name = item.get("bloggername", item.get("author",""))
                                     date = self._normalize_date(item.get("postdate", item.get("pubDate","")))
-                                    try:
-                                        full_content = future.result()
-                                    except Exception:
-                                        full_content = None
+                                    
                                     content = full_content if full_content else f"{title} {desc}"
                                     
                                     if url in seen_urls:
@@ -644,50 +741,32 @@ class NaverSearchAPICrawler(BaseCrawler):
                                     except:
                                         date_obj = datetime.now()
                                         
-                                    post_data = {
-                                        "title": title,
-                                        "content": content,
-                                        "url": url,
-                                        "blog_name": blog_name,
-                                        "published_date": date,
-                                        "date_obj": date_obj.isoformat(),
-                                        "platform": f"naver_{target}_api",
-                                        "keyword": keyword,
-                                        "original_keywords": ",".join(self.keywords),
-                                        "sentiment": None,
-                                        "crawled_at": time.strftime("%Y-%m-%d %H:%M:%S"),
-                                    }
-                                    keyword_results.append(post_data)
-                                    self.cache.save(url)
-
-                            page += 1
-                            # 최적화된 대기 시간 적용
+                                    # 결과 추가
+                                    keyword_results.append({
+                                        'title': title,
+                                        'content': content,
+                                        'url': url,
+                                        'source': blog_name,
+                                        'published_date': date_obj.strftime("%Y-%m-%d"),
+                                        'platform': target
+                                    })
+                                    
+                            # API 요청 간 대기
                             time.sleep(random.uniform(*self.filter_conditions['api_wait_time']))
+                            page += 1
                             
                         except Exception as e:
-                            self.logger.error(f"API 요청 중 오류: {str(e)}")
+                            self.logger.error(f"페이지 처리 중 오류: {str(e)}")
                             break
                             
-                    # 키워드 조건에 따른 필터링
+                    # 키워드별 결과 후처리
                     filtered_results = self._postprocess(keyword_results, self.original_keywords)
+                    self.logger.info(f"키워드 '{keyword}' 결과: {len(keyword_results)}개 중 {len(filtered_results)}개 필터링됨")
                     
-                    self.logger.info(f"[SUMMARY] Found {len(keyword_results)} items, filtered to {len(filtered_results)} for '{keyword}'")
-                    keyword_results = filtered_results
-                    keyword_results.sort(key=lambda x: x['date_obj'], reverse=True)
-                    
-                    if keyword_results:
-                        keywords_str = '_'.join(self.keywords)
-                        filename = f"naver_{target}_{len(keyword_results)}_{keywords_str}_{time.strftime('%Y%m%d_%H%M%S')}.json"
-                        filepath = os.path.join(self.save_dir, filename)
-                        os.makedirs(self.save_dir, exist_ok=True)
-                        with open(filepath, "w", encoding="utf-8") as f:
-                            json.dump(keyword_results, f, ensure_ascii=False, indent=2)
-                        self.logger.info(f"Saved results to {filepath}")
-                        combined_results.extend(keyword_results)
-                    else:
-                        self.logger.warning(f"No data saved for keyword '{keyword}'")
+                    if filtered_results:
+                        combined_results.extend(filtered_results)
                         
-            # 2. 직접 크롤링 (API 결과가 부족하거나 질이 낮을 경우)
+            # 직접 크롤링 (API 결과가 부족한 경우)
             if len(combined_results) < self.filter_conditions['min_acceptable_results']:
                 self.logger.info(f"API 결과가 부족하여 직접 크롤링 필요: {len(combined_results)}개 < {self.filter_conditions['min_acceptable_results']}개")
                 
@@ -698,7 +777,7 @@ class NaverSearchAPICrawler(BaseCrawler):
                     
                 for keyword in main_variations:
                     self.logger.info(f"직접 크롤링 키워드: {keyword}")
-                    direct_results = self.direct_crawl_naver_search(keyword, num_pages=5)  # 페이지 수 증가
+                    direct_results = self.direct_crawl_naver_search(keyword, num_pages=5)
                     
                     # 후처리 적용
                     filtered_direct_results = self._postprocess(direct_results, self.original_keywords)
@@ -707,21 +786,18 @@ class NaverSearchAPICrawler(BaseCrawler):
                     if filtered_direct_results:
                         direct_crawl_results.extend(filtered_direct_results)
                         
-                if direct_crawl_results:
-                    self.logger.info(f"직접 크롤링으로 {len(direct_crawl_results)}개 문서 추가 수집")
-                    keywords_str = '_'.join(self.keywords)
-                    filename = f"naver_direct_{len(direct_crawl_results)}_{keywords_str}_{time.strftime('%Y%m%d_%H%M%S')}.json"
-                    filepath = os.path.join(self.save_dir, filename)
-                    with open(filepath, "w", encoding="utf-8") as f:
-                        json.dump(direct_crawl_results, f, ensure_ascii=False, indent=2)
-                    self.logger.info(f"Saved direct crawl results to {filepath}")
-                    combined_results.extend(direct_crawl_results)
-                    
             # 최종 결과 저장
-            self.logger.info(f"[FINAL SUMMARY] Total {len(combined_results)} items collected for all keywords")
+            all_results = combined_results + direct_crawl_results
+            if all_results:
+                self.save_results(all_results)
             
-            return combined_results
+            return all_results
             
         except Exception as e:
             self.logger.error(f"크롤링 중 오류 발생: {str(e)}")
-            return combined_results
+            return []
+        
+        finally:
+            # 세션 정리
+            if hasattr(self, 'session'):
+                self.session.close()
