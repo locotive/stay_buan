@@ -308,6 +308,7 @@ def run_crawler(cmd):
         crawler_status['error'] = error_msg
         crawler_status['update_timestamp'] = time.time()
         save_crawler_status(crawler_status)
+        logger.error(error_msg, exc_info=True)
         
         # 오류 로그 저장
         error_log_filename = f"crawl_error_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
@@ -920,7 +921,6 @@ def main():
                 datasets = get_available_datasets()
                 raw_datasets = datasets['raw_datasets']
                 
-                # 원본 데이터셋 목록이 비어있는 경우 경고 메시지 표시
                 if not raw_datasets:
                     st.warning("사용 가능한 원본 데이터셋이 없습니다.")
                 else:

@@ -12,6 +12,7 @@ from tqdm import tqdm
 from pathlib import Path
 from core.sentiment_analysis_ensemble import EnsembleSentimentAnalyzer
 import time
+import glob
 
 logger = logging.getLogger(__name__)
 
@@ -1111,3 +1112,127 @@ class DataProcessor:
         except Exception as e:
             logger.error(f"데이터 처리 중 오류 발생: {str(e)}")
             return pd.DataFrame() 
+
+def load_combined_data():
+    """최근 크롤링된 데이터를 모두 로드하여 통합"""
+    try:
+        # 최근 combined 파일 찾기
+        combined_files = glob.glob("data/raw/combined_*.json")
+        if not combined_files:
+            logger.warning("통합 데이터 파일을 찾을 수 없습니다.")
+            return pd.DataFrame()
+        
+        # 가장 최근 파일 선택
+        latest_file = max(combined_files, key=os.path.getmtime)
+        
+        # JSON 파일 로드
+        with open(latest_file, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        
+        # DataFrame으로 변환
+        df = pd.DataFrame(data)
+        
+        # 날짜 형식 변환
+        if 'published_date' in df.columns:
+            df['published_date'] = pd.to_datetime(df['published_date'], errors='coerce')
+        
+        return df
+    
+    except Exception as e:
+        logger.error(f"데이터 로드 중 오류 발생: {str(e)}")
+        return pd.DataFrame()
+
+def get_platform_stats(df):
+    """플랫폼별 게시물 수 통계"""
+    if df.empty:
+        return pd.DataFrame({'platform': [], 'count': []})
+    
+    platform_stats = df['platform'].value_counts().reset_index()
+    platform_stats.columns = ['platform', 'count']
+    return platform_stats
+
+def get_keyword_stats(df):
+    """키워드별 게시물 수 통계"""
+    if df.empty:
+        return pd.DataFrame({'keyword': [], 'count': []})
+    
+    # 키워드 컬럼이 있는 경우
+    if 'keywords' in df.columns:
+        # 키워드 문자열을 리스트로 변환
+        df['keyword_list'] = df['keywords'].apply(lambda x: x.split() if isinstance(x, str) else [])
+        
+        # 모든 키워드 카운트
+        keyword_counts = {}
+        for keywords in df['keyword_list']:
+            for keyword in keywords:
+                keyword_counts[keyword] = keyword_counts.get(keyword, 0) + 1
+        
+        # DataFrame으로 변환
+        keyword_stats = pd.DataFrame([
+            {'keyword': k, 'count': v} for k, v in keyword_counts.items()
+        ])
+        
+        return keyword_stats.sort_values('count', ascending=False)
+    
+    return pd.DataFrame({'keyword': [], 'count': []})
+
+def get_trend_data(df):
+    """시간대별 게시물 수 트렌드"""
+    if df.empty or 'published_date' not in df.columns:
+        return pd.DataFrame({'hour': [], 'count': []})
+    
+    # 시간대별 카운트
+    df['hour'] = df['published_date'].dt.hour
+    trend_data = df['hour'].value_counts().reset_index()
+    trend_data.columns = ['hour', 'count']
+    
+    # 시간순 정렬
+    trend_data = trend_data.sort_values('hour')
+    
+    return trend_data
+
+def get_recent_articles(df, n=10):
+    """최근 게시물 목록"""
+    if df.empty:
+        return pd.DataFrame()
+    
+    # 필요한 컬럼만 선택
+    columns = ['title', 'platform', 'published_date', 'url']
+    available_columns = [col for col in columns if col in df.columns]
+    
+    # 최근 게시물 선택
+    recent_df = df[available_columns].copy()
+    
+    # 날짜순 정렬
+    if 'published_date' in recent_df.columns:
+        recent_df = recent_df.sort_values('published_date', ascending=False)
+    
+    # 상위 n개 선택
+    recent_df = recent_df.head(n)
+    
+    # 날짜 형식 변환
+    if 'published_date' in recent_df.columns:
+        recent_df['published_date'] = recent_df['published_date'].dt.strftime('%Y-%m-%d %H:%M:%S')
+    
+    return recent_df
+
+def analyze_sentiment(text, analyzer):
+    """텍스트 감성 분석"""
+    try:
+        sentiment, confidence = analyzer.analyze(text)
+        return sentiment, confidence
+    except Exception as e:
+        logger.error(f"감성 분석 중 오류 발생: {str(e)}")
+        return 'unknown', 0.0
+
+def clear_analysis_cache():
+    """분석 캐시 초기화"""
+    try:
+        cache_dir = "data/cache"
+        if os.path.exists(cache_dir):
+            for file in glob.glob(os.path.join(cache_dir, "*.cache")):
+                os.remove(file)
+        return True
+    except Exception as e:
+        logger.error(f"캐시 초기화 중 오류 발생: {str(e)}")
+        return False 

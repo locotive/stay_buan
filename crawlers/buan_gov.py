@@ -346,7 +346,7 @@ class BuanGovCrawler(BaseCrawler):
         except Exception as e:
             self.logger.error(f"게시글 상세 정보 추출 중 오류: {str(e)}")
             return None
-
+    
     def _search_board(self, driver, board, keyword, page=1):
         """게시판 검색 (개선된 버전)"""
         try:
