@@ -8,12 +8,9 @@ from dotenv import load_dotenv
 from crawlers.naver_api_crawler import NaverSearchAPICrawler
 from crawlers.youtube import YouTubeCrawler
 from crawlers.google_search import GoogleSearchCrawler
-from crawlers.fmkorea import FMKoreaCrawler
 from crawlers.dcinside import DCInsideCrawler
 from crawlers.buan_gov import BuanGovCrawler
 # 나중에 다른 크롤러 임포트
-
-import asyncio
 
 # .env 파일 로드
 load_dotenv()
@@ -125,7 +122,7 @@ def crawl_platform(platform, keywords, max_pages, max_comments, no_sentiment, br
                 browser_type=browser_type
             )
             # 비동기 crawl() 호출
-            results = asyncio.run(crawler.crawl())
+            results = crawler.crawl()  
             logger.info(f"네이버에서 {len(results)}개 항목 수집 완료")
 
         elif platform == "youtube":
@@ -162,19 +159,6 @@ def crawl_platform(platform, keywords, max_pages, max_comments, no_sentiment, br
             )
             results = crawler.crawl()
             logger.info(f"디시인사이드에서 {len(results)}개 게시글 수집 완료")
-
-        elif platform == "fmkorea":
-            crawler = FMKoreaCrawler(
-                keywords, 
-                max_pages=max_pages, 
-                max_comments=max_comments, 
-                save_dir="data/raw", 
-                analyze_sentiment=False if no_sentiment else True,  # 기본값을 False로 변경
-                browser_type=browser_type, 
-                respect_robots=False
-            )
-            results = crawler.crawl()
-            logger.info(f"FM코리아에서 {len(results)}개 게시글 수집 완료")
 
         elif platform == "buan":
             crawler = BuanGovCrawler(
@@ -279,7 +263,7 @@ def main():
     start_time = time.time()
 
     parser = argparse.ArgumentParser(description="부안 관련 데이터 크롤러")
-    parser.add_argument("--platform", type=str, default="all", help="크롤링할 플랫폼 (all, naver, youtube, google, dcinside, fmkorea, buan)")
+    parser.add_argument("--platform", type=str, default="all", help="크롤링할 플랫폼 (all, naver, youtube, google, dcinside, buan)")
     parser.add_argument("--keywords", type=str, nargs="+", required=True, help="검색할 키워드")
     parser.add_argument("--max-pages", type=int, default=5, help="수집할 최대 페이지 수")
     parser.add_argument("--max-comments", type=int, default=30, help="각 게시글당 수집할 최대 댓글 수")
@@ -308,7 +292,7 @@ def main():
     keywords = [{"text": k, "condition": "OR" if args.loose_filter else "AND"} for k in args.keywords]
 
     # 플랫폼 목록 설정
-    platforms = ["naver", "youtube", "google", "dcinside", "fmkorea", "buan"] if args.platform == "all" else args.platform.split(",")
+    platforms = ["naver", "youtube", "google", "dcinside", "buan"] if args.platform == "all" else args.platform.split(",")
     logger.info(f"크롤링 대상 플랫폼: {', '.join(platforms)}")
 
     all_platform_results = {}
@@ -322,7 +306,7 @@ def main():
 
     # 플랫폼 분류
     api_platforms = ['naver', 'youtube']
-    selenium_platforms = ['dcinside', 'fmkorea', 'buan']
+    selenium_platforms = ['dcinside', 'buan']
     google_platforms = ['google']
 
     # 각 그룹별 독립적인 스레드 풀 생성

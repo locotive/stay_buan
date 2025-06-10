@@ -33,6 +33,8 @@ import time
 import queue
 import logging
 import concurrent.futures
+import matplotlib.dates as mdates
+from matplotlib.dates import MO
 
 # WordCloud 한글 폰트 경로 설정
 def get_korean_font_path():
@@ -194,7 +196,7 @@ def run_crawler(cmd):
             return
         
         # 플랫폼별 진행 상황 표시 - 명령어에서 플랫폼 정보 추출
-        all_platforms = ["naver", "youtube", "google", "dcinside", "fmkorea", "buan"]
+        all_platforms = ["naver", "youtube", "google", "dcinside", "buan"]
         
         # 명령어에서 platform 파라미터 찾기
         platform_param = ""
@@ -334,7 +336,7 @@ def load_latest_results(num_files=5):
     result_files = []
     
     # 플랫폼별 최근 파일 검색
-    platforms = ["naver", "youtube", "google", "dcinside", "fmkorea", "buan", "combined"]
+    platforms = ["naver", "youtube", "google", "dcinside", "buan", "combined"]
     
     for platform in platforms:
         files = glob.glob(f"data/raw/{platform}*.json")
@@ -391,7 +393,6 @@ def get_latest_result_stats():
             "youtube": "유튜브",
             "google": "구글",
             "dcinside": "디시인사이드",
-            "fmkorea": "에펨코리아",
             "buan": "부안군청"
         }
         
@@ -524,7 +525,7 @@ def get_available_datasets():
     
     # 원본 데이터셋 목록
     raw_datasets = []
-    for platform in ['naver', 'youtube', 'google', 'dcinside', 'fmkorea', 'buan']:
+    for platform in ['naver', 'youtube', 'google', 'dcinside', 'buan']:
         for file in glob.glob(f"data/raw/{platform}_*.json"):
             try:
                 filename = os.path.basename(file)
@@ -656,6 +657,41 @@ def check_crawler_process():
         logger.error(f"프로세스 확인 중 오류: {str(e)}")
         return False
 
+def get_appropriate_time_unit(start_date, end_date):
+    """데이터 기간에 따라 적절한 시간 단위와 한국어 이름 반환"""
+    date_diff = end_date - start_date
+    days_diff = date_diff.days
+    
+    if days_diff > 3650:  # 10년 이상
+        return 'Y', '연간'
+    elif days_diff > 1825:  # 5년 이상
+        return '3M', '3개월'  # 3개월 단위
+    elif days_diff > 180:  # 6개월 이상
+        return 'M', '월간'
+    elif days_diff > 30:  # 1개월 이상
+        return 'W', '주간'
+    else:
+        return 'D', '일간'
+
+def format_time_axis(ax, time_unit_code):
+    """시간 축 포맷 설정"""
+    if time_unit_code == 'Y':
+        ax.xaxis.set_major_locator(mdates.YearLocator())
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y년'))
+    elif time_unit_code == '3M':
+        ax.xaxis.set_major_locator(mdates.MonthLocator(interval=3))  # 3개월 간격
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y년 %m월'))
+    elif time_unit_code == 'M':
+        ax.xaxis.set_major_locator(mdates.MonthLocator())
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y년 %m월'))
+    elif time_unit_code == 'W':
+        ax.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=MO))  # 월요일 기준 주간
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+    else:  # 'D'
+        ax.xaxis.set_major_locator(mdates.DayLocator())
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
+    plt.gcf().autofmt_xdate()  # 날짜 겹침 방지
+
 def main():
     """대시보드 메인 함수"""
     global crawler_status
@@ -774,7 +810,7 @@ def main():
                 "네이버": ["naver"],
                 "유튜브": ["youtube"],
                 "구글": ["google"],
-                "커뮤니티": ["dcinside", "fmkorea"],
+                "커뮤니티": ["dcinside"],
                 "부안군청": ["buan"]
             }
             
@@ -796,7 +832,7 @@ def main():
             pages = st.number_input("페이지/결과 수", min_value=1, max_value=100, value=3, key="crawl_pages")
             
             # 댓글 수
-            comments = st.number_input("댓글 수 (유튜브/DC/FMKorea)", min_value=0, max_value=100, value=20, key="crawl_comments")
+            comments = st.number_input("댓글 수 (유튜브/DC)", min_value=0, max_value=100, value=20, key="crawl_comments")
             
             # 고급 옵션
             with st.expander("고급 옵션", expanded=False):
@@ -1261,7 +1297,7 @@ def main():
                 df = pd.read_csv(selected_result['csv_file'])
                 
                 # 감성 값 변환 (숫자 -> 문자열)
-                sentiment_map = {0: 'negative', 1: 'neutral', 2: 'positive'}
+                sentiment_map = {1: 'positive', 2: 'negative', 0: 'neutral'}
                 df['sentiment'] = df['sentiment'].map(sentiment_map)
                 
                 # 신뢰도 백분율로 변환
@@ -1317,7 +1353,7 @@ def main():
                 region_df = df[df['has_region_keyword']].sort_values(
                     by=['confidence_value', 'has_region_keyword'],
                     ascending=[False, False]
-                ).head(50)
+                ).head(500)
                 
                 # 감성별로 색상 지정
                 sentiment_colors = {
@@ -1614,24 +1650,42 @@ def main():
                     df_valid = df.loc[valid_dates]
                     
                     if not df_valid.empty:
-                        # 날짜로 정렬
-                        df_valid = df_valid.sort_values('date')
+                        # 날짜로 정렬하고 인덱스로 설정
+                        df_valid = df_valid.sort_values('date').set_index('date')
                         
-                        # 일별 감성 분포 계산
-                        daily_sentiment = df_valid.groupby(['date', 'sentiment']).size().unstack(fill_value=0)
+                        # 데이터 기간에 따라 적절한 시간 단위 결정
+                        start_date = df_valid.index.min()
+                        end_date = df_valid.index.max()
+                        time_unit_code, time_unit_kor = get_appropriate_time_unit(start_date, end_date)
+                        
+                        # 리샘플링하여 감성 분포 계산
+                        resampled = df_valid['sentiment'] \
+                            .groupby([pd.Grouper(freq=time_unit_code), df_valid['sentiment']]) \
+                            .size() \
+                            .unstack(fill_value=0)
                         
                         # 시각화
                         fig, ax = plt.subplots(figsize=(12, 6))
-                        daily_sentiment.plot(kind='line', ax=ax, marker='o')
+                        
+                        # 색상 설정
+                        colors = {
+                            'positive': '#2ecc71',  # 긍정: 초록색
+                            'neutral': '#95a5a6',   # 중립: 회색
+                            'negative': '#e74c3c'   # 부정: 빨간색
+                        }
+                        
+                        # 선 그래프 그리기
+                        resampled.plot(kind='line', ax=ax, marker='o', 
+                                      color=[colors.get(c, '#3498db') for c in resampled.columns])
                         
                         # 그래프 스타일 설정
-                        plt.title("일별 감성 트렌드", pad=20)
-                        plt.xlabel("날짜")
-                        plt.ylabel("항목 수")
-                        plt.grid(True, linestyle='--', alpha=0.7)
+                        plt.title(f"{time_unit_kor} 감성 트렌드", fontsize=16, pad=20)
+                        plt.xlabel("기간", fontsize=12)
+                        plt.ylabel("게시물 수", fontsize=12)
+                        plt.grid(True, linestyle='--', alpha=0.6)
                         plt.legend(title="감성", bbox_to_anchor=(1.05, 1), loc='upper left')
                         
-                        # x축 날짜 포맷 설정
+                        # x축 포맷 설정
                         plt.gcf().autofmt_xdate()
                         
                         # 여백 조정
@@ -1639,12 +1693,9 @@ def main():
                         
                         st.pyplot(fig)
                         
-                        # 날짜 범위 표시
-                        date_range = f"분석 기간: {df_valid['date'].min().strftime('%Y-%m-%d')} ~ {df_valid['date'].max().strftime('%Y-%m-%d')}"
-                        st.caption(date_range)
-                        
-                        # 처리된 날짜 수 표시
-                        st.info(f"총 {len(valid_dates)}개의 유효한 날짜 데이터가 처리되었습니다.")
+                        # 분석 기간 및 포인트 수 표시
+                        st.caption(f"분석 기간: {start_date.strftime('%Y-%m-%d')} ~ {end_date.strftime('%Y-%m-%d')}")
+                        st.info(f"총 **{len(df_valid)}**개의 유효한 날짜 데이터를 **{time_unit_kor}** 단위로 분석했습니다.")
                     else:
                         st.warning("시계열 트렌드를 표시할 수 있는 유효한 날짜 데이터가 없습니다.")
                 else:

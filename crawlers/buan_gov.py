@@ -13,6 +13,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException, StaleElementReferenceException
 from selenium.webdriver.chrome.service import Service as ChromeService
+from urllib.parse import quote
+from selenium.common.exceptions import WebDriverException
 
 from core.base_crawler import BaseCrawler
 from core.sentiment_analysis_ensemble import EnsembleSentimentAnalyzer
@@ -35,66 +37,61 @@ class BuanGovCrawler(BaseCrawler):
         self.base_url = "https://www.buan.go.kr"
         self.browser_type = browser_type
         
-        # 게시판 설정 개선 - 선택자와 대기 조건을 포함
+        # 게시판 설정 업데이트
         self.boards = [
             {
                 "name": "공지사항",
-                "url": "/board/list.buan?boardId=BBS_0000002&listPage=true",
-                "id": "BBS_0000002",
+                "url": "/index.buan?menuCd=DOM_000000103001001000",
+                "id": "DOM_000000103001001000",
+                "boardId_param": "BBS_0000052",
                 "selectors": {
-                    "list": ".bbs_list table tbody tr",
-                    "title": "td.title a, td:nth-child(2) a",
-                    "date": "td:nth-child(5), td:nth-child(4)",
-                    "author": "td:nth-child(3), td:nth-child(4)",
-                    "content": ".bbs_content, .view_contents, .content",
-                    "attachments": ".bbs_file a, .view_file a"
+                    "list": "table.bbs_list_t tbody tr",
+                    "title": "td.title a",
+                    "date": "td:nth-child(4)",
+                    "author": "td:nth-child(3)",
+                    "content": "div#board_view",
+                    "attachments": ".file_list a"
                 },
                 "wait_conditions": {
-                    "list": (By.CSS_SELECTOR, ".bbs_list table tbody tr"),
-                    "content": (By.CSS_SELECTOR, ".bbs_content, .view_contents, .content")
+                    "list": (By.CSS_SELECTOR, "table.bbs_list_t"),
+                    "content": (By.CSS_SELECTOR, "div#board_view")
                 }
             },
             {
                 "name": "보도자료",
-                "url": "/board/list.buanNews",
-                "id": "buanNews",
+                "url": "/index.buan?menuCd=DOM_000000103002001000",
+                "id": "DOM_000000103002001000",
+                "boardId_param": "BBS_0000053",
                 "selectors": {
-                    "list": ".container.sub .table_list tbody tr",
-                    "title": "td.title a, td:nth-child(2) a",
-                    "date": "td:nth-child(5), td:nth-child(4)",
-                    "author": "td:nth-child(3), td:nth-child(4)",
-                    "content": ".bbs_content, .view_contents, .content",
-                    "attachments": ".bbs_file a, .view_file a"
+                    "list": "table.bbs_list_t tbody tr",
+                    "title": "td.title a",
+                    "date": "td:nth-child(4)",
+                    "author": "td:nth-child(3)",
+                    "content": "div#board_view",
+                    "attachments": ".file_list a"
                 },
                 "wait_conditions": {
-                    "list": (By.CSS_SELECTOR, ".container.sub .table_list tbody tr"),
-                    "content": (By.CSS_SELECTOR, ".bbs_content, .view_contents, .content")
+                    "list": (By.CSS_SELECTOR, "table.bbs_list_t"),
+                    "content": (By.CSS_SELECTOR, "div#board_view")
                 }
             },
             {
-                "name": "군정소식",
-                "url": "/board/list.buan?boardId=BBS_0000004&listPage=true",
-                "id": "BBS_0000004"
-            },
-            {
                 "name": "고시공고",
-                "url": "/board/list.buan?boardId=BBS_0000005&listPage=true",
-                "id": "BBS_0000005"
-            },
-            {
-                "name": "자유게시판",
-                "url": "/board/list.buan?boardId=BBS_0000006&listPage=true",
-                "id": "BBS_0000006"
-            },
-            {
-                "name": "칭찬합니다",
-                "url": "/board/list.buan?boardId=BBS_0000007&listPage=true",
-                "id": "BBS_0000007"
-            },
-            {
-                "name": "소통광장",
-                "url": "/board/list.buan?boardId=BBS_0000008&listPage=true",
-                "id": "BBS_0000008"
+                "url": "/index.buan?menuCd=DOM_000000103001003000",
+                "id": "DOM_000000103001003000",
+                "boardId_param": "BBS_0000054",
+                "selectors": {
+                    "list": "table.bbs_list_t tbody tr",
+                    "title": "td.title a",
+                    "date": "td:nth-child(4)",
+                    "author": "td:nth-child(3)",
+                    "content": "div#board_view",
+                    "attachments": ".file_list a"
+                },
+                "wait_conditions": {
+                    "list": (By.CSS_SELECTOR, "table.bbs_list_t"),
+                    "content": (By.CSS_SELECTOR, "div#board_view")
+                }
             }
         ]
         
@@ -169,14 +166,18 @@ class BuanGovCrawler(BaseCrawler):
             return None, None
     
     def init_driver(self):
-        """웹드라이버 초기화 - Docker 환경 고려"""
+        """
+        웹드라이버 초기화 (수정)
+        - Selenium Manager가 자동으로 드라이버를 관리하도록 수정
+        - NoSuchDriverException 오류 해결
+        """
         try:
             if self.browser_type == "chrome":
+                self.logger.info("Chrome 드라이버 자동 설정을 시도합니다 (via Selenium Manager).")
+                
                 # Chrome 옵션 설정
                 chrome_options = webdriver.ChromeOptions()
-                
-                # 필수 headless 옵션
-                chrome_options.add_argument('--headless=new')  # 새로운 headless 모드
+                chrome_options.add_argument('--headless=new')
                 chrome_options.add_argument('--no-sandbox')
                 chrome_options.add_argument('--disable-dev-shm-usage')
                 chrome_options.add_argument('--disable-gpu')
@@ -184,28 +185,19 @@ class BuanGovCrawler(BaseCrawler):
                 chrome_options.add_argument('--disable-extensions')
                 chrome_options.add_argument('--disable-notifications')
                 
-                # Docker 환경 감지 및 드라이버 경로 설정
+                # Docker 환경 감지 및 추가 옵션 설정
                 if os.getenv('DOCKER_ENV'):
                     self.logger.info("Docker 환경에서 실행 중")
-                    driver_path = "/usr/bin/chromium-driver"
-                    # Docker 환경에서 필요한 추가 옵션
                     chrome_options.add_argument('--disable-software-rasterizer')
                     chrome_options.add_argument('--disable-setuid-sandbox')
                     chrome_options.binary_location = "/usr/bin/chromium"
                 else:
                     self.logger.info("로컬 환경에서 실행 중")
-                    driver_path = "chromedriver"
                 
                 try:
-                    # Chrome 서비스 설정
-                    chrome_service = ChromeService(executable_path=driver_path)
-                    self.logger.info(f"Chrome 드라이버 경로: {driver_path}")
-                    
-                    # 드라이버 초기화
-                    driver = webdriver.Chrome(
-                        service=chrome_service,
-                        options=chrome_options
-                    )
+                    # Selenium 4.6.0 이상에서는 Service 객체를 명시하지 않으면
+                    # Selenium Manager가 자동으로 드라이버를 다운로드하고 경로를 설정
+                    driver = webdriver.Chrome(options=chrome_options)
                     
                     # 타임아웃 설정
                     driver.set_page_load_timeout(30)
@@ -214,11 +206,14 @@ class BuanGovCrawler(BaseCrawler):
                     self.logger.info("Chrome 드라이버 초기화 성공")
                     return driver
                     
-                except Exception as e:
-                    self.logger.error(f"Chrome 드라이버 초기화 실패: {str(e)}")
-                    self.logger.error("상세 오류 정보:", exc_info=True)
+                except WebDriverException as e:
+                    if "net::ERR_CONNECTION_REFUSED" in str(e):
+                        self.logger.error("드라이버가 브라우저에 연결할 수 없습니다. 브라우저가 정상적으로 설치되어 있는지 확인하세요.")
+                    else:
+                        self.logger.error(f"Chrome 드라이버 초기화 실패: {str(e)}")
+                        self.logger.error("상세 오류 정보:", exc_info=True)
                     return None
-                
+                    
             elif self.browser_type == "firefox":
                 # Firefox 옵션 설정
                 firefox_options = webdriver.FirefoxOptions()
@@ -286,20 +281,20 @@ class BuanGovCrawler(BaseCrawler):
             return None
 
     def _get_post_details(self, driver, post_url, board_config):
-        """게시글 상세 정보 수집 (개선된 버전)"""
+        """게시글 상세 정보 가져오기 (수정된 버전)"""
         try:
-            # 페이지 로드
             driver.get(post_url)
-            
-            # 동적 대기 시간 적용
             time.sleep(random.uniform(self.wait_config['min_wait'], self.wait_config['max_wait']))
             
-            # 본문 내용 대기 및 추출
-            content_el = self._wait_for_element(driver, board_config['wait_conditions']['content'])
+            # 본문 대기
+            content_condition = board_config['wait_conditions']['content']
+            content_el = self._wait_for_element(driver, content_condition)
             if not content_el:
-                return None
-                
-            content = content_el.text.strip()
+                self.logger.warning("게시글 본문 요소를 찾을 수 없습니다. 선택자를 확인하세요.")
+                # 본문이 없더라도 첨부파일 등 다른 정보는 수집 시도
+                content = ""
+            else:
+                content = content_el.text.strip()
             
             # 첨부파일 처리
             attachments = []
@@ -308,107 +303,82 @@ class BuanGovCrawler(BaseCrawler):
             for attach in attach_elements:
                 try:
                     file_url = attach.get_attribute("href")
-                    if not file_url:
-                        continue
-                        
-                    # 파일명 추출
                     filename = attach.text.strip() or os.path.basename(file_url)
-                    if not filename:
-                        continue
-                        
-                    # 다운로드
-                    local_path = self._download_attachment(file_url, filename)
-                    if local_path:
-                        attachments.append({
-                            "original_name": filename,
-                            "local_path": local_path,
-                            "url": file_url
-                        })
+                    
+                    if file_url and filename:
+                        local_path = self._download_attachment(file_url, filename)
+                        if local_path:
+                            attachments.append({
+                                "original_name": filename,
+                                "local_path": local_path,
+                                "url": file_url
+                            })
+                except StaleElementReferenceException:
+                    self.logger.warning("첨부파일 요소가 stale 상태가 되었습니다. 재시도합니다.")
                 except Exception as e:
                     self.logger.error(f"첨부파일 처리 중 오류: {str(e)}")
             
-            # 작성일 재확인
-            date_el = driver.find_elements(By.CSS_SELECTOR, ".bbs_view th:contains('등록일'), .view_info span:contains('작성일')")
-            published_date = None
-            if date_el:
-                try:
-                    date_text = date_el[0].find_element(By.XPATH, "following-sibling::*").text.strip()
-                    published_date = self._format_date(date_text)
-                except:
-                    pass
-            
             return {
                 "content": content,
-                "attachments": attachments,
-                "published_date": published_date
+                "attachments": attachments
             }
             
         except Exception as e:
-            self.logger.error(f"게시글 상세 정보 추출 중 오류: {str(e)}")
+            self.logger.error(f"게시글 상세 정보 추출 중 오류: {post_url} - {str(e)}")
             return None
     
     def _search_board(self, driver, board, keyword, page=1):
-        """게시판 검색 (개선된 버전)"""
+        """게시판 검색 (수정된 버전)"""
         try:
-            # 게시판 URL 생성
-            board_url = f"{self.base_url}{board['url']}"
-            if "?" in board_url:
-                search_url = f"{board_url}&searchKeyword={keyword}&currentPage={page}"
-            else:
-                search_url = f"{board_url}?searchKeyword={keyword}&currentPage={page}"
+            # 검색 URL 구성
+            search_url = f"{self.base_url}/board/list.buan?boardId={board['boardId_param']}&menuCd={board['id']}&keyword={quote(keyword)}&startPage={page}"
             
-            self.logger.info(f"게시판 {board['name']} 검색 URL: {search_url}")
-            
-            # 페이지 로드
+            self.logger.info(f"'{board['name']}' 게시판 검색 URL: {search_url}")
             driver.get(search_url)
-            
-            # 동적 대기 적용
             time.sleep(random.uniform(self.wait_config['min_wait'], self.wait_config['max_wait']))
             
             # 게시글 목록 대기
-            list_elements = self._wait_for_element(driver, board['wait_conditions']['list'])
-            if not list_elements:
+            list_condition = board['wait_conditions']['list']
+            if not self._wait_for_element(driver, list_condition):
+                self.logger.warning(f"게시글 목록을 찾을 수 없습니다: {board['name']}")
                 return []
             
-            # 게시글 목록 추출
             posts = []
             article_elements = driver.find_elements(By.CSS_SELECTOR, board['selectors']['list'])
             
             for article in article_elements:
                 try:
-                    # 공지사항 스킵
-                    if article.find_elements(By.CSS_SELECTOR, ".noti"):
+                    # 공지사항 건너뛰기
+                    if article.find_elements(By.CSS_SELECTOR, "td.notice"):
                         continue
                     
-                    # 제목 및 링크
                     title_el = article.find_element(By.CSS_SELECTOR, board['selectors']['title'])
                     title = title_el.text.strip()
                     href = title_el.get_attribute("href")
                     
-                    # 작성일
-                    date_el = article.find_elements(By.CSS_SELECTOR, board['selectors']['date'])
-                    date_text = date_el[0].text.strip() if date_el else ""
-                    
-                    # 작성자
-                    author_el = article.find_elements(By.CSS_SELECTOR, board['selectors']['author'])
-                    author = author_el[0].text.strip() if author_el else "부안군"
+                    date_text = article.find_element(By.CSS_SELECTOR, board['selectors']['date']).text.strip()
+                    author = article.find_element(By.CSS_SELECTOR, board['selectors']['author']).text.strip()
                     
                     if title and href:
                         posts.append({
                             "title": title,
                             "url": href,
                             "published_date": date_text,
-                            "author": author,
+                            "author": author or "부안군",
                             "board": board['name']
                         })
+                        
+                except NoSuchElementException as e:
+                    self.logger.warning(f"게시글 요소를 찾을 수 없습니다: {str(e)}")
+                    continue
                 except Exception as e:
-                    self.logger.error(f"게시글 항목 파싱 중 오류: {str(e)}")
+                    self.logger.error(f"게시글 파싱 중 오류: {str(e)}")
                     continue
             
             return posts
             
         except Exception as e:
-            self.logger.error(f"게시판 검색 중 오류: {str(e)}")
+            self.logger.error(f"게시판 검색 중 오류: {board['name']} - {str(e)}")
             return []
     
     def _format_date(self, date_text):

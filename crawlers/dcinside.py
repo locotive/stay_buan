@@ -39,15 +39,15 @@ class DCInsideCrawler(BaseCrawler):
         self.respect_robots = respect_robots
         self.browser_type = browser_type
         
-        # 필터링 조건 완화
+        # 필터링 조건
         self.filter_conditions = {
-            'min_content_length': 50,         # 최소 컨텐츠 길이 더 완화
-            'max_pages': max_pages,           # 사용자가 지정한 페이지 수 사용
-            'min_confidence': 0.0,            # 감성 분석 신뢰도 제한 제거
-            'exclude_keywords': ['광고', '홍보', 'sponsored', '출처', '저작권'],  # 기본적인 스팸만 제외
-            'required_keywords': ['부안'],     # 부안 키워드는 유지
-            'date_range': None,               # 날짜 제한 제거
-            'include_notice': True            # 공지사항 포함
+            'min_content_length': 50,
+            'max_pages': max_pages,
+            'min_confidence': 0.0,
+            'exclude_keywords': ['광고', '홍보', 'sponsored', '출처', '저작권'],
+            'required_keywords': ['부안'],
+            'date_range': None,
+            'include_notice': True
         }
         
         # HTTP 헤더 설정
@@ -70,7 +70,7 @@ class DCInsideCrawler(BaseCrawler):
         else:
             raise ValueError(f"지원되지 않는 브라우저 타입: {browser_type}")
             
-        options.add_argument("--headless")  # GUI 없이 실행
+        options.add_argument("--headless")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--disable-gpu")
@@ -83,10 +83,10 @@ class DCInsideCrawler(BaseCrawler):
         # 감성 분석기 초기화 (지연 로딩)
         self.sentiment_analyzer = None
         
-        # 로깅 레벨 설정
+        # 로깅 설정
         self.logger.setLevel(logging.INFO)
         
-        # 원본 키워드 객체 저장
+        # 키워드 설정
         if isinstance(keywords, list) and all(isinstance(k, dict) for k in keywords):
             self.original_keywords = keywords
             self.keywords = [k['text'] for k in keywords]
@@ -105,24 +105,291 @@ class DCInsideCrawler(BaseCrawler):
             웹사이트 정책을 위반하면 법적 문제가 발생할 수 있으니 주의하세요.
             """)
     
-    def _get_sentiment_analyzer(self):
-        """감성 분석기 지연 로딩"""
-        if self.sentiment_analyzer is None:
-            self.sentiment_analyzer = EnsembleSentimentAnalyzer()
-        return self.sentiment_analyzer
-        
-    def analyze_text_sentiment(self, text):
-        """텍스트 감성 분석"""
-        if not self.analyze_sentiment or not text:
-            return None, None
-            
+    def _search_posts(self, keyword, page=1):
+        """검색 키워드로 게시글 검색"""
         try:
-            analyzer = self._get_sentiment_analyzer()
-            sentiment, confidence = analyzer.predict(text)
-            return sentiment, confidence
+            # 검색 URL 생성
+            encoded_keyword = quote(keyword)
+            search_url = f"{self.base_url}?q={encoded_keyword}&p={page}"
+            
+            # 요청
+            response = requests.get(
+                search_url,
+                headers=self.headers,
+                timeout=10
+            )
+            
+            # 🔍 Save HTML for debugging
+            debug_path = os.path.join("debug", f"dcinside_search_{keyword}_{page}.html")
+            os.makedirs(os.path.dirname(debug_path), exist_ok=True)
+            with open(debug_path, "w", encoding="utf-8") as f:
+                f.write(response.text)
+            self.logger.info(f"🔍 검색 HTML 저장됨: {debug_path}")
+            
+            # 응답 확인
+            if response.status_code != 200:
+                self.logger.error(f"검색 요청 실패: {response.status_code}")
+                return []
+                
+            # 파싱
+            soup = BeautifulSoup(response.text, 'html.parser')
+            
+            # 검색 결과 없음 확인
+            no_result = soup.select_one('.search_no_data')
+            if no_result:
+                self.logger.info(f"검색 결과가 없습니다: {keyword}")
+                return []
+            
+            # 게시글 목록 추출 (최신 선택자로 변경)
+            posts = []
+            post_items = soup.select('ul.sch_result_list > li')
+            
+            if not post_items:
+                self.logger.warning(f"검색 결과 파싱 실패: {keyword} (페이지 {page})")
+                return []
+            
+            self.logger.info(f"검색 결과 {len(post_items)}개 발견")
+            
+            for item in post_items:
+                try:
+                    # 제목 추출 (최신 선택자로 변경)
+                    title_el = item.select_one('a.sch_tit')
+                    if not title_el:
+                        continue
+                        
+                    title = self._clean_text(title_el.get_text())
+                    
+                    # URL 추출 (이미 절대 경로)
+                    post_url = title_el.get('href')
+                    if not post_url:
+                        continue
+                        
+                    # 작성자 추출 (최신 선택자로 변경)
+                    author_el = item.select_one('.user_nick')
+                    author = self._clean_text(author_el.get_text()) if author_el else "Unknown"
+                    
+                    # 작성일 추출 (최신 선택자로 변경)
+                    date_el = item.select_one('.date')
+                    pub_date = self._clean_text(date_el.get_text()) if date_el else None
+                    
+                    if title and post_url:
+                        posts.append({
+                            'title': title,
+                            'url': post_url,
+                            'published_date': pub_date,
+                            'author': author
+                        })
+                        self.logger.debug(f"게시글 파싱 성공: {title}")
+                except Exception as e:
+                    self.logger.error(f"게시글 항목 파싱 중 오류: {str(e)}")
+                    continue
+                    
+            return posts
+            
         except Exception as e:
-            self.logger.error(f"감성 분석 중 오류: {str(e)}")
-            return None, None
+            self.logger.error(f"검색 중 오류: {str(e)}")
+            return []
+
+    def _get_post_content(self, post_url):
+        """게시글 본문 가져오기"""
+        try:
+            response = requests.get(post_url, headers=self.headers, timeout=10)
+            if response.status_code != 200:
+                return None
+                
+            soup = BeautifulSoup(response.text, 'html.parser')
+            
+            # 제목
+            title_el = soup.select_one('.title_subject')
+            title = self._clean_text(title_el.get_text()) if title_el else ""
+            
+            # 본문
+            content_el = soup.select_one('div.write_div')
+            content = self._clean_text(content_el.get_text()) if content_el else ""
+            
+            # 작성자
+            author_el = soup.select_one('span.nickname')
+            author = self._clean_text(author_el.get_text()) if author_el else "Unknown"
+            
+            # 작성일
+            date_el = soup.select_one('span.gall_date')
+            pub_date = self._clean_text(date_el.get('title') or date_el.get_text()) if date_el else None
+            
+            # 댓글
+            comments = self._get_comments(post_url)
+            
+            return {
+                'title': title,
+                'content': content,
+                'author': author,
+                'published_date': pub_date,
+                'comments': comments,
+                'url': post_url
+            }
+            
+        except Exception as e:
+            self.logger.error(f"게시글 본문 가져오기 중 오류: {str(e)}")
+            return None
+
+    def crawl(self):
+        """디시인사이드 데이터 수집"""
+        try:
+            start_time = time.time()
+            self.logger.info(f"====== 크롤링 시작: {time.strftime('%Y-%m-%d %H:%M:%S')} ======")
+            
+            all_posts = []
+            
+            for keyword in self.keywords:
+                self.logger.info(f"\n===== 키워드 '{keyword}' 검색 시작 =====")
+                
+                for page in range(1, self.filter_conditions['max_pages'] + 1):
+                    self.logger.info(f"페이지 {page} 처리 중...")
+                    posts = self._search_posts(keyword, page)
+                    
+                    if not posts:
+                        break
+                        
+                    for post in posts:
+                        try:
+                            post_details = self._get_post_content(post['url'])
+                            if post_details:
+                                # 게시글 ID 생성
+                                doc_id = hashlib.sha256(post['url'].encode()).hexdigest()
+                                
+                                if doc_id in self.doc_ids:
+                                    continue
+                                    
+                                self.doc_ids.add(doc_id)
+                                
+                                # 감성 분석
+                                combined_text = f"{post_details['title']} {post_details['content']}"
+                                sentiment, confidence = self.analyze_text_sentiment(combined_text)
+                                
+                                post_data = {
+                                    **post_details,
+                                    'platform': 'dcinside',
+                                    'keyword': keyword,
+                                    'original_keywords': ",".join(self.keywords),
+                                    'sentiment': sentiment,
+                                    'confidence': confidence,
+                                    'doc_id': doc_id,
+                                    'crawled_at': time.strftime("%Y-%m-%d %H:%M:%S")
+                                }
+                                
+                                all_posts.append(post_data)
+                                
+                        except Exception as e:
+                            self.logger.error(f"게시글 처리 중 오류: {str(e)}")
+                            continue
+                            
+                    time.sleep(random.uniform(0.5, 1.0))
+                    
+            # 후처리 적용
+            filtered_posts = self._postprocess(all_posts, self.original_keywords)
+            
+            # 결과 저장
+            if filtered_posts:
+                keywords_str = '_'.join(self.keywords)
+                filename = f"dcinside_{len(filtered_posts)}_{keywords_str}_{time.strftime('%Y%m%d_%H%M%S')}.json"
+                filepath = os.path.join(self.save_dir, filename)
+                os.makedirs(self.save_dir, exist_ok=True)
+                
+                with open(filepath, "w", encoding="utf-8") as f:
+                    json.dump(filtered_posts, f, ensure_ascii=False, indent=2)
+                    
+                self.logger.info(f"결과 저장 완료: {filepath}")
+                
+            # 크롤링 종료 시간 기록 및 요약
+            end_time = time.time()
+            elapsed_time = end_time - start_time
+            self.logger.info(f"크롤링 종료: {time.strftime('%Y-%m-%d %H:%M:%S')}")
+            self.logger.info(f"소요 시간: {elapsed_time:.2f}초 ({elapsed_time/60:.2f}분)")
+            self.logger.info(f"수집된 총 문서: {len(filtered_posts)}개")
+            
+            return filtered_posts
+            
+        except Exception as e:
+            self.logger.error(f"크롤링 중 오류 발생: {str(e)}")
+            return []
+
+    def _get_comments(self, post_url):
+        """게시글 댓글 가져오기"""
+        comments = []
+        try:
+            # URL에서 갤러리 ID와 게시글 번호 추출
+            parsed_url = urlparse(post_url)
+            query_params = parse_qs(parsed_url.query)
+            
+            gallery_id = query_params.get('id', [''])[0]
+            post_id = query_params.get('no', [''])[0]
+            
+            if not gallery_id or not post_id:
+                return comments
+                
+            # 댓글 API URL
+            comment_url = f"{self.post_base_url}/board/comment/"
+            
+            data = {
+                'id': gallery_id,
+                'no': post_id,
+                'cmt_id': gallery_id,
+                'cmt_no': post_id,
+                'e_s_n_o': '3eabc219ebdd65f1'
+            }
+            
+            headers = self.headers.copy()
+            headers.update({
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                'Origin': self.post_base_url,
+                'Referer': post_url
+            })
+            
+            response = requests.post(comment_url, data=data, headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                try:
+                    comment_data = response.json()
+                    comment_html = comment_data.get('comments', '')
+                    comment_soup = BeautifulSoup(comment_html, 'html.parser')
+                    
+                    for i, comment_el in enumerate(comment_soup.select('li.ub-content')):
+                        if i >= self.max_comments:
+                            break
+                            
+                        try:
+                            nick_el = comment_el.select_one('span.nickname')
+                            content_el = comment_el.select_one('p.usertxt')
+                            date_el = comment_el.select_one('span.date_time')
+                            
+                            comment = {
+                                'author': self._clean_text(nick_el.get_text()) if nick_el else "Unknown",
+                                'content': self._clean_text(content_el.get_text()) if content_el else "",
+                                'date': self._clean_text(date_el.get_text()) if date_el else "",
+                                'sentiment': None,
+                                'confidence': None
+                            }
+                            
+                            if self.analyze_sentiment:
+                                sentiment, confidence = self.analyze_text_sentiment(comment['content'])
+                                comment.update({
+                                    'sentiment': sentiment,
+                                    'confidence': confidence
+                                })
+                                
+                            comments.append(comment)
+                            
+                        except Exception as e:
+                            self.logger.error(f"댓글 항목 파싱 중 오류: {str(e)}")
+                            continue
+                            
+                except json.JSONDecodeError:
+                    self.logger.error("댓글 응답이 유효한 JSON이 아닙니다.")
+                    
+        except Exception as e:
+            self.logger.error(f"댓글 가져오기 중 오류: {str(e)}")
+            
+        return comments
     
     def _clean_text(self, text):
         """HTML 태그 제거 및 텍스트 정리"""
@@ -139,23 +406,13 @@ class DCInsideCrawler(BaseCrawler):
         
         return text.strip()
     
-    def is_crawling_allowed(self):
-        """robots.txt 정책에 따라 크롤링 허용 여부 확인"""
-        if not self.respect_robots:
-            return True
-            
-        # DCinside는 User-agent: * / Disallow: / 정책을 사용하므로 크롤링이 전체 차단됨
-        self.logger.error("DCinside의 robots.txt 정책은 일반 크롤러의 접근을 전체 차단하고 있습니다.")
-        self.logger.error("크롤링을 계속하려면 respect_robots=False로 설정하세요.")
-        return False
-    
     def _postprocess(self, items, original_keywords):
         """수집된 아이템을 후처리하는 메서드"""
         processed_items = []
         filtered_count = 0
         
         for item in items:
-            # 1. 키워드 조건 확인 (완화된 조건)
+            # 1. 키워드 조건 확인
             combined_text = f"{item['title']} {item.get('content', '')}"
             
             # 필수 키워드(부안)는 반드시 포함
@@ -196,366 +453,16 @@ class DCInsideCrawler(BaseCrawler):
         
         return processed_items
         
-    def _search_posts(self, keyword, page=1):
-        """검색 키워드로 게시글 검색"""
-        try:
-            # 검색 URL 생성
-            encoded_keyword = quote(keyword)
-            search_url = f"{self.base_url}?q={encoded_keyword}&p={page}"
-            
-            # 요청
-            response = requests.get(
-                search_url,
-                headers=self.headers,
-                timeout=10
-            )
-            
-            # 응답 확인
-            if response.status_code != 200:
-                self.logger.error(f"검색 요청 실패: {response.status_code}")
-                return []
-                
-            # 파싱
-            soup = BeautifulSoup(response.text, 'html.parser')
-            
-            # 게시글 목록 추출
-            posts = []
-            post_items = soup.select('div.sch_result_list > ul > li')
-            
-            for item in post_items:
-                try:
-                    # 제목 추출
-                    title_el = item.select_one('a.tit')
-                    if not title_el:
-                        continue
-                        
-                    title = self._clean_text(title_el.get_text())
-                    
-                    # URL 추출
-                    post_url = title_el.get('href')
-                    if post_url and not post_url.startswith('http'):
-                        post_url = urljoin(self.post_base_url, post_url)
-                        
-                    # 작성일 추출
-                    date_el = item.select_one('span.date')
-                    pub_date = self._clean_text(date_el.get_text()) if date_el else None
-                    
-                    # 작성자 추출
-                    author_el = item.select_one('span.user_nick')
-                    author = self._clean_text(author_el.get_text()) if author_el else "Unknown"
-                    
-                    if title and post_url:
-                        posts.append({
-                            'title': title,
-                            'url': post_url,
-                            'published_date': pub_date,
-                            'author': author
-                        })
-                except Exception as e:
-                    self.logger.error(f"게시글 항목 파싱 중 오류: {str(e)}")
-                    
-            return posts
-            
-        except Exception as e:
-            self.logger.error(f"검색 중 오류: {str(e)}")
-            return []
-    
-    def _get_post_details(self, post_info):
-        """게시글 상세 정보 및 댓글 수집"""
-        # robots.txt 정책 확인
-        if self.respect_robots and not self.is_crawling_allowed():
-            self.logger.error("robots.txt 정책으로 인해 크롤링이 차단되었습니다.")
-            return None, []
+    def analyze_text_sentiment(self, text):
+        """텍스트 감성 분석"""
+        if not self.analyze_sentiment or not text:
+            return None, None
             
         try:
-            # 게시글 URL
-            post_url = post_info['url']
-            gallery_id = post_info['gallery_id']
-            post_id = post_info['post_id']
-            
-            # 요청
-            response = requests.get(
-                post_url,
-                headers=self.headers,
-                timeout=10
-            )
-            
-            # 응답 확인
-            if response.status_code != 200:
-                self.logger.error(f"게시글 요청 실패: {response.status_code}")
-                return None, []
-                
-            # 파싱
-            soup = BeautifulSoup(response.text, 'html.parser')
-            
-            # 본문 추출
-            content_el = soup.select_one('div.write_div')
-            content = self._clean_text(content_el.get_text()) if content_el else ""
-            
-            # 작성자 추출
-            author_el = soup.select_one('span.nickname')
-            author = self._clean_text(author_el.get_text()) if author_el else "Unknown"
-            
-            # 작성일 추출 및 형식 변환
-            date_el = soup.select_one('span.gall_date')
-            pub_date = self._clean_text(date_el.get('title') or date_el.get_text()) if date_el else None
-            
-            formatted_date = self._normalize_date(pub_date)
-            
-            # 댓글 가져오기 (AJAX 요청)
-            comments = self._get_comments(gallery_id, post_id)
-            
-            # 게시글 정보 반환
-            post_details = {
-                'content': content,
-                'author': author,
-                'published_date': formatted_date
-            }
-            
-            return post_details, comments
-            
+            if self.sentiment_analyzer is None:
+                self.sentiment_analyzer = EnsembleSentimentAnalyzer()
+            sentiment, confidence = self.sentiment_analyzer.predict(text)
+            return sentiment, confidence
         except Exception as e:
-            self.logger.error(f"게시글 상세 정보 가져오기 중 오류: {str(e)}")
-            return None, []
-    
-    def _get_comments(self, gallery_id, post_id):
-        """게시글 댓글 가져오기 (AJAX 요청)"""
-        # robots.txt 정책 확인
-        if self.respect_robots and not self.is_crawling_allowed():
-            self.logger.error("robots.txt 정책으로 인해 크롤링이 차단되었습니다.")
-            return []
-            
-        comments = []
-        
-        try:
-            # 댓글 API URL
-            comment_url = f"https://gall.dcinside.com/board/comment/"
-            
-            # 댓글 요청 파라미터
-            data = {
-                'id': gallery_id,
-                'no': post_id,
-                'cmt_id': gallery_id,
-                'cmt_no': post_id,
-                'e_s_n_o': '3eabc219ebdd65f1'  # 이 값은 임의로 설정 (실제로는 페이지에서 동적 생성)
-            }
-            
-            # 헤더 추가
-            headers = self.headers.copy()
-            headers['X-Requested-With'] = 'XMLHttpRequest'
-            headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8'
-            headers['Origin'] = 'https://gall.dcinside.com'
-            headers['Referer'] = f'https://gall.dcinside.com/board/view/?id={gallery_id}&no={post_id}'
-            
-            # 요청
-            response = requests.post(
-                comment_url,
-                data=data,
-                headers=headers,
-                timeout=10
-            )
-            
-            # 응답 확인
-            if response.status_code != 200:
-                self.logger.error(f"댓글 요청 실패: {response.status_code}")
-                return comments
-            
-            try:
-                # JSON 파싱
-                comment_data = response.json()
-                
-                # HTML 파싱
-                comment_html = comment_data.get('comments', '')
-                comment_soup = BeautifulSoup(comment_html, 'html.parser')
-                
-                # 댓글 아이템 추출
-                comment_items = comment_soup.select('li.ub-content')
-                
-                for i, comment_el in enumerate(comment_items):
-                    if i >= self.max_comments:
-                        break
-                        
-                    try:
-                        # 작성자
-                        nick_el = comment_el.select_one('span.nickname')
-                        nickname = self._clean_text(nick_el.get_text()) if nick_el else "Unknown"
-                        
-                        # 내용
-                        content_el = comment_el.select_one('p.usertxt')
-                        content = self._clean_text(content_el.get_text()) if content_el else ""
-                        
-                        # 작성일
-                        date_el = comment_el.select_one('span.date_time')
-                        date = self._clean_text(date_el.get_text()) if date_el else ""
-                        
-                        # 댓글 감성 분석
-                        sentiment, confidence = self.analyze_text_sentiment(content)
-                        
-                        comments.append({
-                            'author': nickname,
-                            'content': content,
-                            'date': date,
-                            'sentiment': sentiment,
-                            'confidence': confidence
-                        })
-                    except Exception as e:
-                        self.logger.error(f"댓글 항목 파싱 중 오류: {str(e)}")
-                
-            except json.JSONDecodeError:
-                self.logger.error("댓글 응답이 유효한 JSON이 아닙니다.")
-                
-                # HTML로 직접 파싱 시도
-                comment_soup = BeautifulSoup(response.text, 'html.parser')
-                comment_items = comment_soup.select('li.ub-content')
-                
-                for i, comment_el in enumerate(comment_items):
-                    if i >= self.max_comments:
-                        break
-                        
-                    try:
-                        # 작성자
-                        nick_el = comment_el.select_one('span.nickname')
-                        nickname = self._clean_text(nick_el.get_text()) if nick_el else "Unknown"
-                        
-                        # 내용
-                        content_el = comment_el.select_one('p.usertxt')
-                        content = self._clean_text(content_el.get_text()) if content_el else ""
-                        
-                        # 작성일
-                        date_el = comment_el.select_one('span.date_time')
-                        date = self._clean_text(date_el.get_text()) if date_el else ""
-                        
-                        # 댓글 감성 분석
-                        sentiment, confidence = self.analyze_text_sentiment(content)
-                        
-                        comments.append({
-                            'author': nickname,
-                            'content': content,
-                            'date': date,
-                            'sentiment': sentiment,
-                            'confidence': confidence
-                        })
-                    except Exception as e:
-                        self.logger.error(f"댓글 항목 파싱 중 오류: {str(e)}")
-            
-        except Exception as e:
-            self.logger.error(f"댓글 가져오기 중 오류: {str(e)}")
-        
-        return comments
-    
-    def init_driver(self):
-        """웹드라이버 초기화"""
-        try:
-            if self.browser_type == "chrome":
-                driver = webdriver.Chrome(options=self.options)
-            elif self.browser_type == "firefox":
-                driver = webdriver.Firefox(options=self.options)
-            else:
-                raise ValueError(f"지원되지 않는 브라우저 타입: {self.browser_type}")
-            
-            driver.set_page_load_timeout(30)
-            return driver
-        except Exception as e:
-            self.logger.error(f"드라이버 초기화 실패: {str(e)}")
-            return None
-    
-    def crawl(self):
-        """디시인사이드 데이터 수집"""
-        try:
-            # 크롤링 시작 시간 기록
-            start_time = time.time()
-            self.logger.info(f"====== 크롤링 시작: {time.strftime('%Y-%m-%d %H:%M:%S')} ======")
-            
-            # 검색 결과 수집
-            all_posts = []
-            for keyword in self.keywords:
-                self.logger.info(f"\n===== 키워드 '{keyword}' 검색 시작 =====")
-                
-                for page in range(1, self.filter_conditions['max_pages'] + 1):
-                    self.logger.info(f"페이지 {page} 처리 중...")
-                    posts = self._search_posts(keyword, page)
-                    
-                    if not posts:
-                        break
-                        
-                    all_posts.extend(posts)
-                    time.sleep(random.uniform(0.5, 1.0))
-                    
-            # 게시글별 상세 정보 가져오기
-            processed_posts = []
-            for i, post in enumerate(all_posts):
-                try:
-                    self.logger.info(f"게시글 {i+1}/{len(all_posts)}: '{post['title'][:20]}...' 처리 중")
-                    
-                    # 상세 정보 및 댓글 가져오기
-                    post_details, comments = self._get_post_details(post)
-                    
-                    if not post_details:
-                        self.logger.warning(f"게시글 상세 정보를 가져올 수 없습니다: {post['url']}")
-                        continue
-                        
-                    # 게시글과 댓글 통합
-                    post.update(post_details)
-                    post['comments'] = comments
-                    
-                    # 게시글 ID 생성
-                    doc_id = hashlib.sha256(f"dcinside_{post['post_id']}".encode()).hexdigest()
-                    
-                    # 중복 확인
-                    if doc_id in self.doc_ids:
-                        self.logger.debug(f"중복 게시글 건너뛰기: {post['title'][:20]}...")
-                        continue
-                    self.doc_ids.add(doc_id)
-                    
-                    # 게시글 + 댓글 통합 텍스트에 대한 감성 분석
-                    combined_text = f"{post['title']} {post['content']}"
-                    sentiment, confidence = self.analyze_text_sentiment(combined_text)
-                    
-                    # 결과 저장
-                    post_data = {
-                        'title': post['title'],
-                        'content': post['content'],
-                        'url': post['url'],
-                        'author': post['author'],
-                        'published_date': post['published_date'],
-                        'platform': 'dcinside',
-                        'keyword': keyword,
-                        'original_keywords': ",".join(self.keywords),
-                        'sentiment': sentiment,
-                        'confidence': confidence,
-                        'comments': comments,
-                        'doc_id': doc_id,
-                        'crawled_at': time.strftime("%Y-%m-%d %H:%M:%S")
-                    }
-                    
-                    processed_posts.append(post_data)
-                    
-                except Exception as e:
-                    self.logger.error(f"게시글 처리 중 오류: {str(e)}")
-                    continue
-                    
-            # 후처리 적용
-            filtered_posts = self._postprocess(processed_posts, self.original_keywords)
-            
-            # 결과 저장
-            if filtered_posts:
-                keywords_str = '_'.join(self.keywords)
-                filename = f"dcinside_{len(filtered_posts)}_{keywords_str}_{time.strftime('%Y%m%d_%H%M%S')}.json"
-                filepath = os.path.join(self.save_dir, filename)
-                os.makedirs(self.save_dir, exist_ok=True)
-                with open(filepath, "w", encoding="utf-8") as f:
-                    json.dump(filtered_posts, f, ensure_ascii=False, indent=2)
-                self.logger.info(f"Saved results to {filepath}")
-                
-            # 크롤링 종료 시간 기록 및 요약
-            end_time = time.time()
-            elapsed_time = end_time - start_time
-            self.logger.info(f"크롤링 종료: {time.strftime('%Y-%m-%d %H:%M:%S')}")
-            self.logger.info(f"소요 시간: {elapsed_time:.2f}초 ({elapsed_time/60:.2f}분)")
-            self.logger.info(f"수집된 총 문서: {len(filtered_posts)}개")
-            
-            return filtered_posts
-            
-        except Exception as e:
-            self.logger.error(f"크롤링 중 오류 발생: {str(e)}")
-            return [] 
+            self.logger.error(f"감성 분석 중 오류: {str(e)}")
+            return None, None 
