@@ -724,8 +724,8 @@ def main():
     st.title("부안군 감성 분석 대시보드")
     
     # 서버 시간 표시 (우측 상단)
-    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    st.sidebar.markdown(f"<div style='text-align: right; font-size: 0.8em; color: gray;'>서버 시간: {current_time}</div>", unsafe_allow_html=True)
+    #current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    #st.sidebar.markdown(f"<div style='text-align: right; font-size: 0.8em; color: gray;'>서버 시간: {current_time}</div>", unsafe_allow_html=True)
     
     # 세션 상태 초기화
     if 'analysis_data' not in st.session_state:
@@ -1319,7 +1319,7 @@ def main():
                 with st.expander("📋 분석 정보", expanded=True):
                     col1, col2 = st.columns(2)
                     with col1:
-                        st.markdown(f"**분석 시간:** {selected_result['analysis_time']}")
+                        #st.markdown(f"**분석 시간:** {selected_result['analysis_time']}")
                         st.markdown(f"**사용 모델:** {', '.join(selected_result['models'])}")
                         st.markdown(f"**분석 파일:** {os.path.basename(selected_result['input_file'])}")
                     with col2:
@@ -1736,7 +1736,7 @@ def main():
         # GPT 리포트 생성
                 st.markdown("### 📝 정책 제안 리포트")
                 if st.session_state.analysis_data is not None and len(st.session_state.analysis_data) > 0:
-                    df = pd.DataFrame(st.session_state.analysis_data)
+                    df = st.session_state.analysis_data
                     
                     # API 키 입력 필드 추가
                     api_key = st.text_input(
@@ -1746,33 +1746,34 @@ def main():
                         help="OpenAI API 키를 입력하세요. API 키는 https://platform.openai.com/api-keys 에서 발급받을 수 있습니다."
                     )
                     
-                    if not api_key:
-                        st.warning("OpenAI API 키를 입력해주세요.")
-                    else:
+                    if api_key:
                         try:
-                            report_generator = GPTReportGenerator(api_key=api_key)
-                            report = report_generator.generate_report(df)
-                            # Truncate if report exceeds Streamlit markdown rendering limits (optional)
-                            # Streamlit markdown limit is ~1,000,000 characters, but we can truncate earlier if desired
-                            max_chars = 65000
-                            if len(report) > max_chars:
-                                report = report[:max_chars] + "\n\n(이 리포트는 Streamlit 표시 한도 때문에 잘렸습니다.)"
-                            st.markdown(report)
-                            
-                            # PDF 리포트 저장
-                            pdf_generator = PDFReportGenerator()
-                            pdf_path = pdf_generator.generate_pdf(report)
-                            if pdf_path:
+                            with st.spinner("리포트 생성 중..."):
+                                # 리포트 생성
+                                report_generator = GPTReportGenerator(api_key=api_key)
+                                report = report_generator.generate_report(df)
+                                
+                                # 5,000자 단위로 잘라서 출력 (Streamlit 마크다운 한계 회피)
+                                for i in range(0, len(report), 5000):
+                                    st.markdown(report[i:i+5000])
+                                
+                                # PDF 리포트 저장
+                                pdf_generator = PDFReportGenerator(filename=f"report_{datetime.now():%Y%m%d_%H%M%S}.pdf")
+                                pdf_path = pdf_generator.generate_pdf(report)
+                                
+                                # PDF 다운로드 버튼
                                 with open(pdf_path, "rb") as f:
                                     st.download_button(
                                         "📄 PDF 리포트 다운로드",
                                         f,
-                                        file_name=f"report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
-                                        mime='application/pdf'
+                                        file_name=os.path.basename(pdf_path),
+                                        mime="application/pdf"
                                     )
                         except Exception as e:
                             st.error(f"리포트 생성 중 오류 발생: {str(e)}")
                             logger.error(f"리포트 생성 중 오류 발생: {str(e)}", exc_info=True)
+                    else:
+                        st.info("리포트 생성을 위해 OpenAI API 키를 입력해주세요.")
                 else:
                     st.info("분석할 데이터가 없습니다.")
 

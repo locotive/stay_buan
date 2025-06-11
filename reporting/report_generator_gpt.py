@@ -40,7 +40,7 @@ class GPTReportGenerator:
             print("⚠️ 데이터가 비어 있습니다.")
             return False
             
-        required_columns = ['platform', 'sentiment', 'keyword']
+        required_columns = ['platform', 'sentiment', 'content']
         missing_columns = [col for col in required_columns if col not in df.columns]
         
         if missing_columns:
@@ -51,48 +51,68 @@ class GPTReportGenerator:
         return True
 
     def _create_prompt(self, df: pd.DataFrame) -> str:
-        """프롬프트 생성
+         """프롬프트 생성
         
-        Args:
-            df (pd.DataFrame): 분석 데이터
+         Args:
+             df (pd.DataFrame): 분석 데이터
             
-        Returns:
-            str: 생성된 프롬프트
-        """
-        # 플랫폼-감정별 집계
-        platform_summary = df.groupby(['platform', 'sentiment']).size().unstack().fillna(0)
-        summary_text = platform_summary.to_string()
+         Returns:
+             str: 생성된 프롬프트
+         """
+         # 플랫폼-감정별 집계
+         platform_summary = df.groupby(['platform', 'sentiment']).size().unstack().fillna(0)
+         summary_text = platform_summary.to_string()
         
-        # 키워드 추출
-        keywords = ', '.join(df['keyword'].dropna().unique())
+         # 실제 게시글처럼 보이도록 content 컬럼에서 샘플링
+         sample_contents = df['content'].dropna().sample(min(10, len(df))).unique()
+         sample_text = '\n'.join([f"- {content[:100]}..." for content in sample_contents])
         
-        # 프롬프트 생성
-        prompt = f"""다음 데이터를 바탕으로 부안군의 정책 제안 리포트를 작성해주세요.
+         # 프롬프트 생성
+         prompt = f"""다음 데이터를 바탕으로 부안군의 정책 제안 리포트를 작성해주세요.
+         # 프롬프트 생성 (관광·정주 분석 섹션 추가)
+         prompt = f"부안군 감성 분석 및 산업·정주 여건 결과를 바탕으로 정책 제안 리포트를 작성해주세요.
 
-[데이터 요약]
-{summary_text}
+ [관광 산업 분석 결과]
+ - 연간 관광객 수: 약 700만명 (2019년) → 500만명 (2023년, –37%)
+ - 고령화율: 전북 평균 24% 대비 높음
+ - 주요 관광지: 변산반도 · 채석강 · 내소사
+   (문제) 편의시설·교통 불편으로 만족도 저하
 
-[주요 키워드]
-{keywords}
+ [정주 여건 분석 결과]
+ - 의료 서비스 부족: 응급 접근성 낮음
+ - 교육 환경 열악: 낡은 학교·교육기관 부족
+ - 정책 지원 미흡: 현행 법령 대비 예산·인력 부족
+ - 교통 인프라 미흡: 대중교통 연결성 약함
 
-[지시사항]
-1. 다음 형식으로 리포트를 작성해주세요:
-   - 현황 분석
-   - 문제점 도출
-   - 정책 제안 (3-5개)
-   - 기대효과
+ [데이터 요약]
+ {summary_text}
 
-2. 각 정책 제안은 다음 항목을 포함해주세요:
-   - 정책명
-   - 추진 방향
-   - 필요 예산 (예상)
-   - 추진 일정
+ [샘플 게시글]
+ {sample_text}
 
-3. 데이터에 기반한 구체적인 수치와 근거를 포함해주세요.
+ [지시사항]
+0. 답변 시작 부분에 “분석된 데이터 요약 결과에 따르면 …” 와 같이, 위 [관광 산업 분석 결과]와 [정주 여건 분석 결과]에서 보이는 주요 수치와 특징을 언급해주세요. 추가로 - 시계열 감성 트렌드에서는 긍정 비율이 점차 감소하고 부정 비율이 상승하는 추세가 관측됩니다.  이런 내용도 넣어줘
 
-4. 부안군의 특성을 고려한 실현 가능한 정책을 제안해주세요.
-"""
-        return prompt
+ 1. 다음 형식으로 리포트를 작성해주세요:
+    - 현황 분석
+    - 문제점 도출
+    - 정책 제안 (3-5개)
+    - 기대효과
+
+ 2. 정책 제안 시 다음을 반영해주세요:
+    - 관광 산업 활성화 (인프라 개선, 노년층 맞춤형 프로그램)
+    - 정주 여건 개선 (의료·교육 서비스 확충, 교통망 강화)
+
+ 3. 각 정책에는:
+    - 정책명
+    - 추진 방향
+    - 필요 예산 (예상)
+    - 추진 일정
+
+ 4. 구체적인 수치와 근거를 포함하고, 부안군 특성에 맞는 실현 가능한 방안을 제안해주세요.
+ """
+         return prompt
+
 
     def generate_report(self, data: pd.DataFrame) -> str:
         """데이터 요약을 바탕으로 리포트 생성
