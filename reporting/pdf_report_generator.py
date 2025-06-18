@@ -46,32 +46,54 @@ class PDFReportGenerator:
         c = canvas.Canvas(self.filename, pagesize=letter)
         width, height = letter
         
-        # 제목
+        # 페이지 여백 설정
+        margin = 80
+        line_height = 14
+        current_y = height - margin
+        
+        def add_page():
+            nonlocal current_y
+            c.showPage()
+            current_y = height - margin
+            # 새 페이지에 제목 추가
+            c.setFont(self.font_name, 16)
+            c.drawString(margin, height - margin, "부안군 정책 제안 리포트 (계속)")
+            current_y -= 40
+        
+        # 첫 페이지 제목
         c.setFont(self.font_name, 16)
-        c.drawString(80, height - 80, "부안군 정책 제안 리포트")
+        c.drawString(margin, current_y, "부안군 정책 제안 리포트")
+        current_y -= 40
         
         # 구분선
         c.setStrokeColorRGB(0.8, 0.8, 0.8)
-        c.line(80, height - 100, width - 80, height - 100)
+        c.line(margin, current_y, width - margin, current_y)
+        current_y -= 20
         
         # 본문
-        text_object = c.beginText(80, height - 120)
-        text_object.setFont(self.font_name, 12)
+        c.setFont(self.font_name, 12)
         
         # 텍스트 줄바꿈 처리
         lines = report_text.split('\n')
         for line in lines:
             # 긴 줄은 자동 줄바꿈
             while len(line) > 0:
-                if len(line) <= 80:  # 한 줄 최대 길이
-                    text_object.textLine(line)
+                if current_y < margin + line_height:  # 페이지 끝 체크
+                    add_page()
+                
+                if len(line) <= 50:  # 한 줄 최대 길이
+                    c.drawString(margin, current_y, line)
+                    current_y -= line_height
                     break
                 else:
-                    text_object.textLine(line[:80])
+                    c.drawString(margin, current_y, line[:50])
+                    current_y -= line_height
                     line = line[80:]
-            text_object.textLine("")  # 단락 구분을 위한 빈 줄
+            
+            # 단락 구분을 위한 빈 줄
+            if current_y < margin + line_height:
+                add_page()
+            current_y -= line_height
         
-        c.drawText(text_object)
         c.save()
-        
-        return self.filename  # 생성된 PDF 파일 경로 반환 
+        return self.filename 

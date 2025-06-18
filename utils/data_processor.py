@@ -913,12 +913,36 @@ class DataProcessor:
             csv_path = os.path.join(output_dir, f"{base_filename}.csv")
             df.to_csv(csv_path, index=False, encoding='utf-8')
             
-            # 감성 분포 계산
+            # --- 여기부터 sentiment_distribution 계산 로직 수정 ---
             sentiment_distribution = {
-                'negative': f"{len(df[df['sentiment'] == 'negative']) / len(df) * 100:.1f}%",
-                'neutral': f"{len(df[df['sentiment'] == 'neutral']) / len(df) * 100:.1f}%",
-                'positive': f"{len(df[df['sentiment'] == 'positive']) / len(df) * 100:.1f}%"
+                'negative': "0.0%",
+                'neutral': "0.0%",
+                'positive': "0.0%"
             }
+            
+            if 'sentiment' in df.columns and not df.empty:
+                # 'sentiment' 컬럼이 숫자형(0, 1, 2)이므로, self.sentiment_map을 사용하여 문자열 레이블로 변환 후 통계 계산
+                # df['sentiment_label']이 analyze_dataset에서 이미 생성되었으므로, 해당 컬럼을 활용하는 것이 더 안정적입니다.
+                # 그러나 save_analysis_results 함수만 단독으로 호출될 경우를 대비하여 방어 로직을 추가합니다.
+                
+                # 먼저 sentiment_label 컬럼이 있는지 확인 (analyze_dataset -> process_data에서 생성됨)
+                if 'sentiment_label' in df.columns:
+                    temp_sentiment_series = df['sentiment_label']
+                else:
+                    # sentiment_label이 없는 경우, 숫자 sentiment를 맵핑하여 사용
+                    # 이 경우는 analyze_dataset의 전체 파이프라인을 거치지 않은 경우이므로 경고를 로깅합니다.
+                    logger.warning("df에 'sentiment_label' 컬럼이 없어 숫자 'sentiment' 컬럼을 매핑하여 감성 분포를 계산합니다. 전체 process_data 파이프라인을 통해 df를 생성하는 것이 좋습니다.")
+                    temp_sentiment_series = df['sentiment'].map(self.sentiment_map)
+                    
+                total_items = len(temp_sentiment_series)
+                if total_items > 0:
+                    sentiment_counts_by_label = temp_sentiment_series.value_counts(normalize=True) * 100
+                    
+                    sentiment_distribution['negative'] = f"{sentiment_counts_by_label.get('negative', 0.0):.1f}%"
+                    sentiment_distribution['neutral'] = f"{sentiment_counts_by_label.get('neutral', 0.0):.1f}%"
+                    sentiment_distribution['positive'] = f"{sentiment_counts_by_label.get('positive', 0.0):.1f}%"
+            # --- sentiment_distribution 계산 로직 수정 완료 ---
+            
             
             # JSON 메타데이터 생성
             metadata = {

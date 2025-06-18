@@ -153,6 +153,7 @@ data/
 logs/
 *.log
 crawler.log
+dcinside*
 
 # 환경 설정
 .env
@@ -169,3 +170,4 @@ ENV/
 # OS
 .DS_Store
 Thumbs.db
+

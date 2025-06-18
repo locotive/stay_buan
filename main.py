@@ -311,8 +311,8 @@ def main():
 
     # 각 그룹별 독립적인 스레드 풀 생성
     with concurrent.futures.ThreadPoolExecutor(max_workers=platform_workers['api_based']) as api_executor, \
-         concurrent.futures.ThreadPoolExecutor(max_workers=platform_workers['selenium']) as selenium_executor, \
-         concurrent.futures.ThreadPoolExecutor(max_workers=platform_workers['google']) as google_executor:
+        concurrent.futures.ThreadPoolExecutor(max_workers=platform_workers['selenium']) as selenium_executor, \
+        concurrent.futures.ThreadPoolExecutor(max_workers=platform_workers['google']) as google_executor:
         
         # API 기반 플랫폼
         api_futures = [api_executor.submit(crawl_platform, p, keywords, args.max_pages, args.max_comments, args.no_sentiment, args.browser, args.max_daily_queries) for p in api_platforms if p in platforms]

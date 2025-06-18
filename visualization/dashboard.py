@@ -692,6 +692,19 @@ def format_time_axis(ax, time_unit_code):
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
     plt.gcf().autofmt_xdate()  # 날짜 겹침 방지
 
+def stop_crawler_process():
+    """실행 중인 크롤링 프로세스를 중지"""
+    try:
+        # Windows에서 실행 중인 Python 프로세스 찾기
+        if os.name == 'nt':  # Windows
+            subprocess.run(['taskkill', '/F', '/IM', 'python.exe'], capture_output=True)
+        else:  # Linux/Mac
+            subprocess.run(['pkill', '-f', 'python'], capture_output=True)
+        return True
+    except Exception as e:
+        logger.error(f"크롤링 프로세스 중지 중 오류: {str(e)}")
+        return False
+
 def main():
     """대시보드 메인 함수"""
     global crawler_status
@@ -936,14 +949,16 @@ def main():
                         st.rerun()
             else:
                 if st.button("⏹️ 크롤링 중지", use_container_width=True, type="secondary", key="stop_crawl_btn"):
-                    # 실제로 스레드를 중지할 수 없지만 UI에서는 크롤링이 중지된 것처럼 표시
-                    crawler_status['is_running'] = False
-                    crawler_status['message'] = "크롤링이 중지되었습니다."
-                    crawler_status['progress'] = 1.0
-                    crawler_status['update_timestamp'] = time.time()
-                    save_crawler_status(crawler_status)  # 상태 파일 업데이트
-                    logger.info("크롤링 중지 요청")
-                    st.warning("크롤링 스레드를 강제로 중단할 수 없습니다. 완료될 때까지 기다려주세요.")
+                    if stop_crawler_process():
+                        crawler_status['is_running'] = False
+                        crawler_status['message'] = "크롤링이 중지되었습니다."
+                        crawler_status['progress'] = 1.0
+                        crawler_status['update_timestamp'] = time.time()
+                        save_crawler_status(crawler_status)
+                        logger.info("크롤링 프로세스가 중지되었습니다.")
+                        st.success("크롤링이 중지되었습니다.")
+                    else:
+                        st.error("크롤링 프로세스 중지에 실패했습니다.")
                     st.rerun()
         
         elif dashboard_mode == "데이터 분석":
